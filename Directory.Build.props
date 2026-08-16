@@ -1,6 +1,10 @@
 <Project>
 
   <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Company>SZEINER s.r.o.</Company>
+    <Product>BetterTranslator</Product>
+    <Copyright>Copyright (c) 2026 SZEINER s.r.o.</Copyright>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
