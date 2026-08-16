@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- The native inference DLL is built out of tree, in a separate llama.cpp
+       fork, and is not checked in here. Point at it with
+       -p:BetterRuntimeDir=<path> to have the build copy it in. -->
+
+  <ItemGroup Condition="'$(BetterRuntimeDir)' != ''">
+    <!-- Carried as content rather than by a post-build Exec so it flows to every
+         project referencing this one: the app and the test host each need it
+         beside their own binary, and a copy step would have to be repeated in
+         both. Guarded by Exists so a machine without the fork still builds. -->
+    <None Include="$(BetterRuntimeDir)\BetterRuntimeCPU.dll" Condition="Exists('$(BetterRuntimeDir)\BetterRuntimeCPU.dll')" Link="BetterRuntimeCPU.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The smoke test drives br_gen_next and br_shutdown directly to prove the
+         raw ABI contracts, which the managed wrapper deliberately hides. -->
+    <InternalsVisibleTo Include="BetterTranslator.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BetterTranslator.Core\BetterTranslator.Core.csproj" />
+
+    <!-- The readers and the retrieval index, so a translation asked for by an
+         agent is grounded in the same project as one asked for in the window.
+         Acyclic: Indexing references Core and Engine and nothing else. -->
+    <ProjectReference Include="..\BetterTranslator.Indexing\BetterTranslator.Indexing.csproj" />
+    <ProjectReference Include="..\BetterTranslator.Engine\BetterTranslator.Engine.csproj" />
+  </ItemGroup>
+
+</Project>

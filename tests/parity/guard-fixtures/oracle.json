@@ -1,0 +1,3247 @@
+{
+    "generatedBy":  "tests\\parity\\guard-fixtures\\oracle.ps1",
+    "reference":  "ai-translation\\scripts\\test-guard.ps1",
+    "calls":  [
+                  {
+                      "fn":  "Protect-MarkupSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "# Title\n\nRun the tool with `--no-serve` to skip serving.\n\n```bash\nrun.bat --model 2 --no-console\necho \"do not translate me\"\n```\n\n| Flag | Meaning |\n|---|---|\n| `--stop` | stop the server |\n\nSee https://lmstudio.ai/docs for detail. Path: H:\\Software Development\\x."
+                                   }
+                               ],
+                      "result":  "# Title\n\nRun the tool with `--no-serve` to skip serving.\n\n[[0]]\n\n| Flag | Meaning |\n|---|---|\n| `--stop` | stop the server |\n\nSee [[1]] for detail. Path: [[2]] Development\\x.||"
+                  },
+                  {
+                      "fn":  "Restore-Markup",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "# Title\n\nRun the tool with `--no-serve` to skip serving.\n\n[[0]]\n\n| Flag | Meaning |\n|---|---|\n| `--stop` | stop the server |\n\nSee [[1]] for detail. Path: [[2]] Development\\x."
+                                   },
+                                   {
+                                       "name":  "Store",
+                                       "value":  [
+                                                     "```bash\nrun.bat --model 2 --no-console\necho \"do not translate me\"\n```",
+                                                     "https://lmstudio.ai/docs",
+                                                     "H:\\Software"
+                                                 ]
+                                   }
+                               ],
+                      "result":  "# Title\n\nRun the tool with `--no-serve` to skip serving.\n\n```bash\nrun.bat --model 2 --no-console\necho \"do not translate me\"\n```\n\n| Flag | Meaning |\n|---|---|\n| `--stop` | stop the server |\n\nSee https://lmstudio.ai/docs for detail. Path: H:\\Software Development\\x."
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  [
+                                     "0",
+                                     "1"
+                                 ]
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Uvodni text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  [
+                                     "0",
+                                     "1"
+                                 ]
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  "{name}"
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Uvodni text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  "{name}"
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Uvodni text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  [
+                                     "0",
+                                     "1"
+                                 ]
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Intro text [[0]] and more  plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  "0"
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Intro text [[0]] and more  plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  "protected block count changed: expected 2, got 1 (missing 1)"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  [
+                                     "0",
+                                     "1"
+                                 ]
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {jmeno} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  [
+                                     "0",
+                                     "1"
+                                 ]
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  "{name}"
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {jmeno} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  "{jmeno}"
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {jmeno} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  "placeholder altered: expected \u0027{name}\u0027, got \u0027{jmeno}\u0027"
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "   "
+                                   }
+                               ],
+                      "result":  "empty answer"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  [
+                                     "0",
+                                     "1"
+                                 ]
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  [
+                                     "0",
+                                     "1"
+                                 ]
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  "{name}"
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  "{name}"
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Intro text [[0]] and more [[1]] plus a placeholder {name} here, with enough length to pass the ratio check comfortably because the gate ignores very short strings entirely."
+                                   }
+                               ],
+                      "result":  "source returned unchanged"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. "
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Kratky."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. "
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Kratky."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. Sentence number 1. "
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Kratky."
+                                   }
+                               ],
+                      "result":  "answer collapsed to 1% of the source length, content was probably dropped"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Run the tool using --no-serve to skip serving, and this sentence is long enough for the ratio gate to stay quiet."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Run the tool using --ne-servirovat to skip serving, and this sentence is long enough for the ratio gate to stay quiet."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Run the tool using --no-serve to skip serving, and this sentence is long enough for the ratio gate to stay quiet."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Run the tool using --ne-servirovat to skip serving, and this sentence is long enough for the ratio gate to stay quiet."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Run the tool using --no-serve to skip serving, and this sentence is long enough for the ratio gate to stay quiet."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Run the tool using --ne-servirovat to skip serving, and this sentence is long enough for the ratio gate to stay quiet."
+                                   }
+                               ],
+                      "result":  "command option altered: \u0027--no-serve\u0027 became \u0027--ne-servirovat\u0027"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Run the tool using --no-serve to skip serving, and this sentence is long enough for the ratio gate to stay quiet."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Run the tool using bez obsluhy to skip serving, and this sentence is long enough for the ratio gate to stay quiet."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Run the tool using --no-serve to skip serving, and this sentence is long enough for the ratio gate to stay quiet."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Run the tool using bez obsluhy to skip serving, and this sentence is long enough for the ratio gate to stay quiet."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Run the tool using --no-serve to skip serving, and this sentence is long enough for the ratio gate to stay quiet."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Run the tool using bez obsluhy to skip serving, and this sentence is long enough for the ratio gate to stay quiet."
+                                   }
+                               ],
+                      "result":  "command option count changed: 1 in source, 0 in output"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Use the ` `lms` ` command here, and this sentence is long enough that the length ratio gate will not fire on it."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Use the  lms  command here, and this sentence is long enough that the length ratio gate will not fire on it."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Use the ` `lms` ` command here, and this sentence is long enough that the length ratio gate will not fire on it."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Use the  lms  command here, and this sentence is long enough that the length ratio gate will not fire on it."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Use the ` `lms` ` command here, and this sentence is long enough that the length ratio gate will not fire on it."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Use the  lms  command here, and this sentence is long enough that the length ratio gate will not fire on it."
+                                   }
+                               ],
+                      "result":  "backtick count changed: 4 in source, 0 in output"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "BetterGuard protects the site and this sentence is long enough to matter for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "LepsiOchrana chrani web a tato veta je dost dlouha."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "BetterGuard protects the site and this sentence is long enough to matter for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "LepsiOchrana chrani web a tato veta je dost dlouha."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "BetterGuard protects the site and this sentence is long enough to matter for the ratio gate."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "LepsiOchrana chrani web a tato veta je dost dlouha."
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  "BetterGuard"
+                                   }
+                               ],
+                      "result":  "do-not-translate term lost: \u0027BetterGuard\u0027 (1 -\u003e 0)"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A future llmster release could change either of these, and this sentence is long enough for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A future LLMsteru release could change either of these, and this sentence is long enough for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A future llmster release could change either of these, and this sentence is long enough for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A future LLMsteru release could change either of these, and this sentence is long enough for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "A future llmster release could change either of these, and this sentence is long enough for the ratio gate."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "A future LLMsteru release could change either of these, and this sentence is long enough for the ratio gate."
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  "llmster"
+                                   },
+                                   {
+                                       "name":  "Declinable",
+                                       "value":  "llmster"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A future llmster release could change either of these, and this sentence is long enough for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A future LLMsteru release could change either of these, and this sentence is long enough for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A future llmster release could change either of these, and this sentence is long enough for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A future LLMsteru release could change either of these, and this sentence is long enough for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "A future llmster release could change either of these, and this sentence is long enough for the ratio gate."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "A future LLMsteru release could change either of these, and this sentence is long enough for the ratio gate."
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  "llmster"
+                                   }
+                               ],
+                      "result":  "do-not-translate term lost: \u0027llmster\u0027 (1 -\u003e 0)"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A future llmster release could change either of these, and this sentence is long enough for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A future serveru release could change either of these, and this sentence is long enough for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A future llmster release could change either of these, and this sentence is long enough for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A future serveru release could change either of these, and this sentence is long enough for the ratio gate."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "A future llmster release could change either of these, and this sentence is long enough for the ratio gate."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "A future serveru release could change either of these, and this sentence is long enough for the ratio gate."
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  "llmster"
+                                   },
+                                   {
+                                       "name":  "Declinable",
+                                       "value":  "llmster"
+                                   }
+                               ],
+                      "result":  "do-not-translate term lost: \u0027llmster\u0027 (1 -\u003e 0) (inflected forms allowed)"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "## Choosing a model"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Vyber modelu"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "## Choosing a model"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Vyber modelu"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "## Choosing a model"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Vyber modelu"
+                                   }
+                               ],
+                      "result":  "line prefix changed: \u0027##\u0027 became \u0027\u0027"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "## Choosing a model"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "## Vyber modelu"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "## Choosing a model"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "## Vyber modelu"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "## Choosing a model"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "## Vyber modelu"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "## Choosing a model"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "### Vyber modelu"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "## Choosing a model"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "### Vyber modelu"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "## Choosing a model"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "### Vyber modelu"
+                                   }
+                               ],
+                      "result":  "line prefix changed: \u0027##\u0027 became \u0027###\u0027"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| Flag | Meaning |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Prepinac Vyznam"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| Flag | Meaning |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Prepinac Vyznam"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "| Flag | Meaning |"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Prepinac Vyznam"
+                                   }
+                               ],
+                      "result":  "table cell count changed: 3 pipe(s) became 0"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| Flag | Meaning |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| Prepinac | Vyznam |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| Flag | Meaning |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| Prepinac | Vyznam |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "| Flag | Meaning |"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "| Prepinac | Vyznam |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "- Use formal address here"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Pouzivejte formalni osloveni"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "- Use formal address here"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Pouzivejte formalni osloveni"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "- Use formal address here"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Pouzivejte formalni osloveni"
+                                   }
+                               ],
+                      "result":  "line prefix changed: \u0027-\u0027 became \u0027\u0027"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "One line of prose here"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Jeden radek\nprozy zde"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "One line of prose here"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Jeden radek\nprozy zde"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "One line of prose here"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Jeden radek\nprozy zde"
+                                   }
+                               ],
+                      "result":  "answer spans multiple lines but the source was one line"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "The PATH guard protects your user PATH from the daemon."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Ochrana PATH chrani vasi uzivatelskou PATH pred daemonem."
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "The PATH guard protects your user PATH from the daemon."
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "To translate this text into Czech, I will follow the provided rules."
+                                   }
+                               ],
+                      "result":  "answer narrates the task instead of translating: \u0027To translate this text into Czech, I will follow the provide\u0027"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "The PATH guard protects your user PATH from the daemon."
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Translate the MEANING of the whole sentence, not word by word."
+                                   }
+                               ],
+                      "result":  "answer repeats the instructions: \u0027Translate the MEANING of the whole\u0027"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "The PATH guard protects your user PATH from the daemon."
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "The PATH guard is a security feature designed to prevent unauthorized access to sensitive files or directories by checking whether a user holds permission, and it does so on every single run of the tool without exception."
+                                   }
+                               ],
+                      "result":  "answer has 37 words for a 10-word source, content was invented"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "The PATH guard protects your user PATH from the daemon."
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "system : You are a professional translator."
+                                   }
+                               ],
+                      "result":  "answer narrates the task instead of translating: \u0027system : You are a professional translator.\u0027"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Zachovejte kazdy zpetny apostrof a kodovy usek presne tak, jak je uveden."
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Left- or right-click it for:"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Klepnete na nej levym nebo pravym tlacitkem mysi a zobrazi se nasledujici moznosti:"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Direct from the CDN"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Primy z anglickeho jazyka. Pouzijte prirozenou ceskou gramatiku a spravne koncovky padu."
+                                   }
+                               ],
+                      "result":  "answer contains translation instructions: \u0027gramatik\u0027"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Notes"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "This is a fragment that needs to be translated into Czech."
+                                   }
+                               ],
+                      "result":  "answer contains translation instructions: \u0027fragment\u0027"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "The translation is checked before it is written."
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Preklad je zkontrolovan predtim, nez je zapsan."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "rather than sending instructions to the console."
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "namisto odesilani instrukci na konzoli."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Direct from"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Primy z ̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶"
+                                   }
+                               ],
+                      "result":  "answer contains combining or invisible characters the source did not have"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Direct from"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Primy zzzzzzzzzzzzzzzzzzzz"
+                                   }
+                               ],
+                      "result":  "answer degenerates into a repeated character: \u0027z\u0027"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Direct from the CDN"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Přímo z CDN"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Remove-TranslatorNote",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Why the helper scripts never redirect stderr"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Proc pomocne skripty nikdy nepresmeruji chybovy vystup ... (prelozeno z anglictiny)"
+                                   }
+                               ],
+                      "result":  "Proc pomocne skripty nikdy nepresmeruji chybovy vystup"
+                  },
+                  {
+                      "fn":  "Remove-TranslatorNote",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Why the helper scripts never redirect stderr"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Proc pomocne skripty nikdy nepresmeruji chybovy vystup ... (prelozeno z anglictiny)"
+                                   }
+                               ],
+                      "result":  "Proc pomocne skripty nikdy nepresmeruji chybovy vystup"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Why the helper scripts never redirect stderr"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Proc pomocne skripty nikdy nepresmeruji chybovy vystup"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Remove-TranslatorNote",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "The server is running (port 1234)"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Server bezi (port 1234)"
+                                   }
+                               ],
+                      "result":  "Server bezi (port 1234)"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| Through the proxy (`useHFProxy: true`) | 266 KB/s |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| prostrednictvim proxy)`useHFProxy: true`) | 266 KB/s |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| Through the proxy (`useHFProxy: true`) | 266 KB/s |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| prostrednictvim proxy)`useHFProxy: true`) | 266 KB/s |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "| Through the proxy (`useHFProxy: true`) | 266 KB/s |"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "| prostrednictvim proxy)`useHFProxy: true`) | 266 KB/s |"
+                                   }
+                               ],
+                      "result":  "bracket count changed: \u0027(\u0027 1-\u003e0, \u0027)\u0027 1-\u003e2"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "asks for a target language (default Czech, press Enter to keep"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "pozada o cilovy jazyk (vychozi cestina, stisknete Enter pro zachovani)"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "asks for a target language (default Czech, press Enter to keep"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "pozada o cilovy jazyk (vychozi cestina, stisknete Enter pro zachovani)"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "asks for a target language (default Czech, press Enter to keep"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "pozada o cilovy jazyk (vychozi cestina, stisknete Enter pro zachovani)"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| Choice | What it fetches |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| 1 | The latest news | https://www.cnet.com/news/ |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| Choice | What it fetches |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "| 1 | The latest news | https://www.cnet.com/news/ |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "| Choice | What it fetches |"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "| 1 | The latest news | https://www.cnet.com/news/ |"
+                                   }
+                               ],
+                      "result":  "url count changed: 0 -\u003e 1"
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "See https://lmstudio.ai/docs for the full reference and more detail."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SentinelIds",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Viz https://lmstudio.ai/docs pro uplnou referenci a dalsi podrobnosti."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "See https://lmstudio.ai/docs for the full reference and more detail."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-PlaceholdersSafe",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Viz https://lmstudio.ai/docs pro uplnou referenci a dalsi podrobnosti."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ChunkIntegrity",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "See https://lmstudio.ai/docs for the full reference and more detail."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Viz https://lmstudio.ai/docs pro uplnou referenci a dalsi podrobnosti."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Left- or right-click it for:"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Toto je velmi dlouha vymyslena odpoved, ktera vysvetluje kontext a duvody. Toto je velmi dlouha vymyslena odpoved, ktera vysvetluje kontext a duvody. Toto je velmi dlouha vymyslena odpoved, ktera vysvetluje kontext a duvody. Toto je velmi dlouha vymyslena odpoved, ktera vysvetluje kontext a duvody. "
+                                   }
+                               ],
+                      "result":  "answer has 44 words for a 5-word source, content was invented"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Every lms invocation writes its own output to the daemon log file, and only its exit"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Kazdy clovek by mel mit pristup k zakladni zdravotni peci bez ohledu na jeho financni situaci nebo misto bydliste a to je dulezite"
+                                   }
+                               ],
+                      "result":  "answer has 23 words for a 16-word source, content was invented"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Every lms invocation writes its own output to the daemon log file, and only its exit"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Kazde volani lms zapisuje svuj vystup do logu démona a pouze jeho navratovy kod"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-ListingLine",
+                      "args":  [
+                                   {
+                                       "name":  "Line",
+                                       "value":  "cmd/coordinator/   matchmaking + signaling + encrypted relay (hides host IPs)"
+                                   }
+                               ],
+                      "result":  "True"
+                  },
+                  {
+                      "fn":  "Test-ListingLine",
+                      "args":  [
+                                   {
+                                       "name":  "Line",
+                                       "value":  "cmd/coordinator/"
+                                   }
+                               ],
+                      "result":  "False"
+                  },
+                  {
+                      "fn":  "Test-ListingLine",
+                      "args":  [
+                                   {
+                                       "name":  "Line",
+                                       "value":  "docs/demo/ is the canonical visual reference for this"
+                                   }
+                               ],
+                      "result":  "False"
+                  },
+                  {
+                      "fn":  "Test-ListingLine",
+                      "args":  [
+                                   {
+                                       "name":  "Line",
+                                       "value":  "go build   ./... -race -v"
+                                   }
+                               ],
+                      "result":  "False"
+                  },
+                  {
+                      "fn":  "Test-ListingLine",
+                      "args":  [
+                                   {
+                                       "name":  "Line",
+                                       "value":  "cmd/tool/   -race ./... -v"
+                                   }
+                               ],
+                      "result":  "False"
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "3"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble Surge\\b))"
+                                   },
+                                   {
+                                       "name":  "Source",
+                                       "value":  "On Windows you can also use `build-biotank.bat` to cross-build both binaries into `dist/`."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Na Windows muzete take pouzit `build-biotank.bat` to cross-build both binaries into `dist/`."
+                                   }
+                               ],
+                      "result":  "to cross-build both binaries into|5|"
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "The guard must complete the route inspection."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Strazny musi dokoncit prohlidku trasy."
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "3"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble Surge\\b))"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Run `go build ./... -race -v` before pushing."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Pred odeslanim spustte `go build ./... -race -v`."
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "3"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble Surge\\b))"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "The Bubble Surge design showcase is canonical."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Ukazka designu Bubble Surge je kanonicka."
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "3"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble Surge\\b))"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Response time matters for every patrol."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Response time je dulezity pro kazdou hlidku."
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "3"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble Surge\\b))"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "On Windows you can also use the tool."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "On Windows you can also use nastroj."
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "1"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   }
+                               ],
+                      "result":  [
+                                     "you can also use|4|",
+                                     "On|1|"
+                                 ]
+                  },
+                  {
+                      "fn":  "Get-TranslationDefect",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "On Windows you can also use the tool."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "On Windows you can also use nastroj."
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  [
+                                                     "Bubble Surge",
+                                                     "Bubble Tanks",
+                                                     "biotank",
+                                                     "Windows",
+                                                     "LM Studio"
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "2"
+                                   }
+                               ],
+                      "result":  "you can also use|4|certain-bad"
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Original assets only; nothing else."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Original assets only; nic jineho."
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "1"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   }
+                               ],
+                      "result":  "Original assets only|3|"
+                  },
+                  {
+                      "fn":  "Get-TranslationDefect",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Original assets only; nothing else."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Original assets only; nic jineho."
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  [
+                                                     "Bubble Surge",
+                                                     "Bubble Tanks",
+                                                     "biotank",
+                                                     "Windows",
+                                                     "LM Studio"
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "2"
+                                   }
+                               ],
+                      "result":  "Original assets only|3|certain-bad"
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Audio uses Web Audio for playback."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Zvuk pouziva Web Audio pro prehravani."
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "1"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   }
+                               ],
+                      "result":  "Web Audio|2|"
+                  },
+                  {
+                      "fn":  "Get-TranslationDefect",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Audio uses Web Audio for playback."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Zvuk pouziva Web Audio pro prehravani."
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  [
+                                                     "Bubble Surge",
+                                                     "Bubble Tanks",
+                                                     "biotank",
+                                                     "Windows",
+                                                     "LM Studio"
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "2"
+                                   }
+                               ],
+                      "result":  "Web Audio|2|ambiguous"
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "It carries the Bubble Surge showcase."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Nese ukazku Bubble Surge."
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "1"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-TranslationDefect",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "It carries the Bubble Surge showcase."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Nese ukazku Bubble Surge."
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  [
+                                                     "Bubble Surge",
+                                                     "Bubble Tanks",
+                                                     "biotank",
+                                                     "Windows",
+                                                     "LM Studio"
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "2"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Run `go build ./...` first."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Nejprve spustte `go build ./...`."
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "1"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-TranslationDefect",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Run `go build ./...` first."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Nejprve spustte `go build ./...`."
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  [
+                                                     "Bubble Surge",
+                                                     "Bubble Tanks",
+                                                     "biotank",
+                                                     "Windows",
+                                                     "LM Studio"
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "2"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "A guard and a torch."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Strazny a baterka."
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "1"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   }
+                               ],
+                      "result":  "a|1|"
+                  },
+                  {
+                      "fn":  "Get-TranslationDefect",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "A guard and a torch."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Strazny a baterka."
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  [
+                                                     "Bubble Surge",
+                                                     "Bubble Tanks",
+                                                     "biotank",
+                                                     "Windows",
+                                                     "LM Studio"
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "2"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "inspired by the Bubble Surge showcase"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "inspirovanym prezentaciBubble Surge"
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "1"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-TranslationDefect",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "inspired by the Bubble Surge showcase"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "inspirovanym prezentaciBubble Surge"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  [
+                                                     "Bubble Surge",
+                                                     "Bubble Tanks",
+                                                     "biotank",
+                                                     "Windows",
+                                                     "LM Studio"
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "2"
+                                   }
+                               ],
+                      "result":  "prezentaciBubble|1|certain-bad"
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Call `getUserName` first."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Nejprve zavolejte `getUserName`."
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "1"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-TranslationDefect",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Call `getUserName` first."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Nejprve zavolejte `getUserName`."
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  [
+                                                     "Bubble Surge",
+                                                     "Bubble Tanks",
+                                                     "biotank",
+                                                     "Windows",
+                                                     "LM Studio"
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "2"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "The iPhone app ships today."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Aplikace iPhone vychazi dnes."
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "1"
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   }
+                               ],
+                      "result":  "iPhone|1|"
+                  },
+                  {
+                      "fn":  "Get-TranslationDefect",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "The iPhone app ships today."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Aplikace iPhone vychazi dnes."
+                                   },
+                                   {
+                                       "name":  "Protect",
+                                       "value":  "(`[^`]*`|https?://\\S+|\\b[\\w.-]+\\.(?:bat|ps1|md)\\b|--[a-z][a-z0-9-]*|\\*\\*|__|(?i:\\bBubble\\ Surge\\b)|(?i:\\bBubble\\ Tanks\\b)|(?i:\\bbiotank\\b)|(?i:\\bWindows\\b)|(?i:\\bLM\\ Studio\\b))"
+                                   },
+                                   {
+                                       "name":  "DoNotTranslate",
+                                       "value":  [
+                                                     "Bubble Surge",
+                                                     "Bubble Tanks",
+                                                     "biotank",
+                                                     "Windows",
+                                                     "LM Studio"
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "MinRun",
+                                       "value":  "2"
+                                   }
+                               ],
+                      "result":  "iPhone|1|certain-ok"
+                  },
+                  {
+                      "fn":  "Test-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "On Windows you can also use `build-biotank.bat` to cross-build both binaries into `dist/`."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Na Windows muzete take pouzit `build-biotank.bat` to cross-build both binaries into `dist/`."
+                                   }
+                               ],
+                      "result":  "source text survived untranslated: \u0027to cross build both\u0027"
+                  },
+                  {
+                      "fn":  "Test-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "On Windows you can also use the batch file to build both binaries."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Na Windows muzete pouzit davkovy soubor k sestaveni obou binarek."
+                                   }
+                               ],
+                      "result":  ""
+                  },
+                  {
+                      "fn":  "Test-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Run `go build ./... \u0026\u0026 go test -race` before pushing anything."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Pred odeslanim spustte `go build ./... \u0026\u0026 go test -race` cehokoliv."
+                                   }
+                               ],
+                      "result":  ""
+                  },
+                  {
+                      "fn":  "Test-SourceResidue",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "The Bubble Surge design showcase is the canonical visual reference here."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Bubble Surge design je kanonicka vizualni reference."
+                                   }
+                               ],
+                      "result":  ""
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "One"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Jeden z nejdulezitejsich kroku pri vytvareni webove stranky je vyber spravneho domenoveho jmena a to je nezbytne pro jeji uspesnost"
+                                   }
+                               ],
+                      "result":  "answer has 20 words for a 1-word source, content was invented"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Three"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Tri lide byli zraneni pri nehode v noci na dalnici A1 u mesta Worgl"
+                                   }
+                               ],
+                      "result":  "answer has 14 words for a 1-word source, content was invented"
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Immediate"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Okamzite"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "FAQ"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Casto kladene otazky"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-OutputLeak",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Response time"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Doba odezvy systemu"
+                                   },
+                                   {
+                                       "name":  "Prompt",
+                                       "value":  "You translate one line of text into Czech. Translate the MEANING of the whole sentence, not word by word. Keep every backtick and code span exactly as given."
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-Glossary",
+                      "args":  [
+                                   {
+                                       "name":  "Glossary",
+                                       "value":  "@{Path=H:\\Software Development\\ai-translation\\config\\glossary\\cs.example.md; Terms=System.Object[]; Banned=System.Object[]; Keep=System.Object[]}"
+                                   },
+                                   {
+                                       "name":  "Source",
+                                       "value":  "`run.bat` provisions and starts a local endpoint"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "`run.bat` provisions a spustí lokální koncový bod"
+                                   }
+                               ],
+                      "result":  "glossary term missing: \u0027provisions\u0027 must become \u0027zprovozn\u0027"
+                  },
+                  {
+                      "fn":  "Test-Glossary",
+                      "args":  [
+                                   {
+                                       "name":  "Glossary",
+                                       "value":  "@{Path=H:\\Software Development\\ai-translation\\config\\glossary\\cs.example.md; Terms=System.Object[]; Banned=System.Object[]; Keep=System.Object[]}"
+                                   },
+                                   {
+                                       "name":  "Source",
+                                       "value":  "`run.bat` provisions and starts a local endpoint"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "`run.bat` zprovozní a spustí lokální koncový bod"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-Glossary",
+                      "args":  [
+                                   {
+                                       "name":  "Glossary",
+                                       "value":  "@{Path=H:\\Software Development\\ai-translation\\config\\glossary\\cs.example.md; Terms=System.Object[]; Banned=System.Object[]; Keep=System.Object[]}"
+                                   },
+                                   {
+                                       "name":  "Source",
+                                       "value":  "# run.bat - repo-local LM Studio bootstrap"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "# Spusťte soubor run.bat - místní zavaděč"
+                                   }
+                               ],
+                      "result":  "word added with no basis in the source: \u0027soubor\u0027 needs \u0027file\u0027"
+                  },
+                  {
+                      "fn":  "Test-Glossary",
+                      "args":  [
+                                   {
+                                       "name":  "Glossary",
+                                       "value":  "@{Path=H:\\Software Development\\ai-translation\\config\\glossary\\cs.example.md; Terms=System.Object[]; Banned=System.Object[]; Keep=System.Object[]}"
+                                   },
+                                   {
+                                       "name":  "Source",
+                                       "value":  "the log file is written by run.bat"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "soubor protokolu zapisuje run.bat"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-GlossaryHint",
+                      "args":  [
+                                   {
+                                       "name":  "Glossary",
+                                       "value":  "@{Path=H:\\Software Development\\ai-translation\\config\\glossary\\cs.example.md; Terms=System.Object[]; Banned=System.Object[]; Keep=System.Object[]}"
+                                   },
+                                   {
+                                       "name":  "Text",
+                                       "value":  "run.bat provisions the store"
+                                   }
+                               ],
+                      "result":  " Required Czech terminology (inflect them as the sentence needs): provisions = zprovozní; provision = zprovoznit; store = úložiště."
+                  },
+                  {
+                      "fn":  "Get-GlossaryHint",
+                      "args":  [
+                                   {
+                                       "name":  "Glossary",
+                                       "value":  "@{Path=H:\\Software Development\\ai-translation\\config\\glossary\\cs.example.md; Terms=System.Object[]; Banned=System.Object[]; Keep=System.Object[]}"
+                                   },
+                                   {
+                                       "name":  "Text",
+                                       "value":  "the quick brown fox"
+                                   }
+                               ],
+                      "result":  ""
+                  },
+                  {
+                      "fn":  "Get-DocumentTerms",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "The `daemon` writes to the log on every run.\nStop it with `lms daemon down` when you are done.\nThe daemon rewrites settings on start, and the daemon is machine-wide.\n\n```text\nthe quick brown fox jumps over the lazy dog and the dog sleeps\n```"
+                                   },
+                                   {
+                                       "name":  "MinFrequency",
+                                       "value":  "2"
+                                   }
+                               ],
+                      "result":  "daemon|2"
+                  },
+                  {
+                      "fn":  "Get-TermInconsistency",
+                      "args":  [
+                                   {
+                                       "name":  "SourceLines",
+                                       "value":  [
+                                                     "The daemon starts here.",
+                                                     "The daemon stops here.",
+                                                     "The daemon waits here."
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "TargetLines",
+                                       "value":  [
+                                                     "Démon se spustí zde.",
+                                                     "Démon se zastaví zde.",
+                                                     "The daemon waits here translated."
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "Terms",
+                                       "value":  "daemon|3"
+                                   },
+                                   {
+                                       "name":  "MinOccurrences",
+                                       "value":  "3"
+                                   }
+                               ],
+                      "result":  "daemon|1|2|translated"
+                  },
+                  {
+                      "fn":  "Get-TermInconsistency",
+                      "args":  [
+                                   {
+                                       "name":  "SourceLines",
+                                       "value":  [
+                                                     "The daemon starts here.",
+                                                     "The daemon stops here.",
+                                                     "The daemon waits here."
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "TargetLines",
+                                       "value":  [
+                                                     "Démon se spustí zde.",
+                                                     "Démon se zastaví zde.",
+                                                     "Démon čeká zde."
+                                                 ]
+                                   },
+                                   {
+                                       "name":  "Terms",
+                                       "value":  "daemon|3"
+                                   },
+                                   {
+                                       "name":  "MinOccurrences",
+                                       "value":  "3"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-DocumentStructure",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "# A\n\n```bash\nx\n```\n\n| a | b |"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "# A\n\n```bash\nx\n```\n\n| a | b |"
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Test-DocumentStructure",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "# A\n\n```bash\nx\n```\n\n| a | b |"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "# A\n\n```bash\nx\n\n| a | b |"
+                                   }
+                               ],
+                      "result":  [
+                                     "code fences: 2 in source, 1 in output",
+                                     "code fences are unbalanced (1) - the document will render as one code block"
+                                 ]
+                  },
+                  {
+                      "fn":  "Test-DocumentStructure",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "# A\n\n```bash\nx\n```\n\n| a | b |"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "# A\n\n```bash\nx\n```\n"
+                                   }
+                               ],
+                      "result":  "table rows: 1 in source, 0 in output"
+                  },
+                  {
+                      "fn":  "Repair-Symbols",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Cost - about 5 GB"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Cena — asi 5 GB"
+                                   },
+                                   {
+                                       "name":  "Symbols",
+                                       "value":  "@{action=rewrite; emDashToHyphen=True; normaliseNbsp=True; quoteStyle=cs; onlyIfAbsentInSource=True}"
+                                   }
+                               ],
+                      "result":  "Cena - asi 5 GB||"
+                  },
+                  {
+                      "fn":  "Repair-Content",
+                      "args":  [
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Cena - asi 5 GB"
+                                   },
+                                   {
+                                       "name":  "Content",
+                                       "value":  "@{action=retry-then-strip; stripLeadingPreamble=True; bannedPhrases=System.Object[]; bannedWords=System.Object[]}"
+                                   }
+                               ],
+                      "result":  "Cena - asi 5 GB||"
+                  },
+                  {
+                      "fn":  "Get-RagPlaceholders",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Cost - about 5 GB"
+                                   },
+                                   {
+                                       "name":  "Patterns",
+                                       "value":  [
+                                                     "\\{\\{\\s*[^}]+\\s*\\}\\}",
+                                                     "\\{[A-Za-z0-9_.]+\\}",
+                                                     "\\{[0-9]+\\}",
+                                                     "(?\u003c![A-Za-z0-9_:$]):[A-Za-z_][A-Za-z0-9_]*",
+                                                     "%[sdfx]",
+                                                     "\\[\\[\\d+\\]\\]"
+                                                 ]
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-RagPlaceholders",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Cena - asi 5 GB"
+                                   },
+                                   {
+                                       "name":  "Patterns",
+                                       "value":  [
+                                                     "\\{\\{\\s*[^}]+\\s*\\}\\}",
+                                                     "\\{[A-Za-z0-9_.]+\\}",
+                                                     "\\{[0-9]+\\}",
+                                                     "(?\u003c![A-Za-z0-9_:$]):[A-Za-z_][A-Za-z0-9_]*",
+                                                     "%[sdfx]",
+                                                     "\\[\\[\\d+\\]\\]"
+                                                 ]
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Invoke-SlopValidator",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Cost - about 5 GB"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Cena — asi 5 GB"
+                                   },
+                                   {
+                                       "name":  "Slop",
+                                       "value":  "@{language=cs; symbols=; content=; integrity=}"
+                                   }
+                               ],
+                      "result":  "Cena - asi 5 GB||ok"
+                  },
+                  {
+                      "fn":  "Repair-Symbols",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "He said \"yes\" loudly"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Rekl \"ano\" nahlas"
+                                   },
+                                   {
+                                       "name":  "Symbols",
+                                       "value":  "@{action=rewrite; emDashToHyphen=True; normaliseNbsp=True; quoteStyle=cs; onlyIfAbsentInSource=True}"
+                                   }
+                               ],
+                      "result":  "Rekl „ano“ nahlas||"
+                  },
+                  {
+                      "fn":  "Repair-Content",
+                      "args":  [
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Rekl „ano“ nahlas"
+                                   },
+                                   {
+                                       "name":  "Content",
+                                       "value":  "@{action=retry-then-strip; stripLeadingPreamble=True; bannedPhrases=System.Object[]; bannedWords=System.Object[]}"
+                                   }
+                               ],
+                      "result":  "Rekl „ano“ nahlas||"
+                  },
+                  {
+                      "fn":  "Get-RagPlaceholders",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "He said \"yes\" loudly"
+                                   },
+                                   {
+                                       "name":  "Patterns",
+                                       "value":  [
+                                                     "\\{\\{\\s*[^}]+\\s*\\}\\}",
+                                                     "\\{[A-Za-z0-9_.]+\\}",
+                                                     "\\{[0-9]+\\}",
+                                                     "(?\u003c![A-Za-z0-9_:$]):[A-Za-z_][A-Za-z0-9_]*",
+                                                     "%[sdfx]",
+                                                     "\\[\\[\\d+\\]\\]"
+                                                 ]
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-RagPlaceholders",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Rekl „ano“ nahlas"
+                                   },
+                                   {
+                                       "name":  "Patterns",
+                                       "value":  [
+                                                     "\\{\\{\\s*[^}]+\\s*\\}\\}",
+                                                     "\\{[A-Za-z0-9_.]+\\}",
+                                                     "\\{[0-9]+\\}",
+                                                     "(?\u003c![A-Za-z0-9_:$]):[A-Za-z_][A-Za-z0-9_]*",
+                                                     "%[sdfx]",
+                                                     "\\[\\[\\d+\\]\\]"
+                                                 ]
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Invoke-SlopValidator",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "He said \"yes\" loudly"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Rekl \"ano\" nahlas"
+                                   },
+                                   {
+                                       "name":  "Slop",
+                                       "value":  "@{language=cs; symbols=; content=; integrity=}"
+                                   }
+                               ],
+                      "result":  "Rekl „ano“ nahlas||ok"
+                  },
+                  {
+                      "fn":  "Repair-Symbols",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Save changes"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Here is the translation: Ulozit zmeny"
+                                   },
+                                   {
+                                       "name":  "Symbols",
+                                       "value":  "@{action=rewrite; emDashToHyphen=True; normaliseNbsp=True; quoteStyle=cs; onlyIfAbsentInSource=True}"
+                                   }
+                               ],
+                      "result":  "Here is the translation: Ulozit zmeny||"
+                  },
+                  {
+                      "fn":  "Repair-Content",
+                      "args":  [
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Here is the translation: Ulozit zmeny"
+                                   },
+                                   {
+                                       "name":  "Content",
+                                       "value":  "@{action=retry-then-strip; stripLeadingPreamble=True; bannedPhrases=System.Object[]; bannedWords=System.Object[]}"
+                                   }
+                               ],
+                      "result":  "Ulozit zmeny||"
+                  },
+                  {
+                      "fn":  "Get-RagPlaceholders",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Save changes"
+                                   },
+                                   {
+                                       "name":  "Patterns",
+                                       "value":  [
+                                                     "\\{\\{\\s*[^}]+\\s*\\}\\}",
+                                                     "\\{[A-Za-z0-9_.]+\\}",
+                                                     "\\{[0-9]+\\}",
+                                                     "(?\u003c![A-Za-z0-9_:$]):[A-Za-z_][A-Za-z0-9_]*",
+                                                     "%[sdfx]",
+                                                     "\\[\\[\\d+\\]\\]"
+                                                 ]
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-RagPlaceholders",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Ulozit zmeny"
+                                   },
+                                   {
+                                       "name":  "Patterns",
+                                       "value":  [
+                                                     "\\{\\{\\s*[^}]+\\s*\\}\\}",
+                                                     "\\{[A-Za-z0-9_.]+\\}",
+                                                     "\\{[0-9]+\\}",
+                                                     "(?\u003c![A-Za-z0-9_:$]):[A-Za-z_][A-Za-z0-9_]*",
+                                                     "%[sdfx]",
+                                                     "\\[\\[\\d+\\]\\]"
+                                                 ]
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Invoke-SlopValidator",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Save changes"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Here is the translation: Ulozit zmeny"
+                                   },
+                                   {
+                                       "name":  "Slop",
+                                       "value":  "@{language=cs; symbols=; content=; integrity=}"
+                                   }
+                               ],
+                      "result":  "Ulozit zmeny||content"
+                  },
+                  {
+                      "fn":  "Repair-Symbols",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Welcome :user"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Vitejte :uzivatel"
+                                   },
+                                   {
+                                       "name":  "Symbols",
+                                       "value":  "@{action=rewrite; emDashToHyphen=True; normaliseNbsp=True; quoteStyle=cs; onlyIfAbsentInSource=True}"
+                                   }
+                               ],
+                      "result":  "Vitejte :uzivatel||"
+                  },
+                  {
+                      "fn":  "Repair-Content",
+                      "args":  [
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Vitejte :uzivatel"
+                                   },
+                                   {
+                                       "name":  "Content",
+                                       "value":  "@{action=retry-then-strip; stripLeadingPreamble=True; bannedPhrases=System.Object[]; bannedWords=System.Object[]}"
+                                   }
+                               ],
+                      "result":  "Vitejte :uzivatel||"
+                  },
+                  {
+                      "fn":  "Get-RagPlaceholders",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Welcome :user"
+                                   },
+                                   {
+                                       "name":  "Patterns",
+                                       "value":  [
+                                                     "\\{\\{\\s*[^}]+\\s*\\}\\}",
+                                                     "\\{[A-Za-z0-9_.]+\\}",
+                                                     "\\{[0-9]+\\}",
+                                                     "(?\u003c![A-Za-z0-9_:$]):[A-Za-z_][A-Za-z0-9_]*",
+                                                     "%[sdfx]",
+                                                     "\\[\\[\\d+\\]\\]"
+                                                 ]
+                                   }
+                               ],
+                      "result":  ":user"
+                  },
+                  {
+                      "fn":  "Get-RagPlaceholders",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Vitejte :uzivatel"
+                                   },
+                                   {
+                                       "name":  "Patterns",
+                                       "value":  [
+                                                     "\\{\\{\\s*[^}]+\\s*\\}\\}",
+                                                     "\\{[A-Za-z0-9_.]+\\}",
+                                                     "\\{[0-9]+\\}",
+                                                     "(?\u003c![A-Za-z0-9_:$]):[A-Za-z_][A-Za-z0-9_]*",
+                                                     "%[sdfx]",
+                                                     "\\[\\[\\d+\\]\\]"
+                                                 ]
+                                   }
+                               ],
+                      "result":  ":uzivatel"
+                  },
+                  {
+                      "fn":  "Invoke-SlopValidator",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Welcome :user"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Vitejte :uzivatel"
+                                   },
+                                   {
+                                       "name":  "Slop",
+                                       "value":  "@{language=cs; symbols=; content=; integrity=}"
+                                   }
+                               ],
+                      "result":  "Welcome :user||integrity"
+                  },
+                  {
+                      "fn":  "Repair-Symbols",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Save changes"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Ulozit zmeny"
+                                   },
+                                   {
+                                       "name":  "Symbols",
+                                       "value":  "@{action=rewrite; emDashToHyphen=True; normaliseNbsp=True; quoteStyle=cs; onlyIfAbsentInSource=True}"
+                                   }
+                               ],
+                      "result":  "Ulozit zmeny||"
+                  },
+                  {
+                      "fn":  "Repair-Content",
+                      "args":  [
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Ulozit zmeny"
+                                   },
+                                   {
+                                       "name":  "Content",
+                                       "value":  "@{action=retry-then-strip; stripLeadingPreamble=True; bannedPhrases=System.Object[]; bannedWords=System.Object[]}"
+                                   }
+                               ],
+                      "result":  "Ulozit zmeny||"
+                  },
+                  {
+                      "fn":  "Get-RagPlaceholders",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Save changes"
+                                   },
+                                   {
+                                       "name":  "Patterns",
+                                       "value":  [
+                                                     "\\{\\{\\s*[^}]+\\s*\\}\\}",
+                                                     "\\{[A-Za-z0-9_.]+\\}",
+                                                     "\\{[0-9]+\\}",
+                                                     "(?\u003c![A-Za-z0-9_:$]):[A-Za-z_][A-Za-z0-9_]*",
+                                                     "%[sdfx]",
+                                                     "\\[\\[\\d+\\]\\]"
+                                                 ]
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-RagPlaceholders",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Ulozit zmeny"
+                                   },
+                                   {
+                                       "name":  "Patterns",
+                                       "value":  [
+                                                     "\\{\\{\\s*[^}]+\\s*\\}\\}",
+                                                     "\\{[A-Za-z0-9_.]+\\}",
+                                                     "\\{[0-9]+\\}",
+                                                     "(?\u003c![A-Za-z0-9_:$]):[A-Za-z_][A-Za-z0-9_]*",
+                                                     "%[sdfx]",
+                                                     "\\[\\[\\d+\\]\\]"
+                                                 ]
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Invoke-SlopValidator",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "Save changes"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Ulozit zmeny"
+                                   },
+                                   {
+                                       "name":  "Slop",
+                                       "value":  "@{language=cs; symbols=; content=; integrity=}"
+                                   }
+                               ],
+                      "result":  "Ulozit zmeny||ok"
+                  },
+                  {
+                      "fn":  "Repair-Symbols",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "A dash - here"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Pomlcka - zde"
+                                   },
+                                   {
+                                       "name":  "Symbols",
+                                       "value":  "@{action=rewrite; emDashToHyphen=True; normaliseNbsp=True; quoteStyle=cs; onlyIfAbsentInSource=True}"
+                                   }
+                               ],
+                      "result":  "Pomlcka - zde||"
+                  },
+                  {
+                      "fn":  "Repair-Content",
+                      "args":  [
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Pomlcka - zde"
+                                   },
+                                   {
+                                       "name":  "Content",
+                                       "value":  "@{action=retry-then-strip; stripLeadingPreamble=True; bannedPhrases=System.Object[]; bannedWords=System.Object[]}"
+                                   }
+                               ],
+                      "result":  "Pomlcka - zde||"
+                  },
+                  {
+                      "fn":  "Get-RagPlaceholders",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "A dash - here"
+                                   },
+                                   {
+                                       "name":  "Patterns",
+                                       "value":  [
+                                                     "\\{\\{\\s*[^}]+\\s*\\}\\}",
+                                                     "\\{[A-Za-z0-9_.]+\\}",
+                                                     "\\{[0-9]+\\}",
+                                                     "(?\u003c![A-Za-z0-9_:$]):[A-Za-z_][A-Za-z0-9_]*",
+                                                     "%[sdfx]",
+                                                     "\\[\\[\\d+\\]\\]"
+                                                 ]
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Get-RagPlaceholders",
+                      "args":  [
+                                   {
+                                       "name":  "Text",
+                                       "value":  "Pomlcka - zde"
+                                   },
+                                   {
+                                       "name":  "Patterns",
+                                       "value":  [
+                                                     "\\{\\{\\s*[^}]+\\s*\\}\\}",
+                                                     "\\{[A-Za-z0-9_.]+\\}",
+                                                     "\\{[0-9]+\\}",
+                                                     "(?\u003c![A-Za-z0-9_:$]):[A-Za-z_][A-Za-z0-9_]*",
+                                                     "%[sdfx]",
+                                                     "\\[\\[\\d+\\]\\]"
+                                                 ]
+                                   }
+                               ],
+                      "result":  null
+                  },
+                  {
+                      "fn":  "Invoke-SlopValidator",
+                      "args":  [
+                                   {
+                                       "name":  "Source",
+                                       "value":  "A dash - here"
+                                   },
+                                   {
+                                       "name":  "Translated",
+                                       "value":  "Pomlcka - zde"
+                                   },
+                                   {
+                                       "name":  "Slop",
+                                       "value":  "@{language=cs; symbols=; content=; integrity=}"
+                                   }
+                               ],
+                      "result":  "Pomlcka - zde||ok"
+                  }
+              ]
+}

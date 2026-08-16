@@ -1,0 +1,987 @@
+{
+    "generatedBy":  "tests\\parity\\markup\\oracle.ps1",
+    "listing":  [
+                    {
+                        "line":  "cmd/biotank/       host binary: serves the embedded client",
+                        "isListing":  true
+                    },
+                    {
+                        "line":  "docs/demo/         design showcase - canonical visual reference",
+                        "isListing":  true
+                    },
+                    {
+                        "line":  "go build ./...",
+                        "isListing":  false
+                    },
+                    {
+                        "line":  "npm install",
+                        "isListing":  false
+                    },
+                    {
+                        "line":  "src/main.go  x",
+                        "isListing":  false
+                    },
+                    {
+                        "line":  "src/main.go        -race ./... -v",
+                        "isListing":  false
+                    },
+                    {
+                        "line":  "plain prose with no path at all",
+                        "isListing":  false
+                    },
+                    {
+                        "line":  "a/b/c   one two three",
+                        "isListing":  true
+                    },
+                    {
+                        "line":  "a/b/c one two three",
+                        "isListing":  false
+                    },
+                    {
+                        "line":  "",
+                        "isListing":  false
+                    }
+                ],
+    "residue":  [
+                    {
+                        "name":  "clean",
+                        "source":  "On Windows you can also use the tool.",
+                        "output":  "Na Windows muzete take pouzit nastroj.",
+                        "protect":  "",
+                        "runs":  [
+
+                                 ],
+                        "gate":  ""
+                    },
+                    {
+                        "name":  "half done",
+                        "source":  "On Windows you can also use the tool to cross-build both binaries.",
+                        "output":  "Na Windows muzete pouzit to cross-build both binaries.",
+                        "protect":  "",
+                        "runs":  [
+                                     {
+                                         "text":  "to cross-build both binaries",
+                                         "words":  4
+                                     }
+                                 ],
+                        "gate":  "source text survived untranslated: \u0027to cross build both\u0027"
+                    },
+                    {
+                        "name":  "short term",
+                        "source":  "Uses Web Audio for sound.",
+                        "output":  "Pouziva Web Audio pro zvuk.",
+                        "protect":  "",
+                        "runs":  [
+
+                                 ],
+                        "gate":  ""
+                    },
+                    {
+                        "name":  "empty out",
+                        "source":  "Some source text here.",
+                        "output":  "",
+                        "protect":  "",
+                        "runs":  [
+
+                                 ],
+                        "gate":  ""
+                    },
+                    {
+                        "name":  "protected",
+                        "source":  "Run `build.bat` to start.",
+                        "output":  "Spustte `build.bat` pro start.",
+                        "protect":  "`[^`]*`",
+                        "runs":  [
+
+                                 ],
+                        "gate":  ""
+                    }
+                ],
+    "defects":  [
+                    {
+                        "name":  "function word",
+                        "source":  "On Windows you can also use the tool.",
+                        "output":  "Na Windows you can also use nastroj.",
+                        "dnt":  [
+                                    "Windows"
+                                ],
+                        "items":  [
+                                      {
+                                          "kind":  "residue",
+                                          "text":  "Windows you can also use",
+                                          "words":  5,
+                                          "verdict":  "certain-bad",
+                                          "reason":  "5 words is a clause, not a term"
+                                      }
+                                  ]
+                    },
+                    {
+                        "name":  "glue",
+                        "source":  "the presentation Bubble Surge is here",
+                        "output":  "prezentaciBubble Surge je zde",
+                        "dnt":  [
+                                    "Bubble Surge"
+                                ],
+                        "items":  [
+                                      {
+                                          "kind":  "glue",
+                                          "text":  "prezentaciBubble",
+                                          "words":  1,
+                                          "verdict":  "certain-bad",
+                                          "reason":  "\u0027Bubble Surge\u0027 is glued to the word before it; the source has a space there"
+                                      }
+                                  ]
+                    },
+                    {
+                        "name":  "camel in src",
+                        "source":  "call getUserName now",
+                        "output":  "zavolejte getUserName nyni",
+                        "dnt":  [
+
+                                ],
+                        "items":  [
+                                      {
+                                          "kind":  "glue",
+                                          "text":  "getUserName",
+                                          "words":  1,
+                                          "verdict":  "certain-ok",
+                                          "reason":  "the source spells it the same way"
+                                      }
+                                  ]
+                    },
+                    {
+                        "name":  "clean",
+                        "source":  "A short sentence.",
+                        "output":  "Kratka veta.",
+                        "dnt":  [
+
+                                ],
+                        "items":  [
+
+                                  ]
+                    }
+                ],
+    "leaks":  [
+                  {
+                      "name":  "clean",
+                      "source":  "The build failed.",
+                      "output":  "Sestaveni selhalo.",
+                      "prompt":  "",
+                      "reason":  null
+                  },
+                  {
+                      "name":  "empty",
+                      "source":  "The build failed.",
+                      "output":  "",
+                      "prompt":  "",
+                      "reason":  "empty answer"
+                  },
+                  {
+                      "name":  "combining",
+                      "source":  "Direct from",
+                      "output":  "Primy z ̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶̶",
+                      "prompt":  "",
+                      "reason":  "answer contains combining or invisible characters the source did not have"
+                  },
+                  {
+                      "name":  "repeated char",
+                      "source":  "Hello there",
+                      "output":  "Ahoooooooooooj",
+                      "prompt":  "",
+                      "reason":  "answer degenerates into a repeated character: \u0027o\u0027"
+                  },
+                  {
+                      "name":  "narration",
+                      "source":  "The build failed.",
+                      "output":  "To translate this text I will follow the rules.",
+                      "prompt":  "",
+                      "reason":  "answer narrates the task instead of translating: \u0027To translate this text I will follow the rules.\u0027"
+                  },
+                  {
+                      "name":  "meta words",
+                      "source":  "The build failed.",
+                      "output":  "Prelozte tento fragment do cestiny.",
+                      "prompt":  "",
+                      "reason":  "answer contains translation instructions: \u0027Preloz\u0027"
+                  },
+                  {
+                      "name":  "meta in source",
+                      "source":  "sending instructions to the console",
+                      "output":  "posilani instrukci do konzole",
+                      "prompt":  "",
+                      "reason":  null
+                  },
+                  {
+                      "name":  "invented words",
+                      "source":  "One",
+                      "output":  "Choosing a domain name is one of the most important decisions you will make when starting a new website today.",
+                      "prompt":  "",
+                      "reason":  "answer has 20 words for a 1-word source, content was invented"
+                  },
+                  {
+                      "name":  "short expansion",
+                      "source":  "FAQ",
+                      "output":  "Casto kladene otazky",
+                      "prompt":  "",
+                      "reason":  null
+                  },
+                  {
+                      "name":  "long ok",
+                      "source":  "The configuration file controls how the engine reads documents from disk.",
+                      "output":  "Konfiguracni soubor ridi, jak engine cte dokumenty z disku.",
+                      "prompt":  "",
+                      "reason":  null
+                  },
+                  {
+                      "name":  "prompt echo",
+                      "source":  "The build failed.",
+                      "output":  "Reply with the translation only no commentary no quotes",
+                      "prompt":  "Reply with the translation only no commentary no quotes or explanations",
+                      "reason":  "answer repeats the instructions: \u0027Reply with the translation only no\u0027"
+                  }
+              ],
+    "structure":  [
+                      {
+                          "name":  "identical",
+                          "source":  "# H\n```\ncode\n```",
+                          "output":  "# H\n```\nkod\n```",
+                          "issues":  [
+
+                                     ]
+                      },
+                      {
+                          "name":  "lost heading",
+                          "source":  "# H\ntext",
+                          "output":  "H\ntext",
+                          "issues":  [
+                                         "headings: 1 in source, 0 in output"
+                                     ]
+                      },
+                      {
+                          "name":  "odd fences",
+                          "source":  "```\na\n```",
+                          "output":  "```\na",
+                          "issues":  [
+                                         "code fences: 2 in source, 1 in output",
+                                         "code fences are unbalanced (1) - the document will render as one code block"
+                                     ]
+                      },
+                      {
+                          "name":  "lost table row",
+                          "source":  "| a | b |\n| c | d |",
+                          "output":  "| a | b |",
+                          "issues":  [
+                                         "table rows: 2 in source, 1 in output"
+                                     ]
+                      }
+                  ],
+    "reference":  "ai-translation\\scripts\\markup-guard.ps1",
+    "protect":  [
+                    {
+                        "source":  "plain prose with nothing to protect",
+                        "text":  "plain prose with nothing to protect",
+                        "store":  [
+
+                                  ],
+                        "restored":  "plain prose with nothing to protect",
+                        "unsupported":  false
+                    },
+                    {
+                        "source":  "before\n```powershell\nGet-ChildItem -Path C:\\Temp\n```\nafter",
+                        "text":  "before\n[[0]]\nafter",
+                        "store":  [
+                                      "```powershell\nGet-ChildItem -Path C:\\Temp\n```"
+                                  ],
+                        "restored":  "before\n```powershell\nGet-ChildItem -Path C:\\Temp\n```\nafter",
+                        "unsupported":  false
+                    },
+                    {
+                        "source":  "one ```js\nconst a = 1;\n``` two ```sh\nls -la\n``` three",
+                        "text":  "one ```js\nconst a = 1;\n``` two ```sh\nls -la\n``` three",
+                        "store":  [
+
+                                  ],
+                        "restored":  "one ```js\nconst a = 1;\n``` two ```sh\nls -la\n``` three",
+                        "unsupported":  false
+                    },
+                    {
+                        "source":  "see \u003c!-- a hidden note --\u003e here",
+                        "text":  "see [[0]] here",
+                        "store":  [
+                                      "\u003c!-- a hidden note --\u003e"
+                                  ],
+                        "restored":  "see \u003c!-- a hidden note --\u003e here",
+                        "unsupported":  false
+                    },
+                    {
+                        "source":  "multi \u003c!-- one --\u003e and \u003c!-- two --\u003e comments",
+                        "text":  "multi [[0]] and [[1]] comments",
+                        "store":  [
+                                      "\u003c!-- one --\u003e",
+                                      "\u003c!-- two --\u003e"
+                                  ],
+                        "restored":  "multi \u003c!-- one --\u003e and \u003c!-- two --\u003e comments",
+                        "unsupported":  false
+                    },
+                    {
+                        "source":  "read https://example.com/docs?a=1\u0026b=2 for more",
+                        "text":  "read [[0]] for more",
+                        "store":  [
+                                      "https://example.com/docs?a=1\u0026b=2"
+                                  ],
+                        "restored":  "read https://example.com/docs?a=1\u0026b=2 for more",
+                        "unsupported":  false
+                    },
+                    {
+                        "source":  "link (https://example.com/x) in brackets",
+                        "text":  "link ([[0]]) in brackets",
+                        "store":  [
+                                      "https://example.com/x"
+                                  ],
+                        "restored":  "link (https://example.com/x) in brackets",
+                        "unsupported":  false
+                    },
+                    {
+                        "source":  "open C:\\Program\\Files\\thing.txt now",
+                        "text":  "open [[0]] now",
+                        "store":  [
+                                      "C:\\Program\\Files\\thing.txt"
+                                  ],
+                        "restored":  "open C:\\Program\\Files\\thing.txt now",
+                        "unsupported":  false
+                    },
+                    {
+                        "source":  "path D:\\a\\b and url https://example.org/y together",
+                        "text":  "path [[1]] and url [[0]] together",
+                        "store":  [
+                                      "https://example.org/y",
+                                      "D:\\a\\b"
+                                  ],
+                        "restored":  "path D:\\a\\b and url https://example.org/y together",
+                        "unsupported":  false
+                    },
+                    {
+                        "source":  "# Heading\n\n```\ncode\n```\n\nSee https://example.com and C:\\tmp\\f.log",
+                        "text":  "# Heading\n\n[[0]]\n\nSee [[1]] and [[2]]",
+                        "store":  [
+                                      "```\ncode\n```",
+                                      "https://example.com",
+                                      "C:\\tmp\\f.log"
+                                  ],
+                        "restored":  "# Heading\n\n```\ncode\n```\n\nSee https://example.com and C:\\tmp\\f.log",
+                        "unsupported":  false
+                    },
+                    {
+                        "source":  "no protection but [[0]] looks like a sentinel",
+                        "text":  "no protection but [[0]] looks like a sentinel",
+                        "store":  [
+
+                                  ],
+                        "restored":  "no protection but [[0]] looks like a sentinel",
+                        "unsupported":  false
+                    },
+                    {
+                        "source":  "",
+                        "text":  null,
+                        "store":  [
+
+                                  ],
+                        "restored":  null,
+                        "unsupported":  true
+                    }
+                ],
+    "sentinels":  [
+                      {
+                          "text":  "",
+                          "ids":  [
+
+                                  ]
+                      },
+                      {
+                          "text":  "none here",
+                          "ids":  [
+
+                                  ]
+                      },
+                      {
+                          "text":  "[[0]]",
+                          "ids":  [
+                                      0
+                                  ]
+                      },
+                      {
+                          "text":  "[[0]] and [[1]]",
+                          "ids":  [
+                                      0,
+                                      1
+                                  ]
+                      },
+                      {
+                          "text":  "[[10]] then [[2]] then [[1]]",
+                          "ids":  [
+                                      1,
+                                      2,
+                                      10
+                                  ]
+                      },
+                      {
+                          "text":  "[[3]] [[3]] repeated",
+                          "ids":  [
+                                      3,
+                                      3
+                                  ]
+                      },
+                      {
+                          "text":  "text [[12]] more [[0]] end",
+                          "ids":  [
+                                      0,
+                                      12
+                                  ]
+                      },
+                      {
+                          "text":  "[[a]] not an id",
+                          "ids":  [
+
+                                  ]
+                      },
+                      {
+                          "text":  "[[]] empty",
+                          "ids":  [
+
+                                  ]
+                      }
+                  ],
+    "placeholders":  [
+                         {
+                             "text":  "",
+                             "found":  [
+
+                                       ]
+                         },
+                         {
+                             "text":  "Welcome :user to the app",
+                             "found":  [
+                                           ":user"
+                                       ]
+                         },
+                         {
+                             "text":  "Hello {{ name }} and {{other}}",
+                             "found":  [
+                                           "{{name}}",
+                                           "{{other}}"
+                                       ]
+                         },
+                         {
+                             "text":  "Value {0} then {1} then {10}",
+                             "found":  [
+                                           "{0}",
+                                           "{1}",
+                                           "{10}"
+                                       ]
+                         },
+                         {
+                             "text":  "Config {app.name} and {app_id}",
+                             "found":  [
+                                           "{app.name}",
+                                           "{app_id}"
+                                       ]
+                         },
+                         {
+                             "text":  "Printf %s and %d and %f and %x",
+                             "found":  [
+                                           "%d",
+                                           "%f",
+                                           "%s",
+                                           "%x"
+                                       ]
+                         },
+                         {
+                             "text":  "Mixed {{a}} {0} :user %s {b.c}",
+                             "found":  [
+                                           "%s",
+                                           ":user",
+                                           "{{a}}",
+                                           "{0}",
+                                           "{b.c}"
+                                       ]
+                         },
+                         {
+                             "text":  "Not a placeholder: [System.IO.File]::WriteAllText",
+                             "found":  [
+
+                                       ]
+                         },
+                         {
+                             "text":  "Not a placeholder: -Confirm:$false",
+                             "found":  [
+
+                                       ]
+                         },
+                         {
+                             "text":  "Edge ::double and $:dollar and word:after",
+                             "found":  [
+
+                                       ]
+                         },
+                         {
+                             "text":  "Time is 12:30 and ratio 1:2",
+                             "found":  [
+
+                                       ]
+                         },
+                         {
+                             "text":  "Repeated {0} {0} {0}",
+                             "found":  [
+                                           "{0}",
+                                           "{0}",
+                                           "{0}"
+                                       ]
+                         },
+                         {
+                             "text":  "Braces {} and {  } and {a b}",
+                             "found":  [
+
+                                       ]
+                         }
+                     ],
+    "integrity":  [
+                      {
+                          "name":  "clean single line",
+                          "source":  "Hello world",
+                          "translated":  "Ahoj svete",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "empty answer",
+                          "source":  "Hello world",
+                          "translated":  "",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "empty answer"
+                      },
+                      {
+                          "name":  "whitespace answer",
+                          "source":  "Hello world",
+                          "translated":  "   ",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "empty answer"
+                      },
+                      {
+                          "name":  "sentinel kept",
+                          "source":  "See [[0]] here",
+                          "translated":  "Viz [[0]] zde",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "sentinel dropped",
+                          "source":  "See [[0]] here",
+                          "translated":  "Viz zde",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "protected block count changed: expected 1, got 0 (missing 0)"
+                      },
+                      {
+                          "name":  "sentinel invented",
+                          "source":  "See [[0]] here",
+                          "translated":  "Viz [[0]] a [[1]] zde",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "protected block count changed: expected 1, got 2 (invented 1)"
+                      },
+                      {
+                          "name":  "sentinel renumbered",
+                          "source":  "A [[0]] B [[1]]",
+                          "translated":  "A [[2]] B [[3]]",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "protected block ids altered"
+                      },
+                      {
+                          "name":  "placeholder kept",
+                          "source":  "Welcome :user",
+                          "translated":  "Vitej :user",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "placeholder lost",
+                          "source":  "Welcome :user",
+                          "translated":  "Vitej uzivateli",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "placeholder count changed: expected 1, got 0"
+                      },
+                      {
+                          "name":  "placeholder altered",
+                          "source":  "Value {0}",
+                          "translated":  "Hodnota {1}",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "placeholder altered: expected \u0027{0}\u0027, got \u0027{1}\u0027"
+                      },
+                      {
+                          "name":  "backtick lost",
+                          "source":  "Run `build` now",
+                          "translated":  "Spustte build nyni",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "backtick count changed: 2 in source, 0 in output"
+                      },
+                      {
+                          "name":  "backtick balanced",
+                          "source":  "Run `build` now",
+                          "translated":  "Spustte `build` nyni",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "option translated",
+                          "source":  "Use --no-serve here",
+                          "translated":  "Pouzijte --ne-serve zde",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "command option altered: \u0027--no-serve\u0027 became \u0027--ne-serve\u0027"
+                      },
+                      {
+                          "name":  "option kept",
+                          "source":  "Use --no-serve here",
+                          "translated":  "Pouzijte --no-serve zde",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "option count changed",
+                          "source":  "Use --a-flag and --b-flag",
+                          "translated":  "Pouzijte --a-flag",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "command option count changed: 2 in source, 1 in output"
+                      },
+                      {
+                          "name":  "url invented",
+                          "source":  "A choice of things",
+                          "translated":  "Vyber veci https://www.cnet.com/news/",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "url count changed: 0 -\u003e 1"
+                      },
+                      {
+                          "name":  "url kept",
+                          "source":  "Go to https://x.test now",
+                          "translated":  "Prejdete na https://x.test nyni",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "bracket flipped",
+                          "source":  "Through the proxy (x)",
+                          "translated":  "Pres proxy )x(",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "bracket source open",
+                          "source":  "Through the proxy (",
+                          "translated":  "Pres proxy )",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "heading marker lost",
+                          "source":  "## Choosing a model",
+                          "translated":  "Vyber modelu",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "line prefix changed: \u0027##\u0027 became \u0027\u0027"
+                      },
+                      {
+                          "name":  "heading marker kept",
+                          "source":  "## Choosing a model",
+                          "translated":  "## Vyber modelu",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "bullet marker lost",
+                          "source":  "- an item",
+                          "translated":  "polozka",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "line prefix changed: \u0027-\u0027 became \u0027\u0027"
+                      },
+                      {
+                          "name":  "table pipes lost",
+                          "source":  "| a | b |",
+                          "translated":  "| a b |",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "table cell count changed: 3 pipe(s) became 2"
+                      },
+                      {
+                          "name":  "table pipes kept",
+                          "source":  "| a | b |",
+                          "translated":  "| x | y |",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "answer split lines",
+                          "source":  "One line only",
+                          "translated":  "Prvni\ndruhy",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "answer spans multiple lines but the source was one line"
+                      },
+                      {
+                          "name":  "collapsed long",
+                          "source":  "The quick brown fox jumps over the lazy dog and keeps running for a while. The quick brown fox jumps over the lazy dog and keeps running for a while. The quick brown fox jumps over the lazy dog and keeps running for a while. The quick brown fox jumps over the lazy dog and keeps running for a while. ",
+                          "translated":  "Kratke",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "answer collapsed to 2% of the source length, content was probably dropped"
+                      },
+                      {
+                          "name":  "not collapsed long",
+                          "source":  "The quick brown fox jumps over the lazy dog and keeps running for a while. The quick brown fox jumps over the lazy dog and keeps running for a while. The quick brown fox jumps over the lazy dog and keeps running for a while. The quick brown fox jumps over the lazy dog and keeps running for a while. ",
+                          "translated":  "The quick brown fox jumps over the lazy dog and keeps running for a while. The quick brown fox jumps over the lazy dog and keeps running for a while. The quick brown fox jumps over the lazy dog and keeps running for a while. The quick brown fox jumps over the lazy dog and keeps running for a while. ",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "source returned unchanged"
+                      },
+                      {
+                          "name":  "echoed source",
+                          "source":  "This sentence is quite long enough to trip the echo gate.",
+                          "translated":  "This sentence is quite long enough to trip the echo gate.",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "source returned unchanged"
+                      },
+                      {
+                          "name":  "echoed short source",
+                          "source":  "Short one",
+                          "translated":  "Short one",
+                          "doNotTranslate":  [
+
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "dnt strict lost",
+                          "source":  "The JSON payload",
+                          "translated":  "Datova zprava",
+                          "doNotTranslate":  [
+                                                 "JSON"
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "do-not-translate term lost: \u0027JSON\u0027 (1 -\u003e 0)"
+                      },
+                      {
+                          "name":  "dnt strict kept",
+                          "source":  "The JSON payload",
+                          "translated":  "JSON zprava",
+                          "doNotTranslate":  [
+                                                 "JSON"
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "dnt declinable ok",
+                          "source":  "a future llmster release",
+                          "translated":  "budouci vydani LLMsteru",
+                          "doNotTranslate":  [
+                                                 "llmster"
+                                             ],
+                          "declinable":  [
+                                             "llmster"
+                                         ],
+                          "reason":  null
+                      },
+                      {
+                          "name":  "dnt declinable strict",
+                          "source":  "a future llmster release",
+                          "translated":  "budouci vydani LLMsteru",
+                          "doNotTranslate":  [
+                                                 "llmster"
+                                             ],
+                          "declinable":  [
+
+                                         ],
+                          "reason":  "do-not-translate term lost: \u0027llmster\u0027 (1 -\u003e 0)"
+                      }
+                  ],
+    "notes":  [
+                  {
+                      "source":  "The PATH guard",
+                      "translated":  "Ochrana PATH (prelozeno z anglictiny)",
+                      "cleaned":  "Ochrana PATH"
+                  },
+                  {
+                      "source":  "The PATH guard",
+                      "translated":  "Ochrana PATH (translated from English)",
+                      "cleaned":  "Ochrana PATH"
+                  },
+                  {
+                      "source":  "The PATH guard",
+                      "translated":  "Ochrana PATH [preklad]",
+                      "cleaned":  "Ochrana PATH"
+                  },
+                  {
+                      "source":  "A note (prelozeno z anglictiny)",
+                      "translated":  "Poznamka (prelozeno z anglictiny)",
+                      "cleaned":  "Poznamka (prelozeno z anglictiny)"
+                  },
+                  {
+                      "source":  "Nothing to strip",
+                      "translated":  "Nic ke stripovani",
+                      "cleaned":  "Nic ke stripovani"
+                  },
+                  {
+                      "source":  "Trailing dots",
+                      "translated":  "Koncove tecky ...",
+                      "cleaned":  "Koncove tecky"
+                  },
+                  {
+                      "source":  "Trailing dots ...",
+                      "translated":  "Koncove tecky ...",
+                      "cleaned":  "Koncove tecky ..."
+                  },
+                  {
+                      "source":  "Parenthetical kept",
+                      "translated":  "Zavorka (jina poznamka)",
+                      "cleaned":  "Zavorka (jina poznamka)"
+                  }
+              ]
+}

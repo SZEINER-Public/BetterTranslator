@@ -1,0 +1,3 @@
+[submodule "tools/ai.bat"]
+	path = tools/ai.bat
+	url = https://github.com/Deerpfy/ai.bat.git

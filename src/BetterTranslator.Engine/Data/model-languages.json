@@ -1,0 +1,30 @@
+{
+  "families": [
+    {
+      "family": "translategemma",
+      "match": "translategemma",
+      "version": "4b-it-Q4_K_M",
+      "provenance": "unsourced: translategemma-4b-it-Q4_K_M.gguf publishes no language list, and the runtime metadata endpoint refused the connection",
+      "observed": "2026-08-09",
+      "sourced": [],
+      "resolves": {}
+    },
+    {
+      "family": "eurollm",
+      "match": "eurollm",
+      "version": "9B-Instruct-Q4_K_M",
+      "provenance": "EuroLLM-9B-Instruct-Q4_K_M.gguf, general.languages",
+      "observed": "2026-08-09",
+      "sourced": [
+        "en", "de", "es", "fr", "it", "pt", "pl", "nl", "tr", "sv",
+        "cs", "el", "hu", "ro", "fi", "uk", "sl", "sk", "da", "lt",
+        "lv", "et", "bg", "no", "ca", "hr", "ga", "mt", "gl", "zh",
+        "ru", "ko", "ja", "ar", "hi"
+      ],
+      "resolves": {
+        "no": ["nb"],
+        "zh": ["zh-CN", "zh-TW"]
+      }
+    }
+  ]
+}

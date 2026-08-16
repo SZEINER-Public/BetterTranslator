@@ -1,0 +1,1500 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Flags are composed from rectangles and crosses on a 22 by 15 grid, one
+         DrawingBrush per flag. The icon set deliberately ships no flag artwork
+         and asks for exactly this rather than image files.
+
+         These are the only literal colours outside the token dictionaries: a
+         national flag is not a themeable surface, and recolouring one to fit a
+         palette would make it a different flag. -->
+
+    <DrawingBrush x:Key="FlagCzech" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,7.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#D7141A">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,7.5,22,7.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#11457E">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M0,0 L11,7.5 L0,15 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagGerman" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#000000">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#DD0000">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFCE00">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagPolish" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,7.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#DC143C">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,7.5,22,7.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagSlovak" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0B4EA2">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#EE1C25">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M3,2.5 L9,2.5 L9,8.4 C9,11.1 6,12.6 6,12.6 C6,12.6 3,11.1 3,8.4 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#EE1C25">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M3.5,3 L8.5,3 L8.5,8.4 C8.5,10.7 6,11.9 6,11.9 C6,11.9 3.5,10.7 3.5,8.4 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0B4EA2">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M3.5,10 C4.1,8.75 4.75,8.75 5.1,9.75 C5.45,8.4 6.55,8.4 6.9,9.75 C7.25,8.75 7.9,8.75 8.5,10 C8.5,10.7 6,11.9 6,11.9 C6,11.9 3.5,10.7 3.5,10 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="5.65,4,0.7,5.6" />
+                            <RectangleGeometry Rect="4.6,5.3,2.8,0.6" />
+                            <RectangleGeometry Rect="4.2,7,3.6,0.6" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagFrench" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#002395">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,7.33,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="7.33,0,7.34,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#ED2939">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="14.67,0,7.33,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagItalian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#008C45">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,7.33,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="7.33,0,7.34,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#CD212A">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="14.67,0,7.33,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagSpanish" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#AA151B">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,3.75" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#F1BF00">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,3.75,22,7.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#AA151B">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,11.25,22,3.75" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <!-- Union Jack, simplified to the crosses that read at 22 by 15. -->
+    <DrawingBrush x:Key="FlagEnglish" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#012169">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <PathGeometry Figures="M0,0 L3.2,0 L22,12.8 L22,15 L18.8,15 L0,2.2 Z" />
+                            <PathGeometry Figures="M22,0 L22,2.2 L3.2,15 L0,15 L0,12.8 L18.8,0 Z" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#C8102E">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <PathGeometry Figures="M0,0 L1.6,0 L22,13.9 L22,15 L20.4,15 L0,1.1 Z" />
+                            <PathGeometry Figures="M22,0 L22,1.1 L1.6,15 L0,15 L0,13.9 L20.4,0 Z" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="8.2,0,5.6,15" />
+                            <RectangleGeometry Rect="0,4.7,22,5.6" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#C8102E">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="9.4,0,3.2,15" />
+                            <RectangleGeometry Rect="0,5.9,22,3.2" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagArmenian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#D90012">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0033A0">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#F2A800">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagAzerbaijani" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#00B5E2">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#E4002B">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#00AF66">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="EvenOdd">
+                            <EllipseGeometry Center="10.4,7.5" RadiusX="2.2" RadiusY="2.2" />
+                            <EllipseGeometry Center="11.2,7.5" RadiusX="1.75" RadiusY="1.75" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M13.6,6.25 L13.84,6.92 L14.48,6.62 L14.18,7.26 L14.85,7.5 L14.18,7.74 L14.48,8.38 L13.84,8.08 L13.6,8.75 L13.36,8.08 L12.72,8.38 L13.02,7.74 L12.35,7.5 L13.02,7.26 L12.72,6.62 L13.36,6.92 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagIndonesian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#CE1126">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,7.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,7.5,22,7.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagBengali" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#006A4E">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#F42A41">
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry Center="9.9,7.5" RadiusX="4.2" RadiusY="4.2" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagBulgarian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#00966E">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#D62612">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagDanish" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#C8102E">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="4.6,0,3.6,15" />
+                            <RectangleGeometry Rect="0,5.7,22,3.6" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagFinnish" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#003580">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="4.6,0,3.6,15" />
+                            <RectangleGeometry Rect="0,5.7,22,3.6" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagSwedish" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#006AA7">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FECC00">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="4.6,0,3.6,15" />
+                            <RectangleGeometry Rect="0,5.7,22,3.6" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagNorwegian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#BA0C2F">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="4.6,0,3.6,15" />
+                            <RectangleGeometry Rect="0,5.7,22,3.6" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#00205B">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="5.5,0,1.8,15" />
+                            <RectangleGeometry Rect="0,6.6,22,1.8" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagGreek" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#0D5EAF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="0,1.67,22,1.67" />
+                            <RectangleGeometry Rect="0,5,22,1.67" />
+                            <RectangleGeometry Rect="0,8.33,22,1.67" />
+                            <RectangleGeometry Rect="0,11.67,22,1.67" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0D5EAF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,8.33,8.33" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="3.47,0,1.39,8.33" />
+                            <RectangleGeometry Rect="0,3.47,8.33,1.39" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagHebrew" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0038B8">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="0,2.1,22,1.8" />
+                            <RectangleGeometry Rect="0,11.1,22,1.8" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0038B8">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="EvenOdd">
+                            <PathGeometry Figures="M11,4.8 L13.34,8.85 L8.66,8.85 Z" />
+                            <PathGeometry Figures="M11,10.2 L8.66,6.15 L13.34,6.15 Z" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagHungarian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#CE2939">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#477050">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagJapanese" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#BC002D">
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry Center="11,7.5" RadiusX="4.5" RadiusY="4.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagDutch" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#AE1C28">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#21468B">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagRomanian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#002B7F">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,7.33,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FCD116">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="7.33,0,7.34,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#CE1126">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="14.67,0,7.33,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagRussian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0039A6">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#D52B1E">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagThai" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#A51931">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="0,0,22,2.5" />
+                            <RectangleGeometry Rect="0,12.5,22,2.5" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#F4F5F8">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="0,2.5,22,2.5" />
+                            <RectangleGeometry Rect="0,10,22,2.5" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#2D2A4A">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagTurkish" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#E30A17">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="EvenOdd">
+                            <EllipseGeometry Center="9,7.5" RadiusX="3" RadiusY="3" />
+                            <EllipseGeometry Center="10,7.5" RadiusX="2.4" RadiusY="2.4" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M13.4,5.75 L13.79,6.96 L15.06,6.96 L14.04,7.71 L14.43,8.92 L13.4,8.17 L12.37,8.92 L12.76,7.71 L11.74,6.96 L13.01,6.96 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagUkrainian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#005BBB">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,7.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFD500">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,7.5,22,7.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagUrdu" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#01411C">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,5.5,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="EvenOdd">
+                            <EllipseGeometry Center="12.9,7.5" RadiusX="3.1" RadiusY="3.1" />
+                            <EllipseGeometry Center="13.9,7.5" RadiusX="2.5" RadiusY="2.5" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M16.2,4.1 L16.54,5.14 L17.63,5.14 L16.74,5.78 L17.08,6.81 L16.2,6.17 L15.32,6.81 L15.66,5.78 L14.77,5.14 L15.86,5.14 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagVietnamese" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#DA251D">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFF00">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M11,3.3 L11.94,6.2 L14.99,6.2 L12.53,8 L13.47,10.9 L11,9.1 L8.53,10.9 L9.47,8 L7.01,6.2 L10.06,6.2 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagChineseSimplified" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#EE1C25">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFDE00">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <PathGeometry Figures="M3.67,1.55 L4.16,3.07 L5.76,3.07 L4.47,4.01 L4.96,5.53 L3.67,4.59 L2.38,5.53 L2.87,4.01 L1.58,3.07 L3.18,3.07 Z" />
+                            <PathGeometry Figures="M7.33,0.75 L7.5,1.27 L8.04,1.27 L7.6,1.59 L7.77,2.11 L7.33,1.79 L6.89,2.11 L7.06,1.59 L6.62,1.27 L7.16,1.27 Z" />
+                            <PathGeometry Figures="M8.8,2.25 L8.97,2.77 L9.51,2.77 L9.07,3.09 L9.24,3.61 L8.8,3.29 L8.36,3.61 L8.53,3.09 L8.09,2.77 L8.63,2.77 Z" />
+                            <PathGeometry Figures="M8.8,4.5 L8.97,5.02 L9.51,5.02 L9.07,5.34 L9.24,5.86 L8.8,5.54 L8.36,5.86 L8.53,5.34 L8.09,5.02 L8.63,5.02 Z" />
+                            <PathGeometry Figures="M7.33,6 L7.5,6.52 L8.04,6.52 L7.6,6.84 L7.77,7.36 L7.33,7.04 L6.89,7.36 L7.06,6.84 L6.62,6.52 L7.16,6.52 Z" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagChineseTraditional" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FE0000">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#000095">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,11,7.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M5.5,1.45 L5.83,2.53 L6.65,1.76 L6.39,2.86 L7.49,2.6 L6.72,3.42 L7.8,3.75 L6.72,4.08 L7.49,4.9 L6.39,4.64 L6.65,5.74 L5.83,4.97 L5.5,6.05 L5.17,4.97 L4.35,5.74 L4.61,4.64 L3.51,4.9 L4.28,4.08 L3.2,3.75 L4.28,3.42 L3.51,2.6 L4.61,2.86 L4.35,1.76 L5.17,2.53 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#000095">
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry Center="5.5,3.75" RadiusX="1.35" RadiusY="1.35" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry Center="5.5,3.75" RadiusX="1.1" RadiusY="1.1" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagEstonian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#0072CE">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#000000">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagIrish" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#169B62">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,7.33,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="7.33,0,7.34,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FF883E">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="14.67,0,7.33,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagLatvian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#9E3039">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="0,0,22,6" />
+                            <RectangleGeometry Rect="0,9,22,6" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,6,22,3" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagLithuanian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FDB913">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#006A44">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#C1272D">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagSerbian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#C6363C">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0C4076">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagSlovenian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#005DA4">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#ED1C24">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#ED1C24">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M3,1.6 L7.4,1.6 L7.4,5 C7.4,7 5.2,8.1 5.2,8.1 C5.2,8.1 3,7 3,5 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#005DA4">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M3.35,1.95 L7.05,1.95 L7.05,5 C7.05,6.8 5.2,7.7 5.2,7.7 C5.2,7.7 3.35,6.8 3.35,5 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <PathGeometry Figures="M3.75,6.4 L4.45,4.7 L4.8,5.3 L5.2,3.5 L5.6,5.3 L5.95,4.7 L6.65,6.4 Z" />
+                            <RectangleGeometry Rect="3.75,6.7,2.9,0.28" />
+                            <RectangleGeometry Rect="3.9,7.2,2.6,0.28" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFDF00">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <PathGeometry Figures="M4.3,1.9 L4.42,2.24 L4.78,2.18 L4.55,2.45 L4.78,2.72 L4.42,2.66 L4.3,3 L4.18,2.66 L3.82,2.72 L4.05,2.45 L3.82,2.18 L4.18,2.24 Z" />
+                            <PathGeometry Figures="M6.1,1.9 L6.22,2.24 L6.58,2.18 L6.35,2.45 L6.58,2.72 L6.22,2.66 L6.1,3 L5.98,2.66 L5.62,2.72 L5.85,2.45 L5.62,2.18 L5.98,2.24 Z" />
+                            <PathGeometry Figures="M5.2,3.3 L5.32,3.64 L5.68,3.58 L5.45,3.85 L5.68,4.12 L5.32,4.06 L5.2,4.4 L5.08,4.06 L4.72,4.12 L4.95,3.85 L4.72,3.58 L5.08,3.64 Z" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagCroatian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FF0000">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#171796">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M8.25,4.25 L13.75,4.25 L13.75,8.3 C13.75,10.7 11,12 11,12 C11,12 8.25,10.7 8.25,8.3 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <DrawingGroup ClipGeometry="M8.6,4.6 L13.4,4.6 L13.4,8.25 C13.4,10.45 11,11.6 11,11.6 C11,11.6 8.6,10.45 8.6,8.25 Z">
+                    <GeometryDrawing Brush="#FFFFFF">
+                        <GeometryDrawing.Geometry>
+                            <RectangleGeometry Rect="8.6,4.6,4.8,7" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#FF0000">
+                        <GeometryDrawing.Geometry>
+                            <GeometryGroup FillRule="Nonzero">
+                                <RectangleGeometry Rect="8.6,4.6,0.96,1.2" />
+                                <RectangleGeometry Rect="10.52,4.6,0.96,1.2" />
+                                <RectangleGeometry Rect="12.44,4.6,0.96,1.2" />
+                                <RectangleGeometry Rect="9.56,5.8,0.96,1.2" />
+                                <RectangleGeometry Rect="11.48,5.8,0.96,1.2" />
+                                <RectangleGeometry Rect="8.6,7,0.96,1.2" />
+                                <RectangleGeometry Rect="10.52,7,0.96,1.2" />
+                                <RectangleGeometry Rect="12.44,7,0.96,1.2" />
+                                <RectangleGeometry Rect="9.56,8.2,0.96,1.2" />
+                                <RectangleGeometry Rect="11.48,8.2,0.96,1.2" />
+                                <RectangleGeometry Rect="8.6,9.4,0.96,1.2" />
+                                <RectangleGeometry Rect="10.52,9.4,0.96,1.2" />
+                                <RectangleGeometry Rect="12.44,9.4,0.96,1.2" />
+                                <RectangleGeometry Rect="9.56,10.6,0.96,1.2" />
+                                <RectangleGeometry Rect="11.48,10.6,0.96,1.2" />
+                            </GeometryGroup>
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                </DrawingGroup>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagPortuguese" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#006600">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,8.8,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FF0000">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="8.8,0,13.2,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FFCC00" Thickness="0.34" />
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <EllipseGeometry Center="8.8,7.5" RadiusX="3.3" RadiusY="3.3" />
+                            <EllipseGeometry Center="8.8,7.5" RadiusX="1.5" RadiusY="3.3" />
+                            <EllipseGeometry Center="8.8,7.5" RadiusX="3.3" RadiusY="1.2" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FF0000">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M7.75,6.1 L9.85,6.1 L9.85,7.9 C9.85,8.95 8.8,9.5 8.8,9.5 C8.8,9.5 7.75,8.95 7.75,7.9 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M8.05,6.4 L9.55,6.4 L9.55,7.85 C9.55,8.65 8.8,9.15 8.8,9.15 C8.8,9.15 8.05,8.65 8.05,7.85 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#003399">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <EllipseGeometry Center="8.8,6.95" RadiusX="0.24" RadiusY="0.24" />
+                            <EllipseGeometry Center="8.8,8.25" RadiusX="0.24" RadiusY="0.24" />
+                            <EllipseGeometry Center="8.3,7.6" RadiusX="0.24" RadiusY="0.24" />
+                            <EllipseGeometry Center="9.3,7.6" RadiusX="0.24" RadiusY="0.24" />
+                            <EllipseGeometry Center="8.8,7.6" RadiusX="0.24" RadiusY="0.24" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagHindi" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FF9933">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#138808">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#000080" Thickness="0.14" />
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <EllipseGeometry Center="11,7.5" RadiusX="2.1" RadiusY="2.1" />
+                            <LineGeometry StartPoint="11.25,7.5" EndPoint="13.05,7.5" />
+                            <LineGeometry StartPoint="11.24,7.56" EndPoint="12.98,8.03" />
+                            <LineGeometry StartPoint="11.22,7.62" EndPoint="12.78,8.52" />
+                            <LineGeometry StartPoint="11.18,7.68" EndPoint="12.45,8.95" />
+                            <LineGeometry StartPoint="11.12,7.72" EndPoint="12.02,9.28" />
+                            <LineGeometry StartPoint="11.06,7.74" EndPoint="11.53,9.48" />
+                            <LineGeometry StartPoint="11,7.75" EndPoint="11,9.55" />
+                            <LineGeometry StartPoint="10.94,7.74" EndPoint="10.47,9.48" />
+                            <LineGeometry StartPoint="10.88,7.72" EndPoint="9.98,9.28" />
+                            <LineGeometry StartPoint="10.82,7.68" EndPoint="9.55,8.95" />
+                            <LineGeometry StartPoint="10.78,7.62" EndPoint="9.22,8.52" />
+                            <LineGeometry StartPoint="10.76,7.56" EndPoint="9.02,8.03" />
+                            <LineGeometry StartPoint="10.75,7.5" EndPoint="8.95,7.5" />
+                            <LineGeometry StartPoint="10.76,7.44" EndPoint="9.02,6.97" />
+                            <LineGeometry StartPoint="10.78,7.38" EndPoint="9.22,6.48" />
+                            <LineGeometry StartPoint="10.82,7.32" EndPoint="9.55,6.05" />
+                            <LineGeometry StartPoint="10.88,7.28" EndPoint="9.98,5.72" />
+                            <LineGeometry StartPoint="10.94,7.26" EndPoint="10.47,5.52" />
+                            <LineGeometry StartPoint="11,7.25" EndPoint="11,5.45" />
+                            <LineGeometry StartPoint="11.06,7.26" EndPoint="11.53,5.52" />
+                            <LineGeometry StartPoint="11.12,7.28" EndPoint="12.02,5.72" />
+                            <LineGeometry StartPoint="11.18,7.32" EndPoint="12.45,6.05" />
+                            <LineGeometry StartPoint="11.22,7.38" EndPoint="12.78,6.48" />
+                            <LineGeometry StartPoint="11.24,7.44" EndPoint="12.98,6.97" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#000080">
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry Center="11,7.5" RadiusX="0.4" RadiusY="0.4" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagKorean" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#CD2E3A">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M8.5,7.5 A2.5,2.5 0 0 1 13.5,7.5 A1.25,1.25 0 0 0 11,7.5 A1.25,1.25 0 0 1 8.5,7.5 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0047A0">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M8.5,7.5 A2.5,2.5 0 0 0 13.5,7.5 A1.25,1.25 0 0 1 11,7.5 A1.25,1.25 0 0 0 8.5,7.5 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#000000">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <PathGeometry Figures="M4.38,5.13 L6.07,2.53 L6.42,2.76 L4.74,5.36 Z" />
+                            <PathGeometry Figures="M3.78,4.74 L5.47,2.14 L5.82,2.36 L4.13,4.96 Z" />
+                            <PathGeometry Figures="M3.18,4.34 L4.86,1.74 L5.22,1.97 L3.53,4.57 Z" />
+                            <PathGeometry Figures="M17.62,9.87 L16.9,10.97 L16.55,10.74 L17.26,9.64 Z" />
+                            <PathGeometry Figures="M16.64,11.37 L15.93,12.47 L15.58,12.24 L16.29,11.14 Z" />
+                            <PathGeometry Figures="M18.22,10.26 L17.51,11.36 L17.15,11.13 L17.87,10.04 Z" />
+                            <PathGeometry Figures="M17.25,11.77 L16.53,12.86 L16.18,12.64 L16.89,11.54 Z" />
+                            <PathGeometry Figures="M18.82,10.66 L18.11,11.76 L17.76,11.53 L18.47,10.43 Z" />
+                            <PathGeometry Figures="M17.85,12.16 L17.14,13.26 L16.78,13.03 L17.5,11.93 Z" />
+                            <PathGeometry Figures="M15.93,2.53 L16.64,3.63 L16.29,3.86 L15.58,2.76 Z" />
+                            <PathGeometry Figures="M16.9,4.03 L17.62,5.13 L17.26,5.36 L16.55,4.26 Z" />
+                            <PathGeometry Figures="M16.53,2.14 L18.22,4.74 L17.87,4.96 L16.18,2.36 Z" />
+                            <PathGeometry Figures="M17.14,1.74 L17.85,2.84 L17.5,3.07 L16.78,1.97 Z" />
+                            <PathGeometry Figures="M18.11,3.24 L18.82,4.34 L18.47,4.57 L17.76,3.47 Z" />
+                            <PathGeometry Figures="M6.07,12.47 L4.38,9.87 L4.74,9.64 L6.42,12.24 Z" />
+                            <PathGeometry Figures="M5.47,12.86 L4.75,11.77 L5.11,11.54 L5.82,12.64 Z" />
+                            <PathGeometry Figures="M4.49,11.36 L3.78,10.26 L4.13,10.04 L4.85,11.13 Z" />
+                            <PathGeometry Figures="M4.86,13.26 L3.18,10.66 L3.53,10.43 L5.22,13.03 Z" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagFilipino" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#0038A8">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,7.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#CE1126">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,7.5,22,7.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M0,0 L13,7.5 L0,15 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FCD116">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <PathGeometry Figures="M4.3,5.75 L4.58,6.82 L5.54,6.26 L4.98,7.22 L6.05,7.5 L4.98,7.78 L5.54,8.74 L4.58,8.18 L4.3,9.25 L4.02,8.18 L3.06,8.74 L3.62,7.78 L2.55,7.5 L3.62,7.22 L3.06,6.26 L4.02,6.82 Z" />
+                            <PathGeometry Figures="M1.9,1.28 L2.05,1.7 L2.49,1.71 L2.14,1.98 L2.26,2.4 L1.9,2.15 L1.54,2.4 L1.66,1.98 L1.31,1.71 L1.75,1.7 Z" />
+                            <PathGeometry Figures="M1.9,12.68 L2.05,13.1 L2.49,13.11 L2.14,13.38 L2.26,13.8 L1.9,13.55 L1.54,13.8 L1.66,13.38 L1.31,13.11 L1.75,13.1 Z" />
+                            <PathGeometry Figures="M10.4,6.88 L10.55,7.3 L10.99,7.31 L10.64,7.58 L10.76,8 L10.4,7.75 L10.04,8 L10.16,7.58 L9.81,7.31 L10.25,7.3 Z" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagMalay" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#CC0001">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="0,0,22,1.07" />
+                            <RectangleGeometry Rect="0,2.14,22,1.07" />
+                            <RectangleGeometry Rect="0,4.29,22,1.07" />
+                            <RectangleGeometry Rect="0,6.43,22,1.07" />
+                            <RectangleGeometry Rect="0,8.57,22,1.07" />
+                            <RectangleGeometry Rect="0,10.71,22,1.07" />
+                            <RectangleGeometry Rect="0,12.86,22,1.07" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#010066">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,11,8.57" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFCC00">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="EvenOdd">
+                            <EllipseGeometry Center="4.3,4.3" RadiusX="1.95" RadiusY="1.95" />
+                            <EllipseGeometry Center="5.1,4.3" RadiusX="1.6" RadiusY="1.6" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFCC00">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M6.2,3.15 L6.4,3.72 L6.83,3.29 L6.76,3.9 L7.33,3.7 L7.01,4.21 L7.61,4.28 L7.1,4.6 L7.61,4.92 L7.01,4.99 L7.33,5.5 L6.76,5.3 L6.83,5.91 L6.4,5.48 L6.2,6.05 L6,5.48 L5.57,5.91 L5.64,5.3 L5.07,5.5 L5.39,4.99 L4.79,4.92 L5.3,4.6 L4.79,4.28 L5.39,4.21 L5.07,3.7 L5.64,3.9 L5.57,3.29 L6,3.72 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagMaltese" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,11,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#CF142B">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="11,0,11,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#CF142B">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="2.35,1.3,1.1,3.2" />
+                            <RectangleGeometry Rect="1.3,2.35,3.2,1.1" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#C4C4C4">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="2.48,1.45,0.85,2.9" />
+                            <RectangleGeometry Rect="1.45,2.48,2.9,0.85" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagAlbanian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#E41E20">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#000000">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M11,5.9 L12,5 L12.9,4.4 L13.6,4.55 L14.9,4.15 L14.2,5.05 L13.5,5.35 L12.9,5.85 L12.6,6.35 L14.2,6.25 L15.9,6.6 L17.3,7.35 L15.6,7.4 L16.6,8 L14.9,8.05 L15.6,8.75 L13.9,8.5 L13.1,8.9 L12.6,9.6 L12.9,10.5 L13.4,11.3 L11.9,10.8 L11.5,11.6 L11,11.1 L10.5,11.6 L10.1,10.8 L8.6,11.3 L9.1,10.5 L9.4,9.6 L8.9,8.9 L8.1,8.5 L6.4,8.75 L7.1,8.05 L5.4,8 L6.4,7.4 L4.7,7.35 L6.1,6.6 L7.8,6.25 L9.4,6.35 L9.1,5.85 L8.5,5.35 L7.8,5.05 L7.1,4.15 L8.4,4.55 L9.1,4.4 L10,5 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagKazakh" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#00AFCA">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FEC50C">
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry Center="11.5,5.6" RadiusX="1.5" RadiusY="1.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FEC50C" Thickness="0.16" />
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <LineGeometry StartPoint="13.05,5.6" EndPoint="14.2,5.6" />
+                            <LineGeometry StartPoint="13.02,5.9" EndPoint="14.15,6.13" />
+                            <LineGeometry StartPoint="12.93,6.19" EndPoint="13.99,6.63" />
+                            <LineGeometry StartPoint="12.79,6.46" EndPoint="13.74,7.1" />
+                            <LineGeometry StartPoint="12.6,6.7" EndPoint="13.41,7.51" />
+                            <LineGeometry StartPoint="12.36,6.89" EndPoint="13,7.84" />
+                            <LineGeometry StartPoint="12.09,7.03" EndPoint="12.53,8.09" />
+                            <LineGeometry StartPoint="11.8,7.12" EndPoint="12.03,8.25" />
+                            <LineGeometry StartPoint="11.5,7.15" EndPoint="11.5,8.3" />
+                            <LineGeometry StartPoint="11.2,7.12" EndPoint="10.97,8.25" />
+                            <LineGeometry StartPoint="10.91,7.03" EndPoint="10.47,8.09" />
+                            <LineGeometry StartPoint="10.64,6.89" EndPoint="10,7.84" />
+                            <LineGeometry StartPoint="10.4,6.7" EndPoint="9.59,7.51" />
+                            <LineGeometry StartPoint="10.21,6.46" EndPoint="9.26,7.1" />
+                            <LineGeometry StartPoint="10.07,6.19" EndPoint="9.01,6.63" />
+                            <LineGeometry StartPoint="9.98,5.9" EndPoint="8.85,6.13" />
+                            <LineGeometry StartPoint="9.95,5.6" EndPoint="8.8,5.6" />
+                            <LineGeometry StartPoint="9.98,5.3" EndPoint="8.85,5.07" />
+                            <LineGeometry StartPoint="10.07,5.01" EndPoint="9.01,4.57" />
+                            <LineGeometry StartPoint="10.21,4.74" EndPoint="9.26,4.1" />
+                            <LineGeometry StartPoint="10.4,4.5" EndPoint="9.59,3.69" />
+                            <LineGeometry StartPoint="10.64,4.31" EndPoint="10,3.36" />
+                            <LineGeometry StartPoint="10.91,4.17" EndPoint="10.47,3.11" />
+                            <LineGeometry StartPoint="11.2,4.08" EndPoint="10.97,2.95" />
+                            <LineGeometry StartPoint="11.5,4.05" EndPoint="11.5,2.9" />
+                            <LineGeometry StartPoint="11.8,4.08" EndPoint="12.03,2.95" />
+                            <LineGeometry StartPoint="12.09,4.17" EndPoint="12.53,3.11" />
+                            <LineGeometry StartPoint="12.36,4.31" EndPoint="13,3.36" />
+                            <LineGeometry StartPoint="12.6,4.5" EndPoint="13.41,3.69" />
+                            <LineGeometry StartPoint="12.79,4.74" EndPoint="13.74,4.1" />
+                            <LineGeometry StartPoint="12.93,5.01" EndPoint="13.99,4.57" />
+                            <LineGeometry StartPoint="13.02,5.3" EndPoint="14.15,5.07" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FEC50C">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M11.5,8.95 L12.1,9.15 L13.2,9 L14.6,9.25 L16.2,9.9 L14.7,9.85 L13.5,10.15 L12.3,10.1 L11.5,10.5 L10.7,10.1 L9.5,10.15 L8.3,9.85 L6.8,9.9 L8.4,9.25 L9.8,9 L10.9,9.15 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FEC50C">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <PathGeometry Figures="M0.9,1.5 L1.35,2.2 L0.9,2.9 L0.45,2.2 Z" />
+                            <PathGeometry Figures="M0.9,4.3 L1.35,5 L0.9,5.7 L0.45,5 Z" />
+                            <PathGeometry Figures="M0.9,7.1 L1.35,7.8 L0.9,8.5 L0.45,7.8 Z" />
+                            <PathGeometry Figures="M0.9,9.9 L1.35,10.6 L0.9,11.3 L0.45,10.6 Z" />
+                            <PathGeometry Figures="M0.9,12.7 L1.35,13.4 L0.9,14.1 L0.45,13.4 Z" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagPersian" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#239F40">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,5,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#DA0000">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,10,22,5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="0.75,10.13,1.05,0.42" />
+                            <RectangleGeometry Rect="2.8,10.13,1.05,0.42" />
+                            <RectangleGeometry Rect="4.85,10.13,1.05,0.42" />
+                            <RectangleGeometry Rect="6.9,10.13,1.05,0.42" />
+                            <RectangleGeometry Rect="8.95,10.13,1.05,0.42" />
+                            <RectangleGeometry Rect="11,10.13,1.05,0.42" />
+                            <RectangleGeometry Rect="13.05,10.13,1.05,0.42" />
+                            <RectangleGeometry Rect="15.1,10.13,1.05,0.42" />
+                            <RectangleGeometry Rect="17.15,10.13,1.05,0.42" />
+                            <RectangleGeometry Rect="19.2,10.13,1.05,0.42" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="0.75,4.13,1.05,0.42" />
+                            <RectangleGeometry Rect="2.8,4.13,1.05,0.42" />
+                            <RectangleGeometry Rect="4.85,4.13,1.05,0.42" />
+                            <RectangleGeometry Rect="6.9,4.13,1.05,0.42" />
+                            <RectangleGeometry Rect="8.95,4.13,1.05,0.42" />
+                            <RectangleGeometry Rect="11,4.13,1.05,0.42" />
+                            <RectangleGeometry Rect="13.05,4.13,1.05,0.42" />
+                            <RectangleGeometry Rect="15.1,4.13,1.05,0.42" />
+                            <RectangleGeometry Rect="17.15,4.13,1.05,0.42" />
+                            <RectangleGeometry Rect="19.2,4.13,1.05,0.42" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#DA0000">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <PathGeometry Figures="M11,6.05 L11.32,6.6 L11.32,8.85 L10.68,8.85 L10.68,6.6 Z" />
+                            <RectangleGeometry Rect="10.15,6.3,1.7,0.34" />
+                            <PathGeometry Figures="M10.35,8.85 C9.9,8.3 9.85,7.45 10.15,6.9 L10.5,7.25 C10.3,7.65 10.32,8.3 10.62,8.85 Z" />
+                            <PathGeometry Figures="M11.65,8.85 C12.1,8.3 12.15,7.45 11.85,6.9 L11.5,7.25 C11.7,7.65 11.68,8.3 11.38,8.85 Z" />
+                            <PathGeometry Figures="M9.7,8.85 C9.1,8.05 9.05,7 9.55,6.25 L9.92,6.62 C9.55,7.25 9.55,8.1 9.98,8.85 Z" />
+                            <PathGeometry Figures="M12.3,8.85 C12.9,8.05 12.95,7 12.45,6.25 L12.08,6.62 C12.45,7.25 12.45,8.1 12.02,8.85 Z" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagCatalan" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FCDD09">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#DA121A">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="Nonzero">
+                            <RectangleGeometry Rect="0,1.67,22,1.67" />
+                            <RectangleGeometry Rect="0,5,22,1.67" />
+                            <RectangleGeometry Rect="0,8.33,22,1.67" />
+                            <RectangleGeometry Rect="0,11.67,22,1.67" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagArabic" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#007A3D">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FFFFFF" Thickness="0.45" />
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry Center="11,7.5" RadiusX="4.2" RadiusY="4.2" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup FillRule="EvenOdd">
+                            <EllipseGeometry Center="11,7.9" RadiusX="2.9" RadiusY="2.9" />
+                            <EllipseGeometry Center="11,6.9" RadiusX="2.45" RadiusY="2.45" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagSwahili" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#1EB53A">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M0,0 L22,0 L0,15 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#00A3DD">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M22,0 L22,15 L0,15 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#FCD116">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M-0.96,13.6 L21.04,-1.4 L22.96,1.4 L0.96,16.4 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#000000">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M-0.62,14.09 L21.38,-0.91 L22.62,0.91 L0.62,15.91 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="FlagGalician" Stretch="Fill" Viewbox="0,0,22,15" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,22,15" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0066CC">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M0,0 L3.6,0 L22,12.6 L22,15 L18.4,15 L0,2.4 Z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+</ResourceDictionary>

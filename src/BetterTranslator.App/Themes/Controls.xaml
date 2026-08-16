@@ -1,0 +1,1648 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+                    xmlns:controls="clr-namespace:BetterTranslator.App.Controls"
+                    xmlns:convert="clr-namespace:BetterTranslator.App.Converters"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/BetterTranslator;component/Themes/Typography.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/BetterTranslator;component/Themes/Metrics.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/BetterTranslator;component/Themes/Icons.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    <convert:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
+    <convert:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibility" />
+    <convert:ResourceKeyToBrushConverter x:Key="FlagBrush" />
+    <convert:ResourceKeyToIconConverter x:Key="KeyToIcon" />
+    <convert:StringNotEmptyToVisibilityConverter x:Key="NotEmptyToVisibility" />
+    <convert:ZeroToVisibilityConverter x:Key="ZeroToVisibility" />
+    <convert:EqualToVisibilityConverter x:Key="EqualToVisibility" />
+
+    <!-- An IconDefinition used as content draws itself, which is what lets a
+         MenuItem take one straight into its Icon slot. -->
+    <DataTemplate DataType="{x:Type controls:IconDefinition}">
+        <controls:IconView Definition="{Binding}" />
+    </DataTemplate>
+
+    <!-- ================================================================
+         Window caption controls.
+         46 by 32 and square, which is what Windows draws, and Segoe Fluent
+         Icons glyphs, which the mapping table assigns to caption controls
+         specifically. C1 governs the toolbar buttons, not these.
+         ================================================================ -->
+
+    <!-- The icon set ships its own minimize, maximize, restore and close marks,
+         so those are used rather than Segoe Fluent Icons glyphs. -->
+    <Style x:Key="CaptionButton" TargetType="{x:Type controls:ChromeButton}">
+        <Setter Property="Width" Value="{StaticResource CaptionButtonWidth}" />
+        <Setter Property="Height" Value="{StaticResource CaptionHeight}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushIcon}" />
+        <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:ChromeButton}">
+                    <Border x:Name="Fill" Background="{TemplateBinding Background}">
+                        <controls:IconView Definition="{TemplateBinding Icon}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHoverStrong}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushBorder}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Send: a filled accent disc with a white arrow, which is what the design
+         reference shows and what the composer had lost by using a bare chrome
+         button. The one action on the composer that commits should not look like
+         the icons that merely open things beside it.
+
+         Disabled goes to the muted track rather than to a paler accent: a
+         washed-out blue disc still reads as the primary action and invites the
+         click it will refuse. -->
+    <Style x:Key="SendButton" TargetType="{x:Type controls:ChromeButton}">
+        <Setter Property="Width" Value="{StaticResource SendButtonSize}" />
+        <Setter Property="Height" Value="{StaticResource SendButtonSize}" />
+        <Setter Property="Background" Value="{StaticResource BrushAccentDeep}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushSurface}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:ChromeButton}">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource SendButtonRadius}"
+                            SnapsToDevicePixels="True">
+                        <controls:IconView x:Name="Glyph"
+                                           Definition="{TemplateBinding Icon}"
+                                           Foreground="{TemplateBinding Foreground}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushAccentPressed}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushAccentPressed}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushTrackAlt}" />
+                            <Setter TargetName="Glyph" Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="CaptionCloseButton" TargetType="{x:Type controls:ChromeButton}" BasedOn="{StaticResource CaptionButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:ChromeButton}">
+                    <Border x:Name="Fill" Background="{TemplateBinding Background}">
+                        <controls:IconView x:Name="Glyph"
+                                           Definition="{TemplateBinding Icon}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushDanger}" />
+                            <Setter TargetName="Glyph" Property="Foreground" Value="{StaticResource BrushSurface}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushDangerText}" />
+                            <Setter TargetName="Glyph" Property="Foreground" Value="{StaticResource BrushSurface}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ================================================================
+         C1 ChromeButton
+         ================================================================ -->
+
+    <Style TargetType="{x:Type controls:ChromeButton}">
+        <Setter Property="Width" Value="{StaticResource ChromeButtonSize}" />
+        <Setter Property="Height" Value="{StaticResource ChromeButtonSize}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushIcon}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:ChromeButton}">
+                    <!-- The border is always here and only changes colour, so an
+                         outlined button occupies exactly the space a bare one does. -->
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="Transparent"
+                            BorderThickness="{StaticResource BorderThickness}"
+                            CornerRadius="{StaticResource RadiusDefault}"
+                            SnapsToDevicePixels="True">
+                        <controls:IconView x:Name="Glyph"
+                                           Definition="{TemplateBinding Icon}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsOutlined" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushSurface}" />
+                            <Setter TargetName="Fill" Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+                        </Trigger>
+                        <!-- Active follows the outline trigger so an active toolbar
+                             button takes the accent outline rather than the grey one. -->
+                        <Trigger Property="IsActive" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushAccentTint}" />
+                            <Setter TargetName="Fill" Property="BorderBrush" Value="{StaticResource BrushAccentBorder}" />
+                            <Setter TargetName="Glyph" Property="Foreground" Value="{StaticResource BrushAccentDeep}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHover}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHoverStrong}" />
+                        </Trigger>
+                        <!-- Disabled takes the muted stroke and no hover at all. -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Fill" Property="Background" Value="Transparent" />
+                            <Setter TargetName="Glyph" Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- A chrome button that carries a label as well as icons. Free width, no
+         outline: used for the sidebar section headers and the chat name, which
+         are labels you can click rather than controls in their own right. -->
+    <Style x:Key="ToolbarChromeButton" TargetType="Button">
+        <Setter Property="Height" Value="{StaticResource ChromeButtonSize}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushIcon}" />
+        <Setter Property="Padding" Value="7,0,7,0" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource RadiusDefault}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHover}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHoverStrong}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- The project selector with no scope set: an outlined toolbar control of
+         free width. It names a setting you can change, so unlike the styles
+         above it reads as a control rather than as a label. Once a scope IS
+         set the selector is replaced outright by the scope chip below, which
+         is static apart from its clear button. -->
+    <Style x:Key="ProjectSelectorButton" TargetType="{x:Type controls:ChromeButton}">
+        <Setter Property="Height" Value="{StaticResource ChromeButtonSize}" />
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        <Setter Property="BorderThickness" Value="{StaticResource BorderThickness}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushIcon}" />
+        <Setter Property="Padding" Value="8,0,8,0" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:ChromeButton}">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource RadiusDefault}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <!-- Foreground rides the presenter, not the border, so the
+                             content's icons inherit it. -->
+                        <ContentPresenter VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHover}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHoverStrong}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- The clear button inside the scope chip. It sits on the accent tint, so
+         its hover is the accent hover: BrushHover would read as grey dirt. -->
+    <Style x:Key="ScopeChipClearButton" TargetType="{x:Type controls:ChromeButton}">
+        <Setter Property="Width" Value="{StaticResource ChipButtonSize}" />
+        <Setter Property="Height" Value="{StaticResource ChipButtonSize}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushAccentDeep}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:ChromeButton}">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource RadiusMd}"
+                            SnapsToDevicePixels="True">
+                        <controls:IconView Definition="{TemplateBinding Icon}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushAccentHover}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushAccentBorder}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ================================================================
+         Copy button under an entry column
+         Present but invisible until the pointer is over the entry, so the
+         column keeps its height and nothing below it moves when it appears.
+         ================================================================ -->
+
+    <Style x:Key="EntryCopyButton" TargetType="{x:Type controls:ChromeButton}">
+        <Setter Property="Width" Value="{StaticResource ChipButtonSize}" />
+        <Setter Property="Height" Value="{StaticResource ChipButtonSize}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextTertiary}" />
+        <Setter Property="Opacity" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <!-- Pulled back level with the text it copies, which the button's own
+             padding would otherwise push it out of. -->
+        <Setter Property="Margin" Value="-5,2,0,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:ChromeButton}">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource RadiusDefault}"
+                            SnapsToDevicePixels="True">
+                        <controls:IconView Definition="{TemplateBinding Icon}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHover}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHoverStrong}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <!-- Shown while the pointer is over this button's own column, not
+                 merely over the button, so it is there to be aimed at. The
+                 nearest Border above it is that column: hovering the source
+                 offers the source's button and nothing else. -->
+            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Border}}" Value="True">
+                <Setter Property="Opacity" Value="1" />
+            </DataTrigger>
+            <!-- Keyboard reaches it whether or not a pointer ever does. -->
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="Opacity" Value="1" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ================================================================
+         C5 SegmentedControl
+         ================================================================ -->
+
+    <Style x:Key="SegmentItemStyle" TargetType="ListBoxItem">
+        <Setter Property="Width" Value="{Binding Width}" />
+        <Setter Property="Height" Value="{StaticResource SegmentHeight}" />
+        <Setter Property="IsEnabled" Value="{Binding IsUnlocked}" />
+        <Setter Property="ToolTip" Value="{Binding LockedReason}" />
+        <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+        <Setter Property="AutomationProperties.Name" Value="{Binding AutomationName}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextSecondarySize}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <!-- Transparent, not unset: the thumb behind supplies the
+                         selected fill, and this border only carries hover. -->
+                    <Border x:Name="Fill"
+                            Background="Transparent"
+                            CornerRadius="{StaticResource RadiusDefault}"
+                            SnapsToDevicePixels="True">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                            <controls:IconView x:Name="Glyph"
+                                               Definition="{Binding Icon}"
+                                               Margin="0,0,5,0"
+                                               VerticalAlignment="Center" />
+                            <!-- lock-segment is the 14 box variant, sized to sit
+                                 inline beside a 12.5 label. -->
+                            <controls:IconView x:Name="Padlock"
+                                               Definition="{StaticResource IconLockSegment}"
+                                               Margin="0,0,4,0"
+                                               Visibility="Collapsed"
+                                               VerticalAlignment="Center" />
+                            <TextBlock x:Name="Label"
+                                       Text="{Binding Label}"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding HasIcon}" Value="False">
+                            <Setter TargetName="Glyph" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <!-- Memory is the one segment that overrides this,
+                                 taking BrushAccentDeep while it is active. -->
+                            <Setter Property="Foreground"
+                                    Value="{Binding ActiveForeground, TargetNullValue={StaticResource BrushText}}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsSelected" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <!-- Already sitting on a track, so hover is the
+                                 stronger fill. -->
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHoverStrong}" />
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+                            <Setter TargetName="Padlock" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="Fill" Property="Background" Value="Transparent" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type controls:SegmentedControl}">
+        <Setter Property="Background" Value="{StaticResource BrushTrack}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="{StaticResource Space1Thickness}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource SegmentItemStyle}" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:SegmentedControl}">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource RadiusPanel}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <Grid x:Name="PART_Track">
+                            <Border x:Name="PART_Thumb"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Stretch"
+                                    Background="{StaticResource BrushSurface}"
+                                    CornerRadius="{StaticResource RadiusDefault}"
+                                    Effect="{StaticResource ShadowThumb}" />
+                            <ItemsPresenter />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ================================================================
+         C24 ResizeSeparator
+         ================================================================ -->
+
+    <Style TargetType="{x:Type controls:ResizeSeparator}">
+        <Setter Property="Width" Value="{StaticResource SeparatorHitWidth}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Panel.ZIndex" Value="1" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:ResizeSeparator}">
+                    <Grid x:Name="Root"
+                          Background="{TemplateBinding Background}"
+                          SnapsToDevicePixels="True"
+                          UseLayoutRounding="True">
+                        <Grid x:Name="Grab"
+                              Width="{StaticResource SeparatorGrabWidth}"
+                              Margin="{StaticResource SeparatorGrabOffset}"
+                              HorizontalAlignment="Left"
+                              Background="Transparent">
+                            <StackPanel x:Name="Grip"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Opacity="{StaticResource SeparatorGripRestOpacity}">
+                                <Rectangle x:Name="GripLeading"
+                                           Width="{StaticResource BorderWidth}"
+                                           Height="{StaticResource SeparatorGripHeight}"
+                                           RadiusX="{StaticResource SeparatorGripRadius}"
+                                           RadiusY="{StaticResource SeparatorGripRadius}"
+                                           Fill="{StaticResource BrushTextSubtle}"
+                                           SnapsToDevicePixels="True" />
+                                <Rectangle x:Name="GripTrailing"
+                                           Width="{StaticResource BorderWidth}"
+                                           Height="{StaticResource SeparatorGripHeight}"
+                                           RadiusX="{StaticResource SeparatorGripRadius}"
+                                           RadiusY="{StaticResource SeparatorGripRadius}"
+                                           Margin="{StaticResource SeparatorGripGap}"
+                                           Fill="{StaticResource BrushTextSubtle}"
+                                           SnapsToDevicePixels="True" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Rectangle x:Name="Rule"
+                                   Width="{StaticResource BorderWidth}"
+                                   HorizontalAlignment="Left"
+                                   Fill="{StaticResource BrushBorderSoft}"
+                                   SnapsToDevicePixels="True" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Rule" Property="Fill" Value="{StaticResource BrushAccent}" />
+                            <Setter TargetName="GripLeading" Property="Fill" Value="{StaticResource BrushAccent}" />
+                            <Setter TargetName="GripTrailing" Property="Fill" Value="{StaticResource BrushAccent}" />
+                            <Setter TargetName="Grip" Property="Opacity" Value="{StaticResource SeparatorGripActiveOpacity}" />
+                        </Trigger>
+                        <Trigger Property="IsDragging" Value="True">
+                            <Setter TargetName="Rule" Property="Fill" Value="{StaticResource BrushAccent}" />
+                            <Setter TargetName="GripLeading" Property="Fill" Value="{StaticResource BrushAccent}" />
+                            <Setter TargetName="GripTrailing" Property="Fill" Value="{StaticResource BrushAccent}" />
+                            <Setter TargetName="Grip" Property="Opacity" Value="{StaticResource SeparatorGripActiveOpacity}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Rule" Property="Fill" Value="{StaticResource BrushAccent}" />
+                            <Setter TargetName="GripLeading" Property="Fill" Value="{StaticResource BrushAccent}" />
+                            <Setter TargetName="GripTrailing" Property="Fill" Value="{StaticResource BrushAccent}" />
+                            <Setter TargetName="Grip" Property="Opacity" Value="{StaticResource SeparatorGripActiveOpacity}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ================================================================
+         C2 PrimaryButton, C3 SecondaryButton, C4 DestructiveButton
+         ================================================================ -->
+
+    <Style x:Key="PrimaryButton" TargetType="Button">
+        <Setter Property="Height" Value="{StaticResource PrimaryButtonHeight}" />
+        <Setter Property="Padding" Value="14,0,14,0" />
+        <Setter Property="Background" Value="{StaticResource BrushAccentDeep}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushAccentDeep}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <!-- Centred by default, which is what every caller but the sidebar's
+             New chat wants. Declared here rather than hard-coded in the
+             template so a caller that says otherwise is actually obeyed. -->
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{StaticResource BorderThickness}"
+                            CornerRadius="{StaticResource RadiusRow}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushAccentPressed}" />
+                            <Setter TargetName="Fill" Property="BorderBrush" Value="{StaticResource BrushAccentPressed}" />
+                        </Trigger>
+                        <!-- Disabled keeps the cursor unchanged and states why
+                             through its tooltip, never through a colour alone. -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushTrackAlt}" />
+                            <Setter TargetName="Fill" Property="BorderBrush" Value="{StaticResource BrushBorderSoft}" />
+                            <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{StaticResource BorderThickness}"
+                            CornerRadius="{StaticResource RadiusRow}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHover}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushTrackAlt}" />
+                            <Setter TargetName="Fill" Property="BorderBrush" Value="{StaticResource BrushBorderSoft}" />
+                            <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- C4: surface fill, danger border, danger text. The captures render this
+         as a solid red button; the component specification wins. -->
+    <Style x:Key="DestructiveButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+        <Setter Property="BorderBrush" Value="{StaticResource BrushDangerBorder}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushDanger}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{StaticResource BorderThickness}"
+                            CornerRadius="{StaticResource RadiusRow}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushDangerSurface}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ================================================================
+         C11 TextField. The placeholder is a TextBlock behind the TextBox,
+         collapsed once there is text; no watermark package.
+         ================================================================ -->
+
+    <Style x:Key="TextField" TargetType="TextBox">
+        <Setter Property="Height" Value="{StaticResource TextFieldHeight}" />
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="SelectionBrush" Value="{StaticResource BrushSelection}" />
+        <Setter Property="CaretBrush" Value="{StaticResource BrushText}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="Padding" Value="9,0,9,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <!-- No Padding on the frame: a TextBox already applies its
+                         own Padding to the text inside PART_ContentHost, so
+                         setting it here too inset every field twice over. That
+                         is what put typed text below its own placeholder and
+                         the search caret away from its hint. -->
+                    <Border x:Name="Frame"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{StaticResource BorderThickness}"
+                            CornerRadius="{StaticResource RadiusRow}"
+                            SnapsToDevicePixels="True">
+                        <!-- Bound, not hard-coded: a multi-line field asks for
+                             Stretch and has to be obeyed. The style still
+                             declares Center, which is what a single line wants. -->
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Frame" Property="BorderBrush" Value="{StaticResource BrushBorderStrong}" />
+                        </Trigger>
+                        <!-- Focused takes the accent border and no glow. -->
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="Frame" Property="BorderBrush" Value="{StaticResource BrushAccentBorder}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PlaceholderText" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+        <Setter Property="IsHitTestVisible" Value="False" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- ================================================================
+         C14 ListRow
+         ================================================================ -->
+
+    <Style x:Key="ListRow" TargetType="ListBoxItem">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="10,6,8,7" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Grid>
+                        <!-- Inset from the rail on both sides, so the row reads
+                             as a card in the list rather than a full width band. -->
+                        <Border x:Name="Fill"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="{StaticResource RadiusDefault}"
+                                Margin="{StaticResource ListRowInsetThickness}" />
+                        <ContentPresenter Margin="{TemplateBinding Padding}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushTrackAlt}" />
+                        </Trigger>
+                        <!-- After hover, so the row you are in stays the darker
+                             of the two while the pointer is over it. Keyed on
+                             the workspace's own flag rather than the list's
+                             IsSelected: Pinned and Chats each hold a selection,
+                             and the list without the open chat would otherwise
+                             go on highlighting its last one. -->
+                        <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushRowActive}" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- The chat sidebar list. The pin indicator lives in the Pinned section
+         header only, never on a row.
+         The menu styles below are reached with DynamicResource: StaticResource
+         resolves at parse time and would not see a key defined further down. -->
+    <Style x:Key="ChatRowList" TargetType="ListBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <!-- The row is named after the chat it holds. Without this a container
+             falls back to ToString on whatever it is bound to, so every row in
+             the sidebar announced the view model's type name and a reader had
+             no way to tell one chat from another. -->
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListRow}">
+                    <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel" />
+        <Setter Property="ItemTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <!-- Tag carries the workspace view model across to the
+                         context menu, which sits outside the visual tree. The
+                         menu is declared once here and reached two ways: by
+                         right clicking the row, and by the button on it. -->
+                    <Grid Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}">
+                        <Grid.ContextMenu>
+                            <ContextMenu Style="{DynamicResource AppContextMenu}"
+                                         DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                <MenuItem Header="{Binding PlacementTarget.DataContext.PinLabel, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                          Style="{DynamicResource AppMenuItem}"
+                                          Icon="{StaticResource IconPin}"
+                                          Command="{Binding TogglePinCommand}"
+                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <MenuItem Header="Rename"
+                                          Style="{DynamicResource AppMenuItem}"
+                                          Icon="{StaticResource IconRename}"
+                                          Command="{Binding RenameFromRowCommand}"
+                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <Separator Style="{DynamicResource AppMenuSeparator}" />
+                                <MenuItem Header="Delete"
+                                          Style="{DynamicResource AppMenuItem}"
+                                          controls:Menus.IsDanger="True"
+                                          Icon="{StaticResource IconDeleteBin}"
+                                          Command="{Binding ConfirmDeleteChatCommand}"
+                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            </ContextMenu>
+                        </Grid.ContextMenu>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <!-- Both sit on the same line box: the bar is
+                                 SkeletonBarHeight with half the difference to
+                                 ProseLineHeight above and below it, so swapping
+                                 the name in for it moves nothing. -->
+                            <Grid>
+                                <TextBlock Text="{Binding Name}"
+                                           Style="{StaticResource TextDefault}"
+                                           TextTrimming="CharacterEllipsis"
+                                           Visibility="{Binding IsNaming, Converter={StaticResource InverseBoolToVisibility}}" />
+                                <controls:SkeletonLines SourceLength="{Binding NameLength}"
+                                                        Visibility="{Binding IsNaming, Converter={StaticResource BoolToVisibility}}"
+                                                        AutomationProperties.Name="Naming this chat" />
+                            </Grid>
+                            <TextBlock Text="{Binding Stamp}"
+                                       Style="{StaticResource TextMeta}"
+                                       Foreground="{StaticResource BrushTextMuted}"
+                                       ToolTip="{Binding Tooltip}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Margin="0,2,0,0" />
+                        </StackPanel>
+
+                        <!-- Carries the same Tag as the row, because opening the
+                             menu from here makes this the placement target the
+                             menu reads its workspace off. -->
+                        <controls:ChromeButton Grid.Column="1"
+                                               Style="{DynamicResource RowMenuButton}"
+                                               Icon="{StaticResource IconMoreHorizontal}"
+                                               controls:Menus.OpensRowMenu="True"
+                                               Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                               ToolTip="More"
+                                               AutomationProperties.Name="More" />
+                    </Grid>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ================================================================
+         C12 Menu items, used by the row context menu
+         ================================================================ -->
+
+    <Style x:Key="AppContextMenu" TargetType="ContextMenu">
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        <Setter Property="Padding" Value="{StaticResource Space2Thickness}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{StaticResource BorderThickness}"
+                            CornerRadius="{StaticResource RadiusCard}"
+                            Padding="{TemplateBinding Padding}"
+                            Effect="{StaticResource ShadowPopover}">
+                        <StackPanel IsItemsHost="True" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="AppMenuItem" TargetType="MenuItem">
+        <Setter Property="Height" Value="{StaticResource MenuItemHeight}" />
+        <Setter Property="Padding" Value="9,0,12,0" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Border x:Name="Fill"
+                            Background="Transparent"
+                            CornerRadius="{StaticResource RadiusDefault}"
+                            Padding="{TemplateBinding Padding}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <!-- The glyph carries its own weight, a step lighter
+                                 than the label it sits beside. -->
+                            <ContentPresenter x:Name="Glyph"
+                                              ContentSource="Icon"
+                                              VerticalAlignment="Center"
+                                              Margin="0,0,9,0"
+                                              TextElement.Foreground="{StaticResource BrushIcon}" />
+                            <ContentPresenter x:Name="Label" ContentSource="Header" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHover}" />
+                        </Trigger>
+                        <!-- The destructive item, and its glyph with it. -->
+                        <Trigger Property="controls:Menus.IsDanger" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource BrushDangerText}" />
+                            <Setter TargetName="Glyph" Property="TextElement.Foreground" Value="{StaticResource BrushDangerText}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="controls:Menus.IsDanger" Value="True" />
+                                <Condition Property="IsHighlighted" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushDangerSurface}" />
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Fill" Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Rule between a menu's ordinary items and its destructive one. -->
+    <Style x:Key="AppMenuSeparator" TargetType="Separator">
+        <Setter Property="Height" Value="{StaticResource BorderWidth}" />
+        <Setter Property="Margin" Value="5,3,5,3" />
+        <Setter Property="Background" Value="{StaticResource BrushTrackAlt}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Border Background="{TemplateBinding Background}" SnapsToDevicePixels="True" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- The row's own menu button. Present but invisible until the row is
+         hovered, so a list at rest is names and times and nothing else. -->
+    <Style x:Key="RowMenuButton" TargetType="{x:Type controls:ChromeButton}">
+        <Setter Property="Width" Value="{StaticResource ChipButtonSize}" />
+        <Setter Property="Height" Value="{StaticResource ChipButtonSize}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+        <Setter Property="Opacity" Value="0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:ChromeButton}">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource RadiusMd}"
+                            SnapsToDevicePixels="True">
+                        <controls:IconView Definition="{TemplateBinding Icon}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHoverStrong}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                <Setter Property="Opacity" Value="1" />
+            </DataTrigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="Opacity" Value="1" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ================================================================
+         Slim scrollbar: no arrows.
+
+         MinWidth is set as well as Width, and that is the whole reason the bar
+         is the width it claims. A control keeps its theme style underneath
+         whatever style is applied to it, and the theme's is MinWidth equal to
+         the system scrollbar width, seventeen on a stock Windows. A minimum
+         beats a width, so every bar in this window was seventeen wide while
+         this style said eight, for as long as the style has existed. The
+         horizontal trigger below has the same problem the other way round and
+         the same answer.
+         ================================================================ -->
+
+    <Style TargetType="ScrollBar">
+        <Setter Property="Width" Value="{StaticResource ScrollThumbWidth}" />
+        <Setter Property="MinWidth" Value="{StaticResource ScrollThumbWidth}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid Background="{TemplateBinding Background}">
+                        <!-- Reversed and vertical are the settings for the upright
+                             bar: a vertical track runs bottom to top, so reversing
+                             it is what sends a rising value downwards. Neither
+                             holds sideways, and the trigger below undoes both. -->
+                        <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="True">
+                            <Track.Thumb>
+                                <!-- The inset sits on the Thumb rather than inside
+                                     its template, so the trigger below can turn it
+                                     through a right angle. A setter cannot reach
+                                     into a nested template. -->
+                                <Thumb x:Name="ScrollThumb" Margin="1,0,1,0">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border Background="{StaticResource BrushBorder}"
+                                                    CornerRadius="{StaticResource RadiusMd}" />
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <!-- A horizontal track is already left to right, so leaving
+                             it reversed made a drag to the right scroll the content
+                             left. -->
+                        <Trigger Property="Orientation" Value="Horizontal">
+                            <Setter TargetName="PART_Track" Property="Orientation" Value="Horizontal" />
+                            <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False" />
+                            <Setter TargetName="ScrollThumb" Property="Margin" Value="0,1,0,1" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="Width" Value="Auto" />
+                <Setter Property="MinWidth" Value="0" />
+                <Setter Property="Height" Value="{StaticResource ScrollThumbWidth}" />
+                <Setter Property="MinHeight" Value="{StaticResource ScrollThumbWidth}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ================================================================
+         C12 menu row, used by the plus menu and the language picker
+         ================================================================ -->
+
+    <Style x:Key="MenuRowButton" TargetType="Button">
+        <Setter Property="Height" Value="{StaticResource MenuItemHeight}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Padding" Value="9,0,12,0" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource RadiusDefault}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHover}" />
+                        </Trigger>
+                        <!-- After the hover trigger, and taking its fill back
+                             off: IsMouseOver still goes true over a disabled
+                             element, so a locked row lit up under the pointer. -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Fill" Property="Background" Value="Transparent" />
+                            <Setter TargetName="Fill" Property="Opacity" Value="0.5" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ================================================================
+         C6 LanguagePill
+         Transparent fill and a transparent 1 pixel border, so taking the
+         hover fill shifts nothing around it.
+         ================================================================ -->
+
+    <Style x:Key="LanguagePillButton" TargetType="Button">
+        <Setter Property="Height" Value="{StaticResource LanguagePillHeight}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Padding" Value="6,0,7,0" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{StaticResource BorderThickness}"
+                            CornerRadius="{StaticResource LanguagePillRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHover}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Segment used by the first-run install location, on the same track
+         treatment as C5 but driven by a command rather than selection. -->
+    <Style x:Key="FolderSegment" TargetType="RadioButton">
+        <Setter Property="Height" Value="{StaticResource SegmentHeight}" />
+        <Setter Property="Padding" Value="12,0,12,0" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextSecondarySize}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="Fill"
+                            Background="Transparent"
+                            CornerRadius="{StaticResource RadiusDefault}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushSurface}" />
+                            <Setter TargetName="Fill" Property="Effect" Value="{StaticResource ShadowThumb}" />
+                            <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsChecked" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushHoverStrong}" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Three large equal tiles, icon above label, no descriptions. -->
+    <Style x:Key="StartTile" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorderSoft}" />
+        <Setter Property="Margin" Value="4,0,4,0" />
+        <Setter Property="Padding" Value="0,20,0,20" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{StaticResource BorderThickness}"
+                            CornerRadius="{StaticResource RadiusCardLg}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushAccentTintSoft}" />
+                            <Setter TargetName="Fill" Property="BorderBrush" Value="{StaticResource BrushAccentBorderStrong}" />
+                        </Trigger>
+                        <!-- After the hover trigger, and undoing both of its
+                             setters: IsMouseOver still goes true over a disabled
+                             element, so a locked tile lit up under the pointer
+                             and read as something to click. -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushSurface}" />
+                            <Setter TargetName="Fill" Property="BorderBrush" Value="{StaticResource BrushBorderSoft}" />
+                            <Setter TargetName="Fill" Property="Opacity" Value="0.55" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- An inline action inside a card, such as Choose... or Pick... -->
+    <Style x:Key="LinkButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushAccent}" />
+        <Setter Property="Padding" Value="4,2,4,2" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextSecondarySize}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource RadiusMd}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushAccentTint}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- A word in a result that came from memory. Transparent chrome: the
+         underline is the whole affordance. -->
+    <Style x:Key="MemoryWordButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource RadiusXs}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fill" Property="Background" Value="{StaticResource BrushAccentTint}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ================================================================
+         Keycap: the printed face of a physical key, used in shortcut hints
+         ================================================================ -->
+
+    <!--
+        Reads as a key rather than a button because it is inert: a surface fill
+        and a border on a window that is a shade darker, at the smallest radius
+        the scale carries. Nothing hovers and nothing presses, so it carries no
+        states; a hint that lit up would be read as something to click.
+
+        Sized off the icon inside it rather than off the text beside it, so the
+        cap stays square for one key and stretches only when it holds two.
+    -->
+    <Style x:Key="Keycap" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorderSoft}" />
+        <Setter Property="BorderThickness" Value="{StaticResource BorderThickness}" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}" />
+        <Setter Property="MinWidth" Value="{StaticResource KeycapSize}" />
+        <Setter Property="Height" Value="{StaticResource KeycapSize}" />
+        <Setter Property="Padding" Value="{StaticResource Space2Thickness}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!-- ================================================================
+         C9 Checkbox: 17 square, 1.5 outline, accent fill when ticked
+         ================================================================ -->
+
+    <Style x:Key="AppCheckBox" TargetType="CheckBox">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Border x:Name="Box"
+                            Width="{StaticResource CheckboxSize}"
+                            Height="{StaticResource CheckboxSize}"
+                            Background="{StaticResource BrushSurface}"
+                            BorderBrush="{StaticResource BrushBorder}"
+                            BorderThickness="{StaticResource BorderThicknessControl}"
+                            CornerRadius="{StaticResource RadiusMd}"
+                            SnapsToDevicePixels="True">
+                        <controls:IconView x:Name="Tick"
+                                           Definition="{StaticResource IconCheckCheckbox}"
+                                           Foreground="{StaticResource BrushSurface}"
+                                           Opacity="0"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Box" Property="Background" Value="{StaticResource BrushAccentDeep}" />
+                            <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource BrushAccentDeep}" />
+                            <Setter TargetName="Tick" Property="Opacity" Value="1" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Box" Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ================================================================
+         C10 Toggle: 30 by 17 track, Ellipse knob travelling 13
+         ================================================================ -->
+
+    <Style TargetType="{x:Type controls:ToggleSwitch}">
+        <Setter Property="Width" Value="{StaticResource ToggleTrackWidth}" />
+        <Setter Property="Height" Value="{StaticResource ToggleTrackHeight}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:ToggleSwitch}">
+                    <Border x:Name="Track"
+                            Background="{StaticResource BrushSurface}"
+                            BorderBrush="{StaticResource BrushBorder}"
+                            BorderThickness="{StaticResource BorderThicknessControl}"
+                            CornerRadius="{StaticResource ToggleTrackRadius}"
+                            SnapsToDevicePixels="True">
+                        <!-- A circle is an Ellipse, never a CornerRadius. -->
+                        <Ellipse x:Name="PART_Knob"
+                                 Width="{StaticResource Space9}"
+                                 Height="{StaticResource Space9}"
+                                 Fill="{StaticResource BrushBorderStrong}"
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Center"
+                                 Margin="2,0,0,0" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsOn" Value="True">
+                            <Setter TargetName="Track" Property="Background" Value="{StaticResource BrushAccentDeep}" />
+                            <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource BrushAccentDeep}" />
+                            <Setter TargetName="PART_Knob" Property="Fill" Value="{StaticResource BrushSurface}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource BrushBorderStrong}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ================================================================
+         C16 ProgressBar: 4 high, accent fill, success when complete
+         ================================================================ -->
+
+    <Style x:Key="AppProgressBar" TargetType="ProgressBar">
+        <Setter Property="Height" Value="{StaticResource ProgressBarHeight}" />
+        <Setter Property="Maximum" Value="100" />
+        <Setter Property="Foreground" Value="{StaticResource BrushAccentDeep}" />
+        <Setter Property="Background" Value="{StaticResource BrushProgressTrack}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ProgressBar">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource ProgressBarRadius}"
+                            ClipToBounds="True">
+                        <Grid>
+                            <Rectangle x:Name="PART_Track" />
+                            <Rectangle x:Name="PART_Indicator"
+                                       Fill="{TemplateBinding Foreground}"
+                                       HorizontalAlignment="Left"
+                                       RadiusX="{Binding Source={StaticResource ProgressBarRadius}, Path=TopLeft}"
+                                       RadiusY="{Binding Source={StaticResource ProgressBarRadius}, Path=TopLeft}" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!-- Complete turns the fill to the success value. -->
+                        <DataTrigger Binding="{Binding Value, RelativeSource={RelativeSource Self}}" Value="100">
+                            <Setter TargetName="PART_Indicator" Property="Fill" Value="{StaticResource BrushSuccess}" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ================================================================
+         C8 SourceCard: a selectable row card
+         ================================================================ -->
+
+    <!-- A whole card that picks one of several things: a runtime flavour, a
+         model. The chosen one takes the accent border and tint, so the choice
+         reads from across the panel rather than from a small mark in a corner.
+         A card the machine cannot run stays flat and refuses the pointer. -->
+    <Style x:Key="ChoiceCard" TargetType="Button">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Card"
+                            Background="{StaticResource BrushSurface}"
+                            BorderBrush="{StaticResource BrushBorderSoft}"
+                            BorderThickness="{StaticResource BorderThickness}"
+                            CornerRadius="{StaticResource RadiusCard}"
+                            Padding="14,11,14,11"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Stretch" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Card" Property="BorderBrush" Value="{StaticResource BrushBorderStrong}" />
+                        </Trigger>
+                        <DataTrigger Binding="{Binding IsChosen}" Value="True">
+                            <Setter TargetName="Card" Property="Background" Value="{StaticResource BrushAccentTintSoft}" />
+                            <Setter TargetName="Card" Property="BorderBrush" Value="{StaticResource BrushAccentBorderStrong}" />
+                        </DataTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Card" Property="Opacity" Value="0.55" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SourceCard" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorderSoft}" />
+        <Setter Property="BorderThickness" Value="{StaticResource BorderThickness}" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusCard}" />
+        <Setter Property="Padding" Value="14,11,14,11" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--
+        The fold that Show more opens on a long entry. It caps a column and clips
+        what does not fit.
+
+        A file row is exempt, and has to be: its preview already caps itself to
+        the peek, and the column carries a label and a chip row above that. Two
+        caps of the same size and one of them counting from higher up cut the
+        preview 49 pixels short of its own bottom, so its last lines and the
+        lower end of its scrollbar sat underneath this clip with the row's white
+        behind them. One cap per column, and for a file row it is the preview's.
+    -->
+    <Style x:Key="EntryColumnFold" TargetType="Border">
+        <Setter Property="Background" Value="Transparent" />
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsCollapsed}" Value="True" />
+                    <Condition Binding="{Binding IsFile}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="MaxHeight" Value="{StaticResource EntryCollapsedHeight}" />
+                <Setter Property="ClipToBounds" Value="True" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ================================================================
+         Loading placeholder: bars on the prose line box, one moving mask
+         ================================================================ -->
+
+    <!-- The control fills the bars in: how many there are and how long the last
+         one is come from the source length, which markup cannot compute. What
+         markup owns is that they stack, and that the region stretches so the
+         bars measure the same width the translation will wrap into. -->
+    <Style TargetType="{x:Type controls:SkeletonLines}">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:SkeletonLines}">
+                    <StackPanel x:Name="PART_Lines" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <DataTemplate x:Key="LanguageTile">
+        <Grid Width="{StaticResource LanguageTileWidth}"
+              Height="{StaticResource LanguageTileHeight}">
+            <Border CornerRadius="{StaticResource RadiusXs}"
+                    Background="{Binding FlagKey, Converter={StaticResource FlagBrush}}"
+                    BorderBrush="{StaticResource BrushBorderSoft}"
+                    BorderThickness="{StaticResource BorderThickness}"
+                    Visibility="{Binding HasFlag, Converter={StaticResource BoolToVisibility}}" />
+            <Border CornerRadius="{StaticResource RadiusXs}"
+                    Background="{StaticResource BrushTrackAlt}"
+                    BorderBrush="{StaticResource BrushBorderSoft}"
+                    BorderThickness="{StaticResource BorderThickness}"
+                    Visibility="{Binding HasFlag, Converter={StaticResource InverseBoolToVisibility}}">
+                <TextBlock Text="{Binding CodeLabel}"
+                           Style="{StaticResource TextMicro}"
+                           Foreground="{StaticResource BrushTextSecondary}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+            </Border>
+        </Grid>
+    </DataTemplate>
+
+    <!--
+        A file preview capped to a peek scrolls inside itself. It was made to
+        clip instead, and a reader who opened a preview met a document cut off
+        mid sentence with nothing to take hold of: the only way on was Show more,
+        which sits at the top of the entry, nowhere near the cut.
+
+        Two of the three reasons that were written down for taking the scroller
+        away no longer hold. It cannot own the wheel: WheelChaining.Chains, set
+        below, hands the gesture outward the moment the inner scroller reaches
+        its end, which is the behaviour a reader expects without being told. Its
+        thumb no longer floats beside a paragraph: the peek carries a track of
+        its own, so the bar reads as a bar. What remains true is that Show more
+        is a second way to read further, and the two answer different questions:
+        the bar reads on inside the peek, Show more takes the cap off so the
+        history scrolls the whole document.
+    -->
+    <Style x:Key="FilePreviewScroll" TargetType="ScrollViewer">
+        <!-- The bar this peek carries. The window's own is a bare thumb, which
+             is right at the edge of a panel and wrong beside a paragraph, where
+             it reads as something left behind rather than as a control. In here
+             it runs in a track of its own, which also draws the edge the clipped
+             text is cut against. -->
+        <Style.Resources>
+            <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
+                <Setter Property="Background" Value="{StaticResource BrushBorderFaint}" />
+                <Setter Property="Margin" Value="6,0,0,0" />
+            </Style>
+        </Style.Resources>
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="controls:WheelChaining.Chains" Value="True" />
+        <!-- Shut, a file clips to the peek and scrolls within it. Open, the cap
+             comes off entirely and there is nothing left to scroll, so the bar
+             goes with it. Declared second on purpose, since the last trigger
+             that matches wins. -->
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsFile}" Value="True">
+                <Setter Property="MaxHeight" Value="{StaticResource FilePreviewMaxHeight}" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsFile}" Value="True" />
+                    <Condition Binding="{Binding IsExpanded}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="MaxHeight" Value="{x:Static sys:Double.PositiveInfinity}" />
+                <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+
+
+    <Style TargetType="{x:Type controls:BilingualRow}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:BilingualRow}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <ContentPresenter Grid.Row="0"
+                                          Grid.ColumnSpan="3"
+                                          Content="{TemplateBinding HeaderContent}"
+                                          HorizontalAlignment="Left"
+                                          Margin="0,0,0,6" />
+
+                        <Border Grid.Row="1" Grid.Column="0"
+                                Style="{StaticResource EntryColumnFold}"
+                                Margin="0,0,16,0">
+                            <StackPanel>
+                                <TextBlock Text="{TemplateBinding SourceLabel}"
+                                           Style="{StaticResource TextEntryHeading}" />
+                                <ContentPresenter Content="{TemplateBinding SourceContent}"
+                                                  Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <controls:IconView Grid.Row="1" Grid.Column="1"
+                                           Definition="{StaticResource IconArrowRightLong}"
+                                           Foreground="{StaticResource BrushBorderStrong}"
+                                           Margin="0,26,0,0"
+                                           VerticalAlignment="Top" />
+
+                        <Border Grid.Row="1" Grid.Column="2"
+                                Style="{StaticResource EntryColumnFold}"
+                                Margin="16,0,0,0">
+                            <StackPanel>
+                                <TextBlock x:Name="TargetHeading"
+                                           Text="{TemplateBinding TargetLabel}"
+                                           Style="{StaticResource TextEntryHeading}" />
+
+                                <Grid Margin="0,4,0,0"
+                                      AutomationProperties.LabeledBy="{Binding ElementName=TargetHeading}">
+                                    <ContentPresenter Content="{TemplateBinding TargetContent}" />
+
+                                    <StackPanel Visibility="{Binding HasFailed, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibility}}">
+                                        <TextBlock Text="{TemplateBinding FailureText}"
+                                                   Style="{StaticResource TextWordResult}"
+                                                   Foreground="{StaticResource BrushDangerText}" />
+
+                                        <TextBlock Text="{TemplateBinding Note}"
+                                                   Style="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextMuted}"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,3,0,0"
+                                                   Visibility="{Binding HasNote, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibility}}" />
+
+                                        <Button Content="{TemplateBinding RetryText}"
+                                                Style="{StaticResource SecondaryButton}"
+                                                HorizontalAlignment="Left"
+                                                Margin="0,8,0,0"
+                                                AutomationProperties.Name="{TemplateBinding RetryText}"
+                                                Command="{Binding RetryCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                                CommandParameter="{Binding RetryParameter, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ================================================================
+         C13 Dialog chrome
+         ================================================================ -->
+
+    <Style x:Key="DialogSurface" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        <Setter Property="BorderThickness" Value="{StaticResource BorderThickness}" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusDialog}" />
+        <Setter Property="Effect" Value="{StaticResource ShadowDialog}" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+</ResourceDictionary>

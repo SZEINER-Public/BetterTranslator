@@ -1,0 +1,39 @@
+{
+  "_note": [
+    "How a given model wants to be asked. Only models that were TRAINED on a",
+    "specific prompt shape need an entry; anything not listed here gets the",
+    "engine's own system-plus-user prompt, which is what every model here used",
+    "before this file existed.",
+    "",
+    "Why this matters enough to be configuration rather than a default: a model",
+    "fine-tuned for translation has a prompt it saw for the whole of that",
+    "training run, and asking it a different way throws away the fine-tune. The",
+    "wording below is not invented - it is the structure the model card",
+    "publishes, reproduced verbatim including its punctuation.",
+    "",
+    "  match       matched case-insensitively against the served model id.",
+    "              First entry that matches wins, so put specific names first.",
+    "  role        'user' merges the instruction into the user turn. Required",
+    "              for Gemma-family models: their chat template renders a system",
+    "              message as a SECOND user turn, which is not a system prompt at",
+    "              all - it is a stray message before the real one. Verified from",
+    "              translategemma's own template layer, which routes user and",
+    "              system through the same branch.",
+    "              'system' keeps the engine's normal two-message shape.",
+    "  blankLines  blank lines between the instruction and the text. Two is part",
+    "              of the trained format for translategemma, not a style choice.",
+    "  template    {SOURCE} {SOURCE_CODE} {TARGET} {TARGET_CODE} are substituted.",
+    "              The text to translate is appended after the blank lines and is",
+    "              never interpolated into the middle of the instruction."
+  ],
+  "models": [
+    {
+      "match": "translategemma",
+      "label": "TranslateGemma",
+      "source": "https://ollama.com/library/translategemma",
+      "role": "user",
+      "blankLines": 2,
+      "template": "You are a professional {SOURCE} ({SOURCE_CODE}) to {TARGET} ({TARGET_CODE}) translator. Your goal is to accurately convey the meaning and nuances of the original {SOURCE} text while adhering to {TARGET} grammar, vocabulary, and cultural sensitivities. Produce only the {TARGET} translation, without any additional explanations or commentary. Please translate the following {SOURCE} text into {TARGET}:"
+    }
+  ]
+}

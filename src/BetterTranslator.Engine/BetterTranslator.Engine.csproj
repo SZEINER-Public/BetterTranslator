@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>BetterTranslator.Engine</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The registry travels inside the assembly rather than beside it. A
+         side file would have to survive the single-file publish and be found
+         from a different working directory in every host that loads this;
+         embedded, there is one copy and no path to get wrong. -->
+    <EmbeddedResource Include="Data\languages.json" />
+    <EmbeddedResource Include="Data\language-assets.json" />
+    <EmbeddedResource Include="Data\model-languages.json" />
+    <EmbeddedResource Include="Data\model-prompts.json" />
+    <EmbeddedResource Include="Data\prompts.json" />
+    <EmbeddedResource Include="Data\rag.defaults.json" />
+    <!-- glossary-cs.md, not glossary.cs.md. MSBuild reads the second-to-last
+         extension as a culture, and "cs" is Czech, so the dotted name was built
+         into a cs\ satellite assembly instead of this one and the resource was
+         simply absent at runtime. A hyphen is not a culture. -->
+    <EmbeddedResource Include="Data\glossary-cs.md" />
+    <EmbeddedResource Include="Data\domain-terms-cs.md" />
+    <EmbeddedResource Include="Data\rules-cs.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The Markdown path needs a real parser with source spans, not a set of
+         regexes: the whole point is that structure is preserved mechanically.
+         Already in the solution for the indexer's block model, so this is a
+         second consumer rather than a new dependency. -->
+    <PackageReference Include="Markdig" Version="1.3.2" />
+    <PackageReference Include="WeCantSpell.Hunspell" Version="7.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BetterTranslator.Core\BetterTranslator.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="BetterTranslator.Tests" />
+  </ItemGroup>
+
+</Project>

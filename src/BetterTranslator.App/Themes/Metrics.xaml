@@ -1,0 +1,298 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/BetterTranslator;component/Themes/Colors.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- SPACING. Every step is published twice: a Double for Width, Height and
+         StrokeThickness, and a uniform Thickness for Margin and Padding. A
+         Margin bound to a Double does not compile; there is no implicit
+         conversion. Directional Thicknesses are written at the use site using
+         literal numbers drawn from this set and nothing between them. -->
+
+    <sys:Double x:Key="Space1">2</sys:Double>
+    <sys:Double x:Key="Space2">4</sys:Double>
+    <sys:Double x:Key="Space3">5</sys:Double>
+    <sys:Double x:Key="Space4">6</sys:Double>
+    <sys:Double x:Key="Space5">7</sys:Double>
+    <sys:Double x:Key="Space6">8</sys:Double>
+    <sys:Double x:Key="Space7">9</sys:Double>
+    <sys:Double x:Key="Space8">10</sys:Double>
+    <sys:Double x:Key="Space9">11</sys:Double>
+    <sys:Double x:Key="Space10">12</sys:Double>
+    <sys:Double x:Key="Space11">14</sys:Double>
+    <sys:Double x:Key="Space12">16</sys:Double>
+    <sys:Double x:Key="Space13">18</sys:Double>
+    <sys:Double x:Key="Space14">20</sys:Double>
+    <sys:Double x:Key="Space15">24</sys:Double>
+    <sys:Double x:Key="Space16">28</sys:Double>
+
+    <Thickness x:Key="Space1Thickness">2</Thickness>
+    <Thickness x:Key="Space2Thickness">4</Thickness>
+    <Thickness x:Key="Space3Thickness">5</Thickness>
+    <Thickness x:Key="Space4Thickness">6</Thickness>
+    <Thickness x:Key="Space5Thickness">7</Thickness>
+    <Thickness x:Key="Space6Thickness">8</Thickness>
+    <Thickness x:Key="Space7Thickness">9</Thickness>
+    <Thickness x:Key="Space8Thickness">10</Thickness>
+    <Thickness x:Key="Space9Thickness">11</Thickness>
+    <Thickness x:Key="Space10Thickness">12</Thickness>
+    <Thickness x:Key="Space11Thickness">14</Thickness>
+    <Thickness x:Key="Space12Thickness">16</Thickness>
+    <Thickness x:Key="Space13Thickness">18</Thickness>
+    <Thickness x:Key="Space14Thickness">20</Thickness>
+    <Thickness x:Key="Space15Thickness">24</Thickness>
+    <Thickness x:Key="Space16Thickness">28</Thickness>
+
+    <!-- CORNER RADIUS. A pill is not a token: set CornerRadius to half the
+         element's fixed height at the use site. A circle is not a
+         CornerRadius: node dots and toggle knobs are Ellipse elements. -->
+
+    <CornerRadius x:Key="RadiusXs">2</CornerRadius>
+    <CornerRadius x:Key="RadiusSm">3</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">4</CornerRadius>
+    <CornerRadius x:Key="RadiusControl">5</CornerRadius>
+    <CornerRadius x:Key="RadiusDefault">6</CornerRadius>
+    <CornerRadius x:Key="RadiusRow">7</CornerRadius>
+    <CornerRadius x:Key="RadiusPanel">8</CornerRadius>
+    <CornerRadius x:Key="RadiusCard">9</CornerRadius>
+    <CornerRadius x:Key="RadiusCardLg">10</CornerRadius>
+    <CornerRadius x:Key="RadiusDialog">11</CornerRadius>
+    <CornerRadius x:Key="RadiusComposer">22</CornerRadius>
+
+    <!-- BORDERS. Every border and divider is 1. Checkbox and toggle outlines
+         are 1.5. Nothing exceeds 1.5. -->
+
+    <sys:Double x:Key="BorderWidth">1</sys:Double>
+    <sys:Double x:Key="BorderWidthControl">1.5</sys:Double>
+    <Thickness x:Key="BorderThickness">1</Thickness>
+    <Thickness x:Key="BorderThicknessControl">1.5</Thickness>
+
+    <!-- ELEVATION. Exactly four shadows exist. No stacked shadows, no glow,
+         no colour other than black. Direction 270 is straight down in WPF.
+         Everywhere else separation is a 1 pixel border plus a surface change. -->
+
+    <DropShadowEffect x:Key="ShadowWindow" Direction="270" BlurRadius="34" ShadowDepth="14" Opacity="0.18" Color="Black" />
+    <DropShadowEffect x:Key="ShadowPopover" Direction="270" BlurRadius="26" ShadowDepth="10" Opacity="0.16" Color="Black" />
+    <DropShadowEffect x:Key="ShadowDialog" Direction="270" BlurRadius="54" ShadowDepth="22" Opacity="0.24" Color="Black" />
+    <DropShadowEffect x:Key="ShadowThumb" Direction="270" BlurRadius="2" ShadowDepth="1" Opacity="0.10" Color="Black" />
+
+    <!-- MOTION. WPF has no cubic-bezier easing function. Both easings are
+         KeySpline values applied through DoubleAnimationUsingKeyFrames with a
+         SplineDoubleKeyFrame, or ColorAnimationUsingKeyFrames with a
+         SplineColorKeyFrame. Never CubicEase, PowerEase or QuadraticEase. -->
+
+    <KeySpline x:Key="EaseStandard">0.2,0 0,1</KeySpline>
+    <KeySpline x:Key="EaseBurst">0.3,0 0.4,1</KeySpline>
+
+    <Duration x:Key="Motion120">0:0:0.12</Duration>
+    <Duration x:Key="Motion130">0:0:0.13</Duration>
+    <Duration x:Key="Motion140">0:0:0.14</Duration>
+    <Duration x:Key="Motion150">0:0:0.15</Duration>
+    <Duration x:Key="Motion160">0:0:0.16</Duration>
+    <Duration x:Key="Motion170">0:0:0.17</Duration>
+    <Duration x:Key="Motion180">0:0:0.18</Duration>
+    <Duration x:Key="Motion200">0:0:0.2</Duration>
+    <Duration x:Key="Motion220">0:0:0.22</Duration>
+    <Duration x:Key="Motion240">0:0:0.24</Duration>
+    <Duration x:Key="Motion300">0:0:0.3</Duration>
+    <Duration x:Key="Motion320">0:0:0.32</Duration>
+    <Duration x:Key="Motion400">0:0:0.4</Duration>
+    <Duration x:Key="Motion900">0:0:0.9</Duration>
+    <!-- One sweep of the loading placeholder's mask. The only looping value in
+         the set, and the motion digest bounds a loop period at 1.0 to 1.5 s. -->
+    <Duration x:Key="Motion1200">0:0:1.2</Duration>
+
+    <!-- The size pill hides 400 after the last SizeChanged, and a copy button
+         holds its checkmark for 1600. Neither is an animation duration. -->
+    <sys:Double x:Key="SizePillHideDelayMs">400</sys:Double>
+    <sys:Double x:Key="CopyConfirmHoldMs">1600</sys:Double>
+
+    <!-- The loading placeholder is owed a delay before it appears and a floor
+         once it has. The delay is what stops a fast local answer flashing a
+         placeholder nobody had time to read; the floor is what stops a slow one
+         flickering it away the instant it lands. Neither is a duration either:
+         nothing is animating during them. -->
+    <sys:Double x:Key="SkeletonRevealDelayMs">150</sys:Double>
+    <sys:Double x:Key="SkeletonMinHoldMs">350</sys:Double>
+
+    <!-- FOCUS. Declared once: a 2 pixel BrushAccent rectangle at offset 2. -->
+
+    <sys:Double x:Key="FocusRingWidth">2</sys:Double>
+    <sys:Double x:Key="FocusRingOffset">2</sys:Double>
+
+    <Style x:Key="FocusRing">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle Margin="-2"
+                               RadiusX="{Binding Source={StaticResource RadiusMd}, Path=TopLeft}"
+                               RadiusY="{Binding Source={StaticResource RadiusMd}, Path=TopLeft}"
+                               Stroke="{StaticResource BrushAccent}"
+                               StrokeThickness="{StaticResource FocusRingWidth}"
+                               SnapsToDevicePixels="True" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- WINDOW SHELL -->
+
+    <sys:Double x:Key="CaptionHeight">32</sys:Double>
+    <sys:Double x:Key="ToolbarHeight">48</sys:Double>
+    <sys:Double x:Key="WindowDefaultWidth">1536</sys:Double>
+    <sys:Double x:Key="WindowDefaultHeight">1016</sys:Double>
+    <sys:Double x:Key="WindowMinWidth">880</sys:Double>
+    <sys:Double x:Key="WindowMinHeight">620</sys:Double>
+    <sys:Double x:Key="ResizeBorderWidth">6</sys:Double>
+    <Thickness x:Key="ResizeBorderThickness">6</Thickness>
+    <!-- WindowChrome mechanics: square chrome corners, no glass frame. -->
+    <CornerRadius x:Key="WindowChromeCornerRadius">0</CornerRadius>
+    <Thickness x:Key="WindowChromeGlassFrame">0</Thickness>
+    <sys:Double x:Key="CaptionButtonWidth">46</sys:Double>
+    <sys:Double x:Key="TitlebarMarkHeight">11</sys:Double>
+
+    <Thickness x:Key="TitlebarMarkGap">8,0,0,0</Thickness>
+
+    <!-- LAYOUT RAILS -->
+
+    <sys:Double x:Key="SidebarDefaultWidth">246</sys:Double>
+    <sys:Double x:Key="SidebarMinWidth">200</sys:Double>
+    <sys:Double x:Key="SidebarMaxWidth">420</sys:Double>
+    <sys:Double x:Key="ChatColumnWidth">788</sys:Double>
+
+    <sys:Double x:Key="PinnedSectionMaxHeight">260</sys:Double>
+
+    <sys:Double x:Key="TableCellMinWidth">96</sys:Double>
+    <sys:Double x:Key="TableCellMaxWidth">280</sys:Double>
+    <sys:Double x:Key="EntryCollapsedHeight">360</sys:Double>
+    <sys:Double x:Key="SeparatorHitWidth">5</sys:Double>
+    <sys:Double x:Key="SeparatorGrabWidth">7</sys:Double>
+    <Thickness x:Key="SeparatorGrabOffset">-3,0,0,0</Thickness>
+    <sys:Double x:Key="SeparatorGripHeight">18</sys:Double>
+    <sys:Double x:Key="SeparatorGripRadius">0.5</sys:Double>
+    <Thickness x:Key="SeparatorGripGap">2,0,0,0</Thickness>
+    <sys:Double x:Key="SeparatorGripRestOpacity">0.55</sys:Double>
+    <sys:Double x:Key="SeparatorGripActiveOpacity">1</sys:Double>
+    <sys:Double x:Key="RightPanelDefaultWidth">300</sys:Double>
+    <sys:Double x:Key="RightPanelMinWidth">240</sys:Double>
+    <sys:Double x:Key="RightPanelMaxWidth">460</sys:Double>
+    <sys:Double x:Key="SizePillHeight">26</sys:Double>
+    <sys:Double x:Key="PreviewDefaultWidth">390</sys:Double>
+    <sys:Double x:Key="PreviewMinWidth">300</sys:Double>
+    <sys:Double x:Key="PreviewMaxWidth">620</sys:Double>
+
+    <!-- CONTROL METRICS -->
+
+    <sys:Double x:Key="ChromeButtonSize">32</sys:Double>
+    <sys:Double x:Key="ChromeButtonSizeSmall">30</sys:Double>
+    <!-- A button riding inside a 32 high chip, so it has to clear the chip's
+         border and padding on both sides. -->
+    <sys:Double x:Key="ChipButtonSize">24</sys:Double>
+    <sys:Double x:Key="ScopePathMaxWidth">240</sys:Double>
+    <sys:Double x:Key="PrimaryButtonHeight">32</sys:Double>
+    <sys:Double x:Key="SegmentHeight">26</sys:Double>
+    <sys:Double x:Key="SegmentTrackPadding">2</sys:Double>
+    <sys:Double x:Key="SegmentWidthMemory">100</sys:Double>
+    <sys:Double x:Key="SegmentWidthSimple">86</sys:Double>
+    <sys:Double x:Key="SegmentWidthAdvanced">86</sys:Double>
+    <sys:Double x:Key="LanguagePillHeight">28</sys:Double>
+    <CornerRadius x:Key="LanguagePillRadius">14</CornerRadius>
+    <sys:Double x:Key="ChipHeight">26</sys:Double>
+    <CornerRadius x:Key="ChipRadius">13</CornerRadius>
+    <!-- A keycap drawn around a 12 box icon: the box plus 4 either side, so the
+         cap is square at its smallest and only grows when two keys share one. -->
+    <sys:Double x:Key="KeycapSize">20</sys:Double>
+    <sys:Double x:Key="CheckboxSize">17</sys:Double>
+    <sys:Double x:Key="CheckboxSizeSmall">15</sys:Double>
+    <sys:Double x:Key="ToggleTrackWidth">30</sys:Double>
+    <sys:Double x:Key="ToggleTrackHeight">17</sys:Double>
+    <CornerRadius x:Key="ToggleTrackRadius">8.5</CornerRadius>
+    <sys:Double x:Key="ToggleKnobTravel">13</sys:Double>
+    <sys:Double x:Key="TextFieldHeight">30</sys:Double>
+    <!-- The composer rests two lines tall: twice ProseLineHeight, the line box
+         its own type ramp uses. It grows from there and stops at the maximum,
+         where it starts scrolling instead, so a long paste cannot push the chat
+         off the top of the window. -->
+    <!-- How far the drop mark rises as it arrives. The motion digest caps a
+         small item's travel at 8. -->
+    <sys:Double x:Key="DropMarkTravel">8</sys:Double>
+
+    <!-- The step the temperature slider moves in, as the reference sets it. -->
+    <sys:Double x:Key="TemperatureStep">0.05</sys:Double>
+
+    <!-- LOADING PLACEHOLDER. Bars stand on the prose line box rather than on a
+         pitch of their own, so the placeholder occupies the lines the
+         translation will occupy and the swap moves nothing under it. The
+         character count is what one such line holds at the result's type size
+         across the chat column; it is the only thing the source length can
+         honestly say about the shape of the block coming back. -->
+    <sys:Double x:Key="SkeletonBarHeight">10</sys:Double>
+    <sys:Double x:Key="SkeletonCharsPerLine">68</sys:Double>
+    <sys:Double x:Key="SkeletonMaxLines">8</sys:Double>
+    <!-- The last line of a paragraph is short. How short is what is left over
+         after the full ones, held between these so it is never a full-width bar
+         and never a stub. -->
+    <sys:Double x:Key="SkeletonLastBarMinFraction">0.35</sys:Double>
+    <sys:Double x:Key="SkeletonLastBarMaxFraction">0.85</sys:Double>
+    <!-- How far the travelling mask thins the bars as it passes. A mask, not a
+         glow: the bars keep their one flat fill and nothing is painted over
+         them. -->
+    <sys:Double x:Key="SkeletonShimmerDepth">0.4</sys:Double>
+
+    <!-- The opacity a revealed translation starts from. Not zero: the first
+         frame has to be legible whether or not the fade runs at all. -->
+    <sys:Double x:Key="RevealFromOpacity">0.4</sys:Double>
+
+    <sys:Double x:Key="ComposerMinHeight">42</sys:Double>
+    <sys:Double x:Key="ComposerMaxHeight">140</sys:Double>
+
+    <!-- The send button is a disc, so its radius is half its size. Both are
+         here rather than one being written into the template, because a size
+         changed without its radius stops being round. -->
+    <sys:Double x:Key="SendButtonSize">32</sys:Double>
+    <CornerRadius x:Key="SendButtonRadius">16</CornerRadius>
+
+    <!-- Wide enough for the longest pair the registry carries, "Chinese
+         (Traditional) 繁體中文", without the native name wrapping under it.
+         The height stops about eight rows short of the list, so it always reads
+         as scrollable rather than as a list that happens to end. -->
+    <sys:Double x:Key="LanguagePickerWidth">296</sys:Double>
+    <sys:Double x:Key="LanguagePickerMaxHeight">280</sys:Double>
+    <!-- The peek a shut file row shows. Show more lifts it entirely; see
+         FilePreviewScroll in Controls.xaml. -->
+    <sys:Double x:Key="FilePreviewMaxHeight">360</sys:Double>
+
+    <sys:Double x:Key="LanguageTileWidthSm">16</sys:Double>
+    <sys:Double x:Key="LanguageTileHeightSm">11</sys:Double>
+    <sys:Double x:Key="LanguageTileWidth">20</sys:Double>
+    <sys:Double x:Key="LanguageTileHeight">14</sys:Double>
+    <sys:Double x:Key="LanguageTileWidthLg">24</sys:Double>
+    <sys:Double x:Key="LanguageTileHeightLg">16</sys:Double>
+    <sys:Double x:Key="MenuItemHeight">28</sys:Double>
+    <sys:Double x:Key="ListRowHeight">30</sys:Double>
+    <!-- A chat row is inset from the rail on both sides rather than filling it. -->
+    <Thickness x:Key="ListRowInsetThickness">6,0,6,0</Thickness>
+    <sys:Double x:Key="ProgressBarHeight">4</sys:Double>
+    <CornerRadius x:Key="ProgressBarRadius">2</CornerRadius>
+    <sys:Double x:Key="CopyButtonSize">26</sys:Double>
+    <sys:Double x:Key="ScrollThumbWidth">8</sys:Double>
+    <sys:Double x:Key="LogDotSize">8</sys:Double>
+    <sys:Double x:Key="AddOwnWordButtonSize">27</sys:Double>
+    <sys:Double x:Key="EmptyStateMaxWidthDialog">392</sys:Double>
+    <sys:Double x:Key="EmptyStateMaxWidthPane">568</sys:Double>
+    <sys:Double x:Key="DialogWidthAddSources">568</sys:Double>
+    <sys:Double x:Key="SettingsWindowWidth">768</sys:Double>
+    <sys:Double x:Key="SettingsWindowHeight">560</sys:Double>
+
+    <!-- Config edits JSON, which needs the width for long lines and the height
+         for context. Grown rather than given to every tab: the other four are
+         short lists, and a panel sized for the largest of them would leave the
+         rest sitting in space. -->
+    <sys:Double x:Key="SettingsConfigWidth">1020</sys:Double>
+    <sys:Double x:Key="SettingsConfigHeight">680</sys:Double>
+    <sys:Double x:Key="SettingsRailWidth">196</sys:Double>
+
+</ResourceDictionary>

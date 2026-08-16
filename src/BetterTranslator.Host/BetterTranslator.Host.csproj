@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- A console exe, not WinExe: it has no window, and it is started with no
+         window by the parent. Plain Exe keeps its console output reachable when
+         it is run by hand to diagnose a load failure. -->
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>BetterTranslator.Host</AssemblyName>
+    <RootNamespace>BetterTranslator.Host</RootNamespace>
+    <IsPublishable>true</IsPublishable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BetterTranslator.Runtime\BetterTranslator.Runtime.csproj" />
+  </ItemGroup>
+
+</Project>

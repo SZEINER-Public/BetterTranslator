@@ -1,0 +1,51 @@
+{
+  "_note": [
+    "The application's own prompt fragments, as opposed to the model's.",
+    "",
+    "model-prompts.json carries the instruction a model was TRAINED on, which is",
+    "the model card's wording and must not be improvised. This file carries the",
+    "wording BetterTranslator adds around it: the heading over retrieved material",
+    "when the Memory chip is attached, and the lead-in for the standing",
+    "instruction from the Advanced panel.",
+    "",
+    "These were hardcoded in C# until they were moved here. They are prompt text,",
+    "they change what the model does, and someone tuning output should be able to",
+    "reach them without a compiler.",
+    "",
+    "  engineSystem       the engine's own translator instruction, for a model",
+    "                     that publishes no trained prompt of its own. Ported",
+    "                     verbatim from Get-TranslationSystemPrompt in",
+    "                     scripts\\console.ps1. {TARGET} is substituted.",
+    "                     Its last sentence is load-bearing: it is the only place",
+    "                     the model is told what a [[7]] protected block is, and",
+    "                     without it the markup guard hides spans the model has",
+    "                     no idea it must reproduce.",
+    "  memoryHeading      goes above the retrieved passages and the chat pairs.",
+    "                     It has to say the material is reference and not the text",
+    "                     to translate, because the instruction it sits above ends",
+    "                     'translate the following text' - measured: without that",
+    "                     sentence the model translated the heading itself.",
+    "  instructionLeadIn  prefixes the standing instruction from Advanced.",
+    "",
+    "memoryHeading and instructionLeadIn are inserted BEFORE the translator",
+    "instruction, never between it and the text. Placed after it, the model",
+    "translated the inserted block instead of using it."
+  ],
+  "fragments": [
+    {
+      "id": "engineSystem",
+      "label": "Engine system prompt",
+      "text": "You are a professional translator. Translate the user's text into {TARGET}. Reply with the translation only: no commentary, no quotes, no explanations. Never return the source text unchanged. Preserve formatting, line breaks, placeholders such as {name} or %s, and any markup. Tokens of the form [[7]] are protected blocks: reproduce each exactly once, in the same order, and never translate or renumber them."
+    },
+    {
+      "id": "memoryHeading",
+      "label": "Memory heading",
+      "text": "Here is how this project has translated related wording before. Follow its terminology where it applies. It is reference, not the text to translate."
+    },
+    {
+      "id": "instructionLeadIn",
+      "label": "Standing instruction lead-in",
+      "text": "Also follow this instruction:"
+    }
+  ]
+}

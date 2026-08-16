@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "BetterTranslator (packed, Release)": {
+      "commandName": "Executable",
+      "executablePath": "..\\bin\\Release\\BetterTranslator.exe",
+      "workingDirectory": "..\\bin\\Release"
+    },
+    "BetterTranslator (packed, Debug)": {
+      "commandName": "Executable",
+      "executablePath": "..\\bin\\Debug\\BetterTranslator.exe",
+      "workingDirectory": "..\\bin\\Debug"
+    }
+  }
+}

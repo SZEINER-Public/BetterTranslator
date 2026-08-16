@@ -1,0 +1,42 @@
+#include <windows.h>
+
+#include "src/resource.h"
+
+#ifndef BOOTSTRAP_VERSION_FIELDS
+#define BOOTSTRAP_VERSION_FIELDS 1, 0, 0, 0
+#endif
+
+#ifndef BOOTSTRAP_VERSION_TEXT
+#define BOOTSTRAP_VERSION_TEXT "1.0.0.0"
+#endif
+
+IDI_APPLICATION_ICON ICON "../../src/BetterTranslator.App/Assets/app-icon.ico"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION BOOTSTRAP_VERSION_FIELDS
+PRODUCTVERSION BOOTSTRAP_VERSION_FIELDS
+FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+FILEFLAGS 0x0L
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "SZEINER"
+            VALUE "FileDescription", "BetterTranslator"
+            VALUE "FileVersion", BOOTSTRAP_VERSION_TEXT
+            VALUE "InternalName", "BetterTranslator.exe"
+            VALUE "LegalCopyright", "Copyright (c) 2026 SZEINER s.r.o. MIT licensed."
+            VALUE "OriginalFilename", "BetterTranslator.exe"
+            VALUE "ProductName", "BetterTranslator"
+            VALUE "ProductVersion", BOOTSTRAP_VERSION_TEXT
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

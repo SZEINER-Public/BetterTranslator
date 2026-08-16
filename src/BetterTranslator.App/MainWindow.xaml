@@ -1,0 +1,1032 @@
+<Window x:Class="BetterTranslator.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        xmlns:controls="clr-namespace:BetterTranslator.App.Controls"
+        xmlns:views="clr-namespace:BetterTranslator.App.Views"
+        xmlns:vm="clr-namespace:BetterTranslator.App.ViewModels"
+        Loaded="OnWindowLoaded"
+        Title="BetterTranslator"
+        Icon="pack://application:,,,/BetterTranslator;component/Assets/app-icon.ico"
+        Width="{StaticResource WindowDefaultWidth}"
+        Height="{StaticResource WindowDefaultHeight}"
+        MinWidth="{StaticResource WindowMinWidth}"
+        MinHeight="{StaticResource WindowMinHeight}"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BrushDesk}"
+        Foreground="{StaticResource BrushText}"
+        FontFamily="{StaticResource FontFamilyUi}"
+        FontSize="{StaticResource TextDefaultSize}"
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Ideal">
+
+    <!-- WindowChrome keeps the eight-handle resize, Aero Snap and double-click
+         to maximize that a hand-rolled WindowStyle None window loses.
+         AllowsTransparency stays off for the same reason.
+
+         What it does not keep is correct maximize bounds, which this comment
+         claimed for a while: maximized, the window hangs a resize border off
+         every edge of the screen and the client area goes with it. WindowRoot's
+         margin is what gives that back. See WindowFrame. -->
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="{StaticResource CaptionHeight}"
+                            ResizeBorderThickness="{StaticResource ResizeBorderThickness}"
+                            CornerRadius="{StaticResource WindowChromeCornerRadius}"
+                            GlassFrameThickness="{StaticResource WindowChromeGlassFrame}"
+                            UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
+
+    <Window.DataContext>
+        <vm:MainWindowViewModel />
+    </Window.DataContext>
+
+    <Grid>
+        <!-- Margin is set from WindowState, not left at zero: maximized, this
+             border's edges are eight pixels off the screen. See WindowFrame. -->
+        <Border x:Name="WindowRoot"
+                Background="{StaticResource BrushWindow}"
+                BorderBrush="{StaticResource BrushWindowEdge}"
+                BorderThickness="{StaticResource BorderThickness}">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- ==================== S1 titlebar ==================== -->
+                <Grid Grid.Row="0" Height="{StaticResource CaptionHeight}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="12,0,0,0">
+                        <controls:Wordmark BarBrush="{StaticResource BrushText}"
+                                           AccentBrush="{StaticResource BrushAccent}"
+                                           MarkHeight="{StaticResource TitlebarMarkHeight}"
+                                           VerticalAlignment="Center" />
+                        <TextBlock Text="BetterTranslator"
+                                   Style="{StaticResource TextSecondary}"
+                                   VerticalAlignment="Center"
+                                   Margin="{StaticResource TitlebarMarkGap}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <!-- Settings sits with the caption controls, in the slot
+                             the design reference gives its theme toggle. It takes
+                             the caption geometry so it reads as one row with the
+                             three beside it rather than a toolbar button that
+                             wandered up here. -->
+                        <!-- The runtime, beside the thing that installs it. Play
+                             loads the model now instead of waiting for the first
+                             send; pause unloads it and gives the memory back.
+                             Both open the panel, because the useful part is
+                             seeing what it is doing. -->
+                        <controls:ChromeButton x:Name="RuntimeStartButton"
+                                               Style="{StaticResource CaptionButton}"
+                                               Icon="{StaticResource IconPlay}"
+                                               Command="{Binding Runtime.StartCommand}"
+                                               AutomationProperties.Name="Load the model"
+                                               ToolTip="{Binding Runtime.StateLabel, StringFormat='Load the model now - {0}'}"
+                                               Visibility="{Binding Runtime.CanStart, Converter={StaticResource BoolToVisibility}}" />
+
+                        <!-- Pause stops the answer being written. Eject puts the
+                             model down. Two different things, so two buttons:
+                             one abandons a translation, the other gives back the
+                             gigabytes the weights are holding. -->
+                        <controls:ChromeButton x:Name="RuntimePauseButton"
+                                               Style="{StaticResource CaptionButton}"
+                                               Icon="{StaticResource IconPause}"
+                                               Command="{Binding Runtime.PauseCommand}"
+                                               AutomationProperties.Name="Stop this translation"
+                                               ToolTip="Stop this translation - the model stays loaded"
+                                               Visibility="{Binding Runtime.CanPause, Converter={StaticResource BoolToVisibility}}" />
+
+                        <controls:ChromeButton x:Name="RuntimeUnloadButton"
+                                               Style="{StaticResource CaptionButton}"
+                                               Icon="{StaticResource IconEject}"
+                                               Command="{Binding Runtime.UnloadCommand}"
+                                               AutomationProperties.Name="Unload the model"
+                                               ToolTip="Unload the model and give its memory back"
+                                               Visibility="{Binding Runtime.CanUnload, Converter={StaticResource BoolToVisibility}}" />
+
+                        <controls:ChromeButton x:Name="RuntimePanelButton"
+                                               Style="{StaticResource CaptionButton}"
+                                               Icon="{StaticResource IconInfoCircle}"
+                                               Command="{Binding Runtime.TogglePanelCommand}"
+                                               IsActive="{Binding Runtime.IsPanelOpen}"
+                                               AutomationProperties.Name="Runtime status"
+                                               ToolTip="What the runtime is doing" />
+
+                        <Popup PlacementTarget="{Binding ElementName=RuntimePanelButton}"
+                               Placement="Bottom"
+                               VerticalOffset="6"
+                               HorizontalOffset="-180"
+                               StaysOpen="False"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               IsOpen="{Binding Runtime.IsPanelOpen, Mode=TwoWay}">
+                            <Border Background="{StaticResource BrushSurface}"
+                                    BorderBrush="{StaticResource BrushBorder}"
+                                    BorderThickness="{StaticResource BorderThickness}"
+                                    CornerRadius="{StaticResource RadiusCard}"
+                                    Effect="{StaticResource ShadowPopover}"
+                                    Width="300"
+                                    Padding="14,12,14,12">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Runtime.StateLabel}"
+                                               Style="{StaticResource TextCardTitle}" />
+
+                                    <TextBlock Text="{Binding Runtime.StateDetail}"
+                                               Style="{StaticResource TextMeta}"
+                                               Foreground="{StaticResource BrushTextSecondary}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,0,0" />
+
+                                    <Rectangle Height="{StaticResource BorderWidth}"
+                                               Fill="{StaticResource BrushBorderFaint}"
+                                               Margin="0,10,0,10" />
+
+                                    <Grid>
+                                        <TextBlock Text="Runtime"
+                                                   Style="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextMuted}" />
+                                        <TextBlock Text="{Binding Runtime.BackendLabel}"
+                                                   Style="{StaticResource TextMeta}"
+                                                   HorizontalAlignment="Right" />
+                                    </Grid>
+
+                                    <Grid Margin="0,6,0,0">
+                                        <TextBlock Text="Model"
+                                                   Style="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextMuted}" />
+                                        <TextBlock Text="{Binding Runtime.ModelLabel}"
+                                                   Style="{StaticResource TextMeta}"
+                                                   HorizontalAlignment="Right"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   MaxWidth="200" />
+                                    </Grid>
+
+                                    <Grid Margin="0,6,0,0">
+                                        <TextBlock Text="Prompt"
+                                                   Style="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextMuted}" />
+                                        <TextBlock Text="{Binding Runtime.PromptShapeLabel}"
+                                                   Style="{StaticResource TextMeta}"
+                                                   HorizontalAlignment="Right" />
+                                    </Grid>
+
+                                    <Grid Margin="0,6,0,0"
+                                          Visibility="{Binding Runtime.HasLastRun, Converter={StaticResource BoolToVisibility}}">
+                                        <TextBlock Text="Last run"
+                                                   Style="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextMuted}" />
+                                        <TextBlock Text="{Binding Runtime.LastRun}"
+                                                   Style="{StaticResource TextMeta}"
+                                                   HorizontalAlignment="Right" />
+                                    </Grid>
+
+                                    <!-- What is running is not what was chosen.
+                                         Said here because the only other
+                                         symptom is that it is slow, which reads
+                                         as the machine being slow rather than
+                                         as the wrong library having loaded. -->
+                                    <Border Background="{StaticResource BrushAccentTint}"
+                                            BorderBrush="{StaticResource BrushAccentBorder}"
+                                            BorderThickness="{StaticResource BorderThickness}"
+                                            CornerRadius="{StaticResource RadiusRow}"
+                                            Margin="0,10,0,0"
+                                            Padding="9,7,9,7"
+                                            Visibility="{Binding Runtime.HasBackendNote, Converter={StaticResource BoolToVisibility}}">
+                                        <TextBlock Text="{Binding Runtime.BackendNote}"
+                                                   Style="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushText}"
+                                                   TextWrapping="Wrap" />
+                                    </Border>
+
+                                    <!-- The model is being asked in a way it was
+                                         never tuned for. Worth saying, because
+                                         the output looks fine and only reads
+                                         slightly worse. -->
+                                    <Border Background="{StaticResource BrushAccentTint}"
+                                            BorderBrush="{StaticResource BrushAccentBorder}"
+                                            BorderThickness="{StaticResource BorderThickness}"
+                                            CornerRadius="{StaticResource RadiusRow}"
+                                            Margin="0,10,0,0"
+                                            Padding="9,7,9,7"
+                                            Visibility="{Binding Runtime.HasPromptWarning, Converter={StaticResource BoolToVisibility}}">
+                                        <TextBlock Text="{Binding Runtime.PromptWarning}"
+                                                   Style="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushText}"
+                                                   TextWrapping="Wrap" />
+                                    </Border>
+
+                                    <!-- The sampler that went out is not the one
+                                         the panel holds. This was computed on
+                                         every send and bound nowhere, so the one
+                                         place the override could have been read
+                                         showed nothing at all. -->
+                                    <Border Background="{StaticResource BrushWarnSurface}"
+                                            BorderBrush="{StaticResource BrushWarnBorder}"
+                                            BorderThickness="{StaticResource BorderThickness}"
+                                            CornerRadius="{StaticResource RadiusRow}"
+                                            Margin="0,10,0,0"
+                                            Padding="9,7,9,7"
+                                            Visibility="{Binding Runtime.HasConfigAdvisories, Converter={StaticResource BoolToVisibility}}">
+                                        <TextBlock Text="{Binding Runtime.ConfigAdvisories}"
+                                                   Style="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushWarnText}"
+                                                   TextWrapping="Wrap" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+
+                        <controls:ChromeButton x:Name="DownloadsButton"
+                                               Style="{StaticResource CaptionButton}"
+                                               Icon="{StaticResource IconDownload}"
+                                               Command="{Binding OpenDownloadsCommand}"
+                                               AutomationProperties.Name="Models and runtimes"
+                                               ToolTip="Models and runtimes - what is installed and what can be downloaded" />
+                        <controls:ChromeButton x:Name="SettingsButton"
+                                               Style="{StaticResource CaptionButton}"
+                                               Icon="{StaticResource IconGear}"
+                                               Command="{Binding OpenSettingsCommand}"
+                                               AutomationProperties.Name="Settings"
+                                               ToolTip="Settings - memory behaviour, your data, cache" />
+                        <controls:ChromeButton x:Name="MinimizeButton"
+                                               Style="{StaticResource CaptionButton}"
+                                               Icon="{StaticResource IconMinimize}"
+                                               AutomationProperties.Name="Minimize"
+                                               ToolTip="Minimize"
+                                               Click="OnMinimizeClick" />
+                        <controls:ChromeButton x:Name="MaximizeButton"
+                                               Style="{StaticResource CaptionButton}"
+                                               Icon="{StaticResource IconMaximize}"
+                                               AutomationProperties.Name="Maximize"
+                                               ToolTip="Maximize"
+                                               Click="OnMaximizeClick" />
+                        <controls:ChromeButton x:Name="CloseButton"
+                                               Style="{StaticResource CaptionCloseButton}"
+                                               Icon="{StaticResource IconCloseWindow}"
+                                               AutomationProperties.Name="Close"
+                                               ToolTip="Close"
+                                               Click="OnCloseClick" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- ==================== S2 toolbar ==================== -->
+                <Grid Grid.Row="1" Height="{StaticResource ToolbarHeight}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="16,0,0,0">
+
+                        <controls:ChromeButton Icon="{StaticResource IconPanelLeft}"
+                                               IsOutlined="True"
+                                               IsActive="{Binding IsSidebarVisible}"
+                                               Command="{Binding ToggleSidebarCommand}"
+                                               ToolTip="Show or hide the chat sidebar"
+                                               AutomationProperties.Name="Show or hide the chat sidebar" />
+
+                        <!-- With no scope set the selector carries no label, only
+                             a folder icon and a chevron, and it opens the menu. -->
+                        <controls:ChromeButton x:Name="ProjectSelector"
+                                               Style="{StaticResource ProjectSelectorButton}"
+                                               Command="{Binding ToggleProjectMenuCommand}"
+                                               Margin="8,0,0,0"
+                                               ToolTip="{Binding ProjectSelectorTooltip}"
+                                               AutomationProperties.Name="{Binding ProjectSelectorLabel}"
+                                               Visibility="{Binding HasProject, Converter={StaticResource InverseBoolToVisibility}}">
+                            <StackPanel Orientation="Horizontal">
+                                <controls:IconView Definition="{StaticResource IconFolder}"
+                                                   VerticalAlignment="Center" />
+                                <!-- Turns to point up while the menu is showing.
+                                     The transform is built in code so it is not
+                                     shared or frozen. -->
+                                <controls:IconView x:Name="ScopeChevron"
+                                                   Definition="{StaticResource IconChevronDown}"
+                                                   Margin="5,0,0,0"
+                                                   VerticalAlignment="Center"
+                                                   RenderTransformOrigin="0.5,0.5" />
+                            </StackPanel>
+                        </controls:ChromeButton>
+
+                        <!-- Once a scope IS set the selector is replaced by this
+                             chip, which states the scope and is static apart from
+                             its clear button: clearing is the way back to the menu. -->
+                        <Border Height="{StaticResource ChromeButtonSize}"
+                                Background="{StaticResource BrushAccentTint}"
+                                BorderBrush="{StaticResource BrushAccentBorder}"
+                                BorderThickness="{StaticResource BorderThickness}"
+                                CornerRadius="{StaticResource RadiusDefault}"
+                                Padding="10,0,4,0"
+                                Margin="8,0,0,0"
+                                SnapsToDevicePixels="True"
+                                shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                Visibility="{Binding HasProject, Converter={StaticResource BoolToVisibility}}">
+                            <StackPanel Orientation="Horizontal">
+                                <controls:IconView Definition="{StaticResource IconFolder}"
+                                                   Foreground="{StaticResource BrushAccentDeep}"
+                                                   VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding ScopeKindLabel}"
+                                           Style="{StaticResource TextDefault}"
+                                           Foreground="{StaticResource BrushAccentDeep}"
+                                           VerticalAlignment="Center"
+                                           Margin="8,0,0,0" />
+                                <!-- The path is trimmed rather than wrapped: the chip
+                                     is one line of chrome and a deep tree must not
+                                     grow the toolbar. The whole path is the tooltip. -->
+                                <TextBlock Text="{Binding ProjectPath}"
+                                           Style="{StaticResource TextMonoPath}"
+                                           VerticalAlignment="Center"
+                                           Margin="8,0,0,0"
+                                           MaxWidth="{StaticResource ScopePathMaxWidth}"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip="{Binding ProjectPath}" />
+                                <controls:ChromeButton Style="{StaticResource ScopeChipClearButton}"
+                                                       Icon="{StaticResource IconCloseSmall}"
+                                                       Command="{Binding ClearProjectCommand}"
+                                                       Margin="8,0,0,0"
+                                                       VerticalAlignment="Center"
+                                                       ToolTip="Remove scope"
+                                                       AutomationProperties.Name="Remove scope" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Scope: Project, Folder or None. Defaults to None,
+                             and never gates translation. -->
+                        <!-- StaysOpen, because the popup's own outside-click close
+                             races the selector's click: it would close on the way
+                             down and reopen on the way up, so the second click
+                             never shut it. Dismissal is handled in code-behind
+                             instead, which can tell the selector from the rest. -->
+                        <Popup x:Name="ProjectMenuPopup"
+                               PlacementTarget="{Binding ElementName=ProjectSelector}"
+                               Placement="Bottom"
+                               VerticalOffset="6"
+                               StaysOpen="True"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               IsOpen="{Binding IsProjectMenuOpen, Mode=TwoWay}">
+                            <Border Background="{StaticResource BrushSurface}"
+                                    BorderBrush="{StaticResource BrushBorder}"
+                                    BorderThickness="{StaticResource BorderThickness}"
+                                    CornerRadius="{StaticResource RadiusCard}"
+                                    Padding="{StaticResource Space2Thickness}"
+                                    Effect="{StaticResource ShadowPopover}"
+                                    MinWidth="300">
+                                <ItemsControl ItemsSource="{Binding ProjectScopes}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <!-- A locked scope is disabled rather than
+                                                 dropped, and says why on the row and to
+                                                 a screen reader. ShowOnDisabled, or the
+                                                 reason never reaches the pointer that
+                                                 went looking for it. -->
+                                            <Button Style="{StaticResource MenuRowButton}"
+                                                    Height="Auto"
+                                                    Padding="11,9,12,10"
+                                                    IsEnabled="{Binding IsUnlocked}"
+                                                    ToolTip="{Binding LockedReason}"
+                                                    ToolTipService.ShowOnDisabled="True"
+                                                    AutomationProperties.Name="{Binding AutomationName}"
+                                                    Command="{Binding DataContext.ChooseScopeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <!-- The 14 box variant, sized to
+                                                             sit inline beside the title. -->
+                                                        <controls:IconView Definition="{StaticResource IconLockSegment}"
+                                                                           Margin="0,0,6,0"
+                                                                           VerticalAlignment="Center"
+                                                                           Visibility="{Binding IsLocked, Converter={StaticResource BoolToVisibility}}" />
+                                                        <TextBlock Text="{Binding Title}"
+                                                                   Style="{StaticResource TextCardTitle}"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding Detail}"
+                                                               Style="{StaticResource TextMeta}"
+                                                               Foreground="{StaticResource BrushTextSecondary}"
+                                                               TextWrapping="Wrap"
+                                                               MaxWidth="252"
+                                                               Margin="0,3,0,0" />
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Popup>
+
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="0,0,16,0">
+
+                        <!-- ============ S3 workspace mode slider ============ -->
+                        <controls:SegmentedControl ItemsSource="{Binding WorkspaceModes}"
+                                                   SelectedItem="{Binding SelectedWorkspaceMode, Mode=TwoWay}"
+                                                   AutomationProperties.Name="Workspace mode" />
+
+                        <!-- Advanced only: the panel it toggles is the Advanced
+                             panel, so offering it from Simple would open a
+                             thing that mode does not have. -->
+                        <controls:ChromeButton Icon="{StaticResource IconPanelRight}"
+                                               IsOutlined="True"
+                                               IsActive="{Binding IsRightPanelVisible}"
+                                               Command="{Binding ToggleRightPanelCommand}"
+                                               Visibility="{Binding IsAdvancedMode, Converter={StaticResource BoolToVisibility}}"
+                                               Margin="8,0,0,0"
+                                               ToolTip="Show or hide the right panel"
+                                               AutomationProperties.Name="Show or hide the right panel" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- ==================== content ==================== -->
+                <Border Grid.Row="2"
+                        Background="{StaticResource BrushSurface}"
+                        BorderBrush="{StaticResource BrushBorderSoft}"
+                        BorderThickness="0,1,0,0">
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- ============ S4 chat sidebar ============ -->
+                        <!-- The host is what opens and closes: its width animates
+                             while the sidebar inside keeps its own, so the content
+                             is clipped rather than reflowed on the way out. Width
+                             resolves against the window, not the workspace this
+                             view is bound to, or it would auto-size. -->
+                        <!-- The host's own width is driven from code-behind, not
+                             bound: an animation and a binding cannot both own one
+                             property, and the open and close motion needs it. -->
+                        <Border x:Name="SidebarHost"
+                                Grid.Column="0"
+                                ClipToBounds="True">
+                            <views:SidebarView Width="{Binding DataContext.SidebarWidth, RelativeSource={RelativeSource AncestorType=Window}}"
+                                               HorizontalAlignment="Left"
+                                               DataContext="{Binding Workspace}" />
+                        </Border>
+
+                        <controls:ResizeSeparator x:Name="SidebarSeparator"
+                                                  Grid.Column="1"
+                                                  Value="{Binding SidebarWidth, Mode=TwoWay}"
+                                                  Minimum="{Binding SidebarMinWidth}"
+                                                  Maximum="{Binding SidebarMaxWidth}"
+                                                  AutomationProperties.Name="Resize chats panel"
+                                                  ToolTip="Resize chats panel" />
+
+                        <!-- ============ S5, S6 chat ============ -->
+                        <views:ChatView Grid.Column="2"
+                                        DataContext="{Binding Workspace}"
+                                        Visibility="{Binding DataContext.IsMemoryMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource InverseBoolToVisibility}}" />
+
+                        <!-- S10 Memory. The rail is fed from the index; the two
+                             cards land in Phase 8. -->
+                        <Grid Grid.Column="2"
+                              Visibility="{Binding IsMemoryMode, Converter={StaticResource BoolToVisibility}}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Overview and Retrieval map, then a divider, then
+                                 Add sources, which sits outside the tablist. -->
+                            <Grid Grid.Row="0" Grid.ColumnSpan="2" Margin="16,10,16,10">
+                            <TextBlock Text="{Binding Memory.IndexedStatus}"
+                                       Style="{StaticResource TextMeta}"
+                                       Foreground="{StaticResource BrushTextTertiary}"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal">
+                                <!-- The way back out of Memory, which the mode
+                                     slider alone does not read as. -->
+                                <Button Style="{StaticResource LinkButton}"
+                                        Command="{Binding BackToChatCommand}"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,10,0"
+                                        AutomationProperties.Name="Back to the chat">
+                                    <StackPanel Orientation="Horizontal">
+                                        <controls:IconView Definition="{StaticResource IconChevronLeftSmall}"
+                                                           VerticalAlignment="Center" />
+                                        <TextBlock Text="Chat"
+                                                   Style="{StaticResource TextSecondary}"
+                                                   Margin="5,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <Rectangle Width="{StaticResource BorderWidth}"
+                                           Fill="{StaticResource BrushBorderSoft}"
+                                           Margin="0,4,10,4" />
+
+                                <Border Background="{StaticResource BrushTrack}"
+                                        CornerRadius="{StaticResource RadiusPanel}"
+                                        Padding="{StaticResource Space1Thickness}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton Style="{StaticResource FolderSegment}"
+                                                     Content="Overview"
+                                                     IsChecked="{Binding Memory.ShowOverviewTabChecked, Mode=OneWay}"
+                                                     Command="{Binding Memory.ShowOverviewCommand}"
+                                                     AutomationProperties.Name="Overview" />
+                                        <RadioButton Style="{StaticResource FolderSegment}"
+                                                     Content="Retrieval map"
+                                                     IsChecked="{Binding Memory.IsMapTab, Mode=OneWay}"
+                                                     Command="{Binding Memory.ShowMapCommand}"
+                                                     AutomationProperties.Name="Retrieval map" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Rectangle Width="{StaticResource BorderWidth}"
+                                           Fill="{StaticResource BrushBorderSoft}"
+                                           Margin="10,4,10,4" />
+
+                                <Button Style="{StaticResource SecondaryButton}"
+                                        Height="{StaticResource SegmentHeight}"
+                                        Command="{Binding OpenAddSourcesCommand}"
+                                        AutomationProperties.Name="Add sources">
+                                    <StackPanel Orientation="Horizontal">
+                                        <controls:IconView Definition="{StaticResource IconPlusSmall}"
+                                                           VerticalAlignment="Center" />
+                                        <TextBlock Text="Add sources"
+                                                   Style="{StaticResource TextSecondary}"
+                                                   Margin="6,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                            </Grid>
+
+                            <!-- S12 retrieval map -->
+                            <views:RetrievalMapView Grid.Row="1" Grid.ColumnSpan="2"
+                                                    DataContext="{Binding Memory.Map}"
+                                                    Visibility="{Binding DataContext.Memory.IsMapTab, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
+
+                            <Border Grid.Row="1" Grid.Column="0"
+                                    Width="{StaticResource SidebarDefaultWidth}"
+                                    Background="{StaticResource BrushSurfaceMuted}"
+                                    BorderBrush="{StaticResource BrushBorderSoft}"
+                                    BorderThickness="0,0,1,0"
+                                    Visibility="{Binding Memory.IsMapTab, Converter={StaticResource InverseBoolToVisibility}}">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16,16,12,16">
+                                    <StackPanel DataContext="{Binding Memory}">
+                                        <TextBlock Text="Project sources"
+                                                   Style="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextTertiary}" />
+                                        <TextBlock Text="{Binding SourcesEmptyLine}"
+                                                   Style="{StaticResource TextSecondary}"
+                                                   Foreground="{StaticResource BrushTextMuted}"
+                                                   Margin="0,8,0,0"
+                                                   Visibility="{Binding HasSources, Converter={StaticResource InverseBoolToVisibility}}" />
+                                        <ItemsControl ItemsSource="{Binding ProjectSources}" Margin="0,8,0,0">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0,0,0,7">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Rectangle Width="{StaticResource Space6}"
+                                                                       Height="{StaticResource Space6}"
+                                                                       RadiusX="{Binding Source={StaticResource RadiusXs}, Path=TopLeft}"
+                                                                       RadiusY="{Binding Source={StaticResource RadiusXs}, Path=TopLeft}"
+                                                                       Fill="{Binding Dot}"
+                                                                       VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding Label}"
+                                                                       Style="{StaticResource TextSecondary}"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       MaxWidth="140"
+                                                                       Margin="9,0,0,0"
+                                                                       VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                        <TextBlock Text="{Binding Count}"
+                                                                   Style="{StaticResource TextMicro}"
+                                                                   Foreground="{StaticResource BrushTextMuted}"
+                                                                   HorizontalAlignment="Right"
+                                                                   VerticalAlignment="Center" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <TextBlock Text="Learned"
+                                                   Style="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextTertiary}"
+                                                   Margin="0,20,0,0" />
+                                        <TextBlock Text="{Binding LearnedEmptyLine}"
+                                                   Style="{StaticResource TextSecondary}"
+                                                   Foreground="{StaticResource BrushTextMuted}"
+                                                   Margin="0,8,0,0" />
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Border>
+
+                            <!-- Empty state, until something is indexed -->
+                            <StackPanel Grid.Row="1" Grid.Column="1"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        MaxWidth="{StaticResource EmptyStateMaxWidthPane}"
+                                        Visibility="{Binding Memory.ShowOverviewEmptyState, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="Nothing is indexed yet"
+                                           Style="{StaticResource TextTitle}"
+                                           HorizontalAlignment="Center" />
+                                <TextBlock Text="Point memory at a folder, a repository or a few files and it starts matching your own wording."
+                                           Style="{StaticResource TextProse}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           Margin="0,6,0,0" />
+                                <Button Style="{StaticResource PrimaryButton}"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,16,0,0"
+                                        Command="{Binding OpenAddSourcesCommand}"
+                                        AutomationProperties.Name="Add sources">
+                                    <StackPanel Orientation="Horizontal">
+                                        <controls:IconView Definition="{StaticResource IconPlusSmall}"
+                                                           VerticalAlignment="Center" />
+                                        <TextBlock Text="Add sources"
+                                                   VerticalAlignment="Center"
+                                                   Margin="8,0,0,0" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+
+                            <!-- Populated: totals and the live progress line -->
+                            <StackPanel Grid.Row="1" Grid.Column="1"
+                                        Margin="24,20,24,0"
+                                        VerticalAlignment="Top"
+                                        Visibility="{Binding Memory.ShowOverviewContent, Converter={StaticResource BoolToVisibility}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Memory.TextIndexedLabel}" Style="{StaticResource TextHeading}" />
+                                    <TextBlock Text="pieces ready to search"
+                                               Style="{StaticResource TextMeta}"
+                                               Foreground="{StaticResource BrushTextTertiary}"
+                                               Margin="8,0,0,0"
+                                               VerticalAlignment="Bottom" />
+                                    <Button Style="{StaticResource SecondaryButton}"
+                                            Content="Add sources"
+                                            Margin="20,0,0,0"
+                                            Command="{Binding OpenAddSourcesCommand}"
+                                            AutomationProperties.Name="Add sources" />
+                                </StackPanel>
+
+                                <Grid Margin="0,16,0,0"
+                                      Visibility="{Binding Memory.IsIndexing, Converter={StaticResource BoolToVisibility}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding Memory.ProgressActivity}"
+                                                   Style="{StaticResource TextSecondary}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <ProgressBar Style="{StaticResource AppProgressBar}"
+                                                     Value="{Binding Memory.ProgressPercent}"
+                                                     Margin="0,8,0,0" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Memory.QueuedLabel}"
+                                               Style="{StaticResource TextMeta}"
+                                               Foreground="{StaticResource BrushTextMuted}"
+                                               Margin="14,0,0,0"
+                                               VerticalAlignment="Top" />
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- S9 file preview, opening beside the chat -->
+                        <controls:ResizeSeparator Grid.Column="3"
+                                                  Value="{Binding PreviewWidth, Mode=TwoWay}"
+                                                  Minimum="{Binding PreviewMinWidth}"
+                                                  Maximum="{Binding PreviewMaxWidth}"
+                                                  Inverted="True"
+                                                  AutomationProperties.Name="Resize panel"
+                                                  ToolTip="Resize panel"
+                                                  x:Name="PreviewSeparator" />
+
+                        <!-- Same arrangement as the two side panels: the host
+                             owns its width from code so the separator can drag
+                             it, and the view inside keeps the bound width so its
+                             content is clipped rather than reflowed. -->
+                        <Border x:Name="PreviewHost"
+                                Grid.Column="4"
+                                ClipToBounds="True">
+                            <views:FilePreviewView Width="{Binding DataContext.PreviewWidth, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                   HorizontalAlignment="Left"
+                                                   DataContext="{Binding Workspace.Preview}" />
+                        </Border>
+
+                        <!-- The right panel's own separator, matching the
+                             sidebar's: the divider is always drawn and only
+                             strengthens when grabbed. -->
+                        <controls:ResizeSeparator x:Name="RightPanelSeparator"
+                                                  Grid.Column="5"
+                                                  Value="{Binding RightPanelWidth, Mode=TwoWay}"
+                                                  Minimum="{Binding RightPanelMinWidth}"
+                                                  Maximum="{Binding RightPanelMaxWidth}"
+                                                  Inverted="True"
+                                                  AutomationProperties.Name="Resize advanced panel"
+                                                  ToolTip="Resize advanced panel" />
+
+                        <!-- S8 Advanced panel. No mode chips and no context
+                             field: this is the whole of it. Like the sidebar,
+                             the host is what opens and closes and owns its own
+                             width from code-behind; the panel inside keeps the
+                             bound width so its content is clipped rather than
+                             reflowed on the way out. -->
+                        <Border x:Name="RightPanelHost"
+                                Grid.Column="6"
+                                ClipToBounds="True">
+                        <!-- No border of its own: the separator to its left
+                             already draws the rule, and the sidebar does not
+                             double it either. -->
+                        <Border Width="{Binding RightPanelWidth}"
+                                HorizontalAlignment="Right"
+                                Background="{StaticResource BrushSurface}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="18,18,18,18">
+                                <StackPanel DataContext="{Binding Translation}">
+
+                                    <!-- The panel names itself and offers the
+                                         way out, rather than relying on the
+                                         toolbar toggle that opened it. -->
+                                    <Grid Margin="0,0,0,18">
+                                        <TextBlock Text="Advanced" Style="{StaticResource TextTitle}" />
+                                        <controls:ChromeButton Icon="{StaticResource IconCloseCrossSearch}"
+                                                               HorizontalAlignment="Right"
+                                                               VerticalAlignment="Top"
+                                                               Command="{Binding DataContext.ToggleRightPanelCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                               ToolTip="Close the advanced panel"
+                                                               AutomationProperties.Name="Close the advanced panel" />
+                                    </Grid>
+
+                                    <TextBlock Text="Model" Style="{StaticResource TextSubheading}" />
+
+                                    <ItemsControl ItemsSource="{Binding Efforts}" Margin="0,10,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <!-- Each model is its own card, so the
+                                                     choice reads as two things to pick
+                                                     between rather than a list of radios. -->
+                                                <Border Background="{StaticResource BrushSurface}"
+                                                        BorderBrush="{StaticResource BrushBorder}"
+                                                        BorderThickness="{StaticResource BorderThickness}"
+                                                        CornerRadius="{StaticResource RadiusDefault}"
+                                                        Padding="12,10,12,11"
+                                                        Margin="0,0,0,10">
+                                                <StackPanel>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <RadioButton Grid.Column="0"
+                                                                     GroupName="AdvancedModel"
+                                                                     Content="{Binding Model.Name}"
+                                                                     IsChecked="{Binding IsChosen, Mode=OneWay}"
+                                                                     IsEnabled="{Binding IsInstalled}"
+                                                                     ToolTip="{Binding BlockedTooltip}"
+                                                                     ToolTipService.ShowOnDisabled="True"
+                                                                     AutomationProperties.Name="{Binding Model.Name}"
+                                                                     Command="{Binding DataContext.ChooseEffortCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                     CommandParameter="{Binding}" />
+
+                                                        <!-- The second route to the download manager -->
+                                                        <Button Grid.Column="1"
+                                                                Style="{StaticResource LinkButton}"
+                                                                Content="Get it"
+                                                                VerticalAlignment="Top"
+                                                                Visibility="{Binding IsBlocked, Converter={StaticResource BoolToVisibility}}"
+                                                                Command="{Binding DataContext.GetModelCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                CommandParameter="{Binding}"
+                                                                AutomationProperties.Name="Get this model" />
+                                                    </Grid>
+
+                                                    <TextBlock Text="{Binding RadioNote}"
+                                                               Style="{StaticResource TextMeta}"
+                                                               Foreground="{StaticResource BrushTextTertiary}"
+                                                               TextWrapping="Wrap"
+                                                               Margin="24,3,0,0"
+                                                               Visibility="{Binding RadioNote, Converter={StaticResource NotEmptyToVisibility}}" />
+                                                </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <!-- Label and value share a row, the value
+                                         right aligned and monospaced so it does
+                                         not shift as the slider moves. -->
+                                    <Grid Margin="0,10,0,8">
+                                        <TextBlock Text="Temperature" Style="{StaticResource TextSubheading}" />
+                                        <TextBlock Text="{Binding TemperatureReadout}"
+                                                   Style="{StaticResource TextMonoSmall}"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+                                    <!-- IsMoveToPointEnabled, so the thumb goes
+                                         where the track was clicked and can be
+                                         dragged straight on from there. Without
+                                         it a click stepped by LargeChange,
+                                         which defaults to 1 and over a range of
+                                         0 to 1 is the whole scale, so any click
+                                         slammed the value to an end. The steps
+                                         are the reference's 0.05. -->
+                                    <!-- Locked while the chosen model writes its own
+                                         sampler: the note below carries the reason,
+                                         and a screen reader is told it too. -->
+                                    <Slider Minimum="0"
+                                            Maximum="1"
+                                            SmallChange="{StaticResource TemperatureStep}"
+                                            LargeChange="{StaticResource TemperatureStep}"
+                                            IsMoveToPointEnabled="True"
+                                            Value="{Binding Temperature, Mode=TwoWay}"
+                                            IsEnabled="{Binding TemperatureIsAdjustable}"
+                                            AutomationProperties.Name="Temperature"
+                                            AutomationProperties.HelpText="{Binding TemperatureNote}" />
+                                    <TextBlock Text="{Binding TemperatureNote}"
+                                               Style="{StaticResource TextMeta}"
+                                               Foreground="{StaticResource BrushTextTertiary}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,0,0" />
+
+                                    <TextBlock Text="User prompt"
+                                               Style="{StaticResource TextSubheading}"
+                                               Margin="0,20,0,0" />
+                                    <Grid Margin="0,8,0,0">
+                                        <TextBox Style="{StaticResource TextField}"
+                                                 Height="Auto"
+                                                 MinHeight="72"
+                                                 AcceptsReturn="True"
+                                                 TextWrapping="Wrap"
+                                                 VerticalContentAlignment="Stretch"
+                                                 Padding="9,7,9,7"
+                                                 Text="{Binding UserPrompt, UpdateSourceTrigger=PropertyChanged}"
+                                                 AutomationProperties.Name="User prompt" />
+                                        <TextBlock Text="Sent with every request. Example: keep product names in English."
+                                                   Style="{StaticResource PlaceholderText}"
+                                                   VerticalAlignment="Top"
+                                                   TextWrapping="Wrap"
+                                                   Margin="10,8,10,0"
+                                                   Visibility="{Binding UserPrompt, Converter={StaticResource StringEmptyToVisibility}}" />
+                                    </Grid>
+
+                                    <!-- Ruled off from the settings above it: it
+                                         undoes all of them, not the last one. -->
+                                    <Border BorderBrush="{StaticResource BrushBorderSoft}"
+                                            BorderThickness="0,1,0,0"
+                                            Margin="0,20,0,0"
+                                            Padding="0,12,0,0">
+                                        <Button Style="{StaticResource LinkButton}"
+                                                Content="Reset to defaults"
+                                                HorizontalAlignment="Left"
+                                                Command="{Binding ResetToDefaultsCommand}"
+                                                AutomationProperties.Name="Reset to defaults" />
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Border>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Size readout during a resize drag, centred at the bottom. -->
+        <Border HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Margin="0,0,0,24"
+                Height="{StaticResource SizePillHeight}"
+                CornerRadius="{StaticResource ChipRadius}"
+                Background="{StaticResource BrushBadgeOverlay}"
+                Padding="12,0,12,0"
+                IsHitTestVisible="False"
+                Visibility="{Binding IsSizeReadoutVisible, Converter={StaticResource BoolToVisibility}}">
+            <TextBlock Text="{Binding SizeReadout}"
+                       Style="{StaticResource TextMeta}"
+                       Foreground="{StaticResource BrushSurface}"
+                       VerticalAlignment="Center" />
+        </Border>
+
+        <!-- S14 first run. The backdrop closes it, the same as every other
+             modal layer here. It was a required step while nothing behind it
+             worked without a model; the chat does work, so holding the window
+             hostage to an install was the installer overstating its case. -->
+        <Grid Background="{StaticResource BrushOverlay}"
+              Tag="{Binding FirstRun.DismissCommand}"
+              MouseLeftButtonDown="OnBackdropClick"
+              Visibility="{Binding HasFirstRun, Converter={StaticResource BoolToVisibility}}">
+            <views:FirstRunView DataContext="{Binding FirstRun}" />
+        </Grid>
+
+        <!-- S13 Settings -->
+        <Grid Background="{StaticResource BrushOverlay}"
+              Tag="{Binding Settings.CloseCommand}"
+              MouseLeftButtonDown="OnBackdropClick"
+              Visibility="{Binding HasSettings, Converter={StaticResource BoolToVisibility}}">
+            <views:SettingsView DataContext="{Binding Settings}" />
+        </Grid>
+
+        <!-- S11 Add to this project. Escape, the close button and the backdrop
+             all close it without changing state. -->
+        <Grid Background="{StaticResource BrushOverlay}"
+              Tag="{Binding AddSources.CancelCommand}"
+              MouseLeftButtonDown="OnBackdropClick"
+              Visibility="{Binding HasAddSources, Converter={StaticResource BoolToVisibility}}">
+            <views:AddSourcesView DataContext="{Binding AddSources}" />
+        </Grid>
+
+        <!-- C13 modal layer. Escape and the backdrop close it. -->
+        <Grid Background="{StaticResource BrushOverlay}"
+              Tag="{Binding CloseDialogCommand}"
+              MouseLeftButtonDown="OnBackdropClick"
+              Visibility="{Binding HasDialog, Converter={StaticResource BoolToVisibility}}">
+
+            <Border Style="{StaticResource DialogSurface}"
+                    DataContext="{Binding ActiveDialog}"
+                    MinWidth="{StaticResource EmptyStateMaxWidthDialog}">
+                <StackPanel Margin="20,18,20,0">
+                    <TextBlock Text="{Binding Title}" Style="{StaticResource TextTitle}" />
+                    <TextBlock Text="{Binding Body}"
+                               Style="{StaticResource TextProse}"
+                               Foreground="{StaticResource BrushTextSecondary}"
+                               TextWrapping="Wrap"
+                               Margin="0,8,0,0" />
+
+                    <Border Background="{StaticResource BrushSurfaceSunken}"
+                            BorderBrush="{StaticResource BrushBorderFaint}"
+                            BorderThickness="0,1,0,0"
+                            CornerRadius="0,0,11,11"
+                            Margin="-20,18,-20,0"
+                            Padding="20,14,20,14">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <!-- Each glyph takes the button's own foreground, so
+                                 the destructive one reads red with its label.
+
+                                 Both carry their label as an automation name as
+                                 well: a button whose content is a panel rather
+                                 than a string has no name to derive, so this
+                                 prompt offered a reader two unnamed buttons and
+                                 one of them destroys a chat. -->
+                            <Button Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding CancelCommand}"
+                                    AutomationProperties.Name="{Binding CancelLabel}">
+                                <StackPanel Orientation="Horizontal">
+                                    <controls:IconView Definition="{Binding CancelIconKey, Converter={StaticResource KeyToIcon}}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,4,0" />
+                                    <TextBlock Text="{Binding CancelLabel}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource DestructiveButton}"
+                                    Command="{Binding ConfirmCommand}"
+                                    Margin="8,0,0,0"
+                                    AutomationProperties.Name="{Binding ConfirmLabel}">
+                                <StackPanel Orientation="Horizontal">
+                                    <controls:IconView Definition="{Binding ConfirmIconKey, Converter={StaticResource KeyToIcon}}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,4,0" />
+                                    <TextBlock Text="{Binding ConfirmLabel}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Resize grip, faded in while the pointer is over the window. -->
+        <controls:IconView x:Name="ResizeGrip"
+                           Definition="{StaticResource IconResizeGrip}"
+                           Foreground="{StaticResource BrushTextSubtle}"
+                           Opacity="0"
+                           IsHitTestVisible="False"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Bottom"
+                           Margin="0,0,2,2" />
+    </Grid>
+</Window>

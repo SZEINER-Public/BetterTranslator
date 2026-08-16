@@ -1,0 +1,932 @@
+<UserControl x:Class="BetterTranslator.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:BetterTranslator.App.Controls">
+
+    <!-- Sized in code-behind so the change to Config can be animated through
+         MotionService, which is the one place that reads the reduced-motion
+         flag. A XAML trigger would bypass it. -->
+    <Border x:Name="Surface"
+            Style="{StaticResource DialogSurface}"
+            Width="{StaticResource SettingsWindowWidth}"
+            Height="{StaticResource SettingsWindowHeight}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="20,16,12,14">
+                <TextBlock Text="Settings" Style="{StaticResource TextTitle}" VerticalAlignment="Center" />
+                <controls:ChromeButton Icon="{StaticResource IconCloseSmall}"
+                                       HorizontalAlignment="Right"
+                                       Command="{Binding CloseCommand}"
+                                       ToolTip="Close"
+                                       AutomationProperties.Name="Close" />
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <!-- Auto, with the width on the rail itself: a
+                         ColumnDefinition takes a GridLength, not a Double. -->
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Navigation rail -->
+                <Border Grid.Column="0"
+                        Width="{StaticResource SettingsRailWidth}"
+                        Background="{StaticResource BrushSurfaceMuted}"
+                        BorderBrush="{StaticResource BrushBorderFaint}"
+                        BorderThickness="0,1,1,0"
+                        CornerRadius="0,0,0,11">
+                    <StackPanel Margin="10,12,10,0">
+                        <Button Style="{StaticResource MenuRowButton}"
+                                Content="Memory"
+                                Command="{Binding ShowMemoryCommand}"
+                                AutomationProperties.Name="Memory" />
+                        <Button Style="{StaticResource MenuRowButton}"
+                                Content="Your data"
+                                Command="{Binding ShowYourDataCommand}"
+                                AutomationProperties.Name="Your data" />
+                        <Button Style="{StaticResource MenuRowButton}"
+                                Content="Runtime"
+                                Command="{Binding ShowRuntimeCommand}"
+                                AutomationProperties.Name="Runtime" />
+                        <Button Style="{StaticResource MenuRowButton}"
+                                Content="Downloads"
+                                Command="{Binding ShowDownloadsCommand}"
+                                AutomationProperties.Name="Downloads" />
+                        <Button Style="{StaticResource MenuRowButton}"
+                                Content="Agent"
+                                Command="{Binding ShowAgentCommand}"
+                                AutomationProperties.Name="Agent" />
+                        <Button Style="{StaticResource MenuRowButton}"
+                                Content="Config"
+                                Command="{Binding ShowConfigCommand}"
+                                AutomationProperties.Name="Config" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Memory -->
+                <ScrollViewer Grid.Column="1"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="22,14,22,18"
+                              Visibility="{Binding IsMemoryTab, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <controls:ToggleSwitch IsOn="{Binding LearnFromMyEdits, Mode=TwoWay}"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,2,12,0"
+                                                   AutomationProperties.Name="Learn from my edits" />
+                            <StackPanel MaxWidth="440">
+                                <TextBlock Text="Learn from my edits" Style="{StaticResource TextCardTitle}" />
+                                <TextBlock Text="When you swap a word by hand, memory keeps your version for next time."
+                                           Style="{StaticResource TextMeta}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,3,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <controls:ToggleSwitch IsOn="{Binding UnderlineMemoryWords, Mode=TwoWay}"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,2,12,0"
+                                                   AutomationProperties.Name="Underline words that came from memory" />
+                            <StackPanel MaxWidth="440">
+                                <TextBlock Text="Underline words that came from memory" Style="{StaticResource TextCardTitle}" />
+                                <TextBlock Text="Shows which terms memory decided, so you can check them at a glance."
+                                           Style="{StaticResource TextMeta}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,3,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <controls:ToggleSwitch IsOn="{Binding ReindexFilesWhenTheyChange, Mode=TwoWay}"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,2,12,0"
+                                                   AutomationProperties.Name="Reindex files when they change" />
+                            <StackPanel MaxWidth="440">
+                                <TextBlock Text="Reindex files when they change" Style="{StaticResource TextCardTitle}" />
+                                <TextBlock Text="Watches the folders you added and re-reads a file after you edit it."
+                                           Style="{StaticResource TextMeta}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,3,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Rectangle Height="{StaticResource BorderWidth}"
+                                   Fill="{StaticResource BrushBorderFaint}"
+                                   Margin="0,20,0,0" />
+
+                        <TextBlock Text="Default scope for new chats"
+                                   Style="{StaticResource TextCardTitle}"
+                                   Margin="0,18,0,0" />
+                        <Border Background="{StaticResource BrushTrack}"
+                                CornerRadius="{StaticResource RadiusPanel}"
+                                Padding="{StaticResource Space1Thickness}"
+                                HorizontalAlignment="Left"
+                                Margin="0,10,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource FolderSegment}"
+                                             GroupName="DefaultScope"
+                                             Content="Whole project"
+                                             IsChecked="{Binding ScopeIsWholeProject, Mode=TwoWay}"
+                                             AutomationProperties.Name="Whole project" />
+                                <RadioButton Style="{StaticResource FolderSegment}"
+                                             GroupName="DefaultScope"
+                                             Content="This chat"
+                                             AutomationProperties.Name="This chat" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,22,0,0">
+                            <TextBlock Text="Mark a word unsure below" Style="{StaticResource TextCardTitle}" />
+                            <TextBlock Text="{Binding UnsureThresholdLabel}"
+                                       Style="{StaticResource TextCardTitle}"
+                                       Foreground="{StaticResource BrushAccentDeep}"
+                                       Margin="8,0,0,0" />
+                        </StackPanel>
+                        <Slider Minimum="0"
+                                Maximum="100"
+                                Value="{Binding UnsureThreshold, Mode=TwoWay}"
+                                Margin="0,10,0,0"
+                                AutomationProperties.Name="Mark a word unsure below" />
+                        <TextBlock Text="Anything the engine is less certain about than this gets a dotted underline and shows up under Unsure."
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,8,0,0" />
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Your data -->
+                <ScrollViewer Grid.Column="1"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="22,14,22,18"
+                              Visibility="{Binding IsDataTab, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="Data folder"
+                                           Style="{StaticResource TextMeta}"
+                                           Foreground="{StaticResource BrushTextTertiary}" />
+                                <TextBlock Text="{Binding DataFolder}"
+                                           Style="{StaticResource TextMonoPath}"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxWidth="380"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,4,0,0" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center">
+                                <!-- Only while a pointer is in force. On the
+                                     default folder there is nothing to reset,
+                                     and a button that undoes nothing invites the
+                                     press that finds that out. -->
+                                <controls:ChromeButton Icon="{StaticResource IconRefresh}"
+                                                       Command="{Binding ResetDataFolderCommand}"
+                                                       ToolTip="Put the data folder back to the default"
+                                                       AutomationProperties.Name="Reset the data folder to the default"
+                                                       Visibility="{Binding HasCustomDataFolder, Converter={StaticResource BoolToVisibility}}" />
+                                <controls:ChromeButton Icon="{StaticResource IconRename}"
+                                                       Command="{Binding ChangeDataFolderCommand}"
+                                                       ToolTip="Change where the data is kept"
+                                                       AutomationProperties.Name="Change the data folder" />
+                                <controls:ChromeButton Icon="{StaticResource IconFolder}"
+                                                       Command="{Binding OpenDataFolderCommand}"
+                                                       ToolTip="Open the data folder"
+                                                       AutomationProperties.Name="Open the data folder" />
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,10,0,0"
+                                    Visibility="{Binding DataFolderStatus, Converter={StaticResource NotEmptyToVisibility}}">
+                            <TextBlock Text="{Binding DataFolderStatus}"
+                                       Style="{StaticResource TextMeta}"
+                                       Foreground="{StaticResource BrushTextSecondary}"
+                                       TextWrapping="Wrap"
+                                       MaxWidth="330"
+                                       VerticalAlignment="Center" />
+
+                            <!-- Beside the status, not somewhere else: the copy
+                                 only takes effect on the next start, so the way
+                                 to finish the job belongs where the job is
+                                 reported. Shown only once the pointer is
+                                 written, so a failed copy offers no restart. -->
+                            <Button Style="{StaticResource PrimaryButton}"
+                                    Content="Restart now"
+                                    Command="{Binding RestartCommand}"
+                                    Margin="12,0,0,0"
+                                    VerticalAlignment="Center"
+                                    AutomationProperties.Name="Restart now"
+                                    Visibility="{Binding DataFolderMoved, Converter={StaticResource BoolToVisibility}}" />
+                        </StackPanel>
+
+                        <!-- Cache table -->
+                        <Border Background="{StaticResource BrushSurface}"
+                                BorderBrush="{StaticResource BrushBorderSoft}"
+                                BorderThickness="{StaticResource BorderThickness}"
+                                CornerRadius="{StaticResource RadiusCard}"
+                                Margin="0,16,0,0">
+                            <StackPanel>
+                                <Grid Background="{StaticResource BrushSurfaceSunken}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="Stored on this machine"
+                                               Style="{StaticResource TextCardTitle}"
+                                               Margin="14,10,0,10" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding CacheTotalLabel}"
+                                               Style="{StaticResource TextSecondary}"
+                                               Foreground="{StaticResource BrushTextSecondary}"
+                                               Margin="0,10,14,10" />
+                                </Grid>
+
+                                <ItemsControl ItemsSource="{Binding CacheRows}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="14,11,14,11">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel Grid.Column="0">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Name}" Style="{StaticResource TextDefault}" />
+                                                        <!-- The consequence is stated, not implied -->
+                                                        <Border Background="{StaticResource BrushWarnSurface}"
+                                                                BorderBrush="{StaticResource BrushWarnBorder}"
+                                                                BorderThickness="{StaticResource BorderThickness}"
+                                                                CornerRadius="{StaticResource RadiusSm}"
+                                                                Padding="6,1,6,2"
+                                                                Margin="8,0,0,0"
+                                                                VerticalAlignment="Center"
+                                                                Visibility="{Binding WipesMemory, Converter={StaticResource BoolToVisibility}}">
+                                                            <TextBlock Text="wipes memory"
+                                                                       Style="{StaticResource TextMicro}"
+                                                                       Foreground="{StaticResource BrushWarnText}" />
+                                                        </Border>
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding Note}"
+                                                               Style="{StaticResource TextMeta}"
+                                                               Foreground="{StaticResource BrushTextSecondary}"
+                                                               Margin="0,3,0,0" />
+                                                </StackPanel>
+
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding SizeLabel}"
+                                                           Style="{StaticResource TextSecondary}"
+                                                           VerticalAlignment="Center"
+                                                           Margin="12,0,14,0" />
+
+                                                <Button Grid.Column="2"
+                                                        Style="{StaticResource DestructiveButton}"
+                                                        Content="Delete"
+                                                        Height="{StaticResource SegmentHeight}"
+                                                        Padding="12,0,12,0"
+                                                        VerticalAlignment="Center"
+                                                        Command="{Binding DataContext.DeleteCacheRowCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        AutomationProperties.Name="Delete this cache" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Models on disk -->
+                        <Border Background="{StaticResource BrushSurface}"
+                                BorderBrush="{StaticResource BrushBorderSoft}"
+                                BorderThickness="{StaticResource BorderThickness}"
+                                CornerRadius="{StaticResource RadiusCard}"
+                                Margin="0,16,0,0">
+                            <StackPanel>
+                                <Grid Background="{StaticResource BrushSurfaceSunken}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="Models on disk"
+                                               Style="{StaticResource TextCardTitle}"
+                                               Margin="14,10,0,10" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding ModelsTotalLabel}"
+                                               Style="{StaticResource TextSecondary}"
+                                               Foreground="{StaticResource BrushTextSecondary}"
+                                               Margin="0,10,14,10" />
+                                </Grid>
+
+                                <TextBlock Text="Nothing installed yet"
+                                           Style="{StaticResource TextSecondary}"
+                                           Foreground="{StaticResource BrushTextMuted}"
+                                           Margin="14,11,14,11"
+                                           Visibility="{Binding InstalledModels.Count, Converter={StaticResource ZeroToVisibility}}" />
+
+                                <ItemsControl ItemsSource="{Binding InstalledModels}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="14,11,14,11">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="{Binding Name}" Style="{StaticResource TextDefault}" />
+                                                    <TextBlock Text="{Binding Note}"
+                                                               Style="{StaticResource TextMeta}"
+                                                               Foreground="{StaticResource BrushTextSecondary}"
+                                                               Margin="0,3,0,0" />
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding SizeLabel}"
+                                                           Style="{StaticResource TextSecondary}"
+                                                           VerticalAlignment="Center"
+                                                           Margin="12,0,14,0" />
+                                                <!-- BetterRuntime offers no Remove -->
+                                                <Button Grid.Column="2"
+                                                        Style="{StaticResource DestructiveButton}"
+                                                        Content="Delete"
+                                                        Height="{StaticResource SegmentHeight}"
+                                                        Padding="12,0,12,0"
+                                                        VerticalAlignment="Center"
+                                                        Visibility="{Binding CanDelete, Converter={StaticResource BoolToVisibility}}"
+                                                        Command="{Binding DataContext.DeleteModelCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        AutomationProperties.Name="Delete this model" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <!-- What the last Delete actually did. A runtime
+                                     the session has loaded cannot be removed at
+                                     all, and saying nothing made that read as a
+                                     button that does nothing. -->
+                                <Border Background="{StaticResource BrushAccentTint}"
+                                        BorderBrush="{StaticResource BrushAccentBorder}"
+                                        BorderThickness="{StaticResource BorderThickness}"
+                                        CornerRadius="{StaticResource RadiusRow}"
+                                        Margin="14,0,14,12"
+                                        Padding="10,8,10,8"
+                                        Visibility="{Binding HasDataMessage, Converter={StaticResource BoolToVisibility}}">
+                                    <TextBlock Text="{Binding DataMessage}"
+                                               Style="{StaticResource TextMeta}"
+                                               Foreground="{StaticResource BrushText}"
+                                               TextWrapping="Wrap" />
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- C26: the warning replaces its own trigger in place -->
+                        <Button Style="{StaticResource DestructiveButton}"
+                                Content="Delete everything"
+                                HorizontalAlignment="Left"
+                                Margin="0,16,0,0"
+                                Command="{Binding BeginDeleteEverythingCommand}"
+                                AutomationProperties.Name="Delete everything on this machine"
+                                Visibility="{Binding ShowDeleteEverythingTrigger, Converter={StaticResource BoolToVisibility}}" />
+
+                        <Border Background="{StaticResource BrushDangerSurface}"
+                                BorderBrush="{StaticResource BrushDangerBorder}"
+                                BorderThickness="{StaticResource BorderThickness}"
+                                CornerRadius="{StaticResource RadiusCard}"
+                                Padding="14,12,14,14"
+                                Margin="0,16,0,0"
+                                Visibility="{Binding IsConfirmingDeleteEverything, Converter={StaticResource BoolToVisibility}}">
+                            <StackPanel>
+                                <Grid>
+                                    <TextBlock Text="Delete everything on this machine?"
+                                               Style="{StaticResource TextCardTitle}"
+                                               Foreground="{StaticResource BrushDangerText}" />
+                                    <controls:IconView Definition="{StaticResource IconWarningTriangle}"
+                                                       Foreground="{StaticResource BrushDanger}"
+                                                       HorizontalAlignment="Right"
+                                                       VerticalAlignment="Top" />
+                                </Grid>
+                                <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                                    <Button Style="{StaticResource SecondaryButton}"
+                                            Content="Keep it"
+                                            Command="{Binding KeepEverythingCommand}"
+                                            AutomationProperties.Name="Keep it" />
+                                    <Button Style="{StaticResource DestructiveButton}"
+                                            Content="Delete"
+                                            Margin="8,0,0,0"
+                                            Command="{Binding DeleteEverythingCommand}"
+                                            AutomationProperties.Name="Delete everything" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Runtime -->
+                <ScrollViewer Grid.Column="1"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="22,14,22,18"
+                              Visibility="{Binding IsRuntimeTab, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <TextBlock Text="How translation runs" Style="{StaticResource TextCardTitle}" />
+                        <TextBlock Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,3,0,12">
+                            <Run Text="{Binding HardwareLabel, Mode=OneWay}" /><Run Text=" found on this machine. A flavour your hardware cannot run stays unavailable." />
+                        </TextBlock>
+
+                        <ItemsControl ItemsSource="{Binding Backends}" MaxWidth="470" HorizontalAlignment="Left">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Button Style="{StaticResource ChoiceCard}"
+                                                Command="{Binding DataContext.ChooseBackendCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                IsEnabled="{Binding CanSelect}"
+                                                AutomationProperties.Name="{Binding Title}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="{Binding Title}" Style="{StaticResource TextCardTitle}" />
+                                                    <TextBlock Text="{Binding Summary}"
+                                                               Style="{StaticResource TextMeta}"
+                                                               Foreground="{StaticResource BrushTextSecondary}"
+                                                               TextWrapping="Wrap"
+                                                               Margin="0,3,0,0" />
+                                                    <TextBlock Text="{Binding BlockedReason}"
+                                                               Style="{StaticResource TextMeta}"
+                                                               Foreground="{StaticResource BrushTextMuted}"
+                                                               Margin="0,4,0,0"
+                                                               Visibility="{Binding HasBlockedReason, Converter={StaticResource BoolToVisibility}}" />
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="Recommended"
+                                                           Style="{StaticResource TextMeta}"
+                                                           Foreground="{StaticResource BrushAccentDeep}"
+                                                           VerticalAlignment="Top"
+                                                           Margin="10,1,0,0"
+                                                           Visibility="{Binding IsRecommended, Converter={StaticResource BoolToVisibility}}" />
+                                            </Grid>
+                                        </Button>
+
+                                        <!-- A sibling of the card, never a child.
+                                             The card is disabled whenever the
+                                             flavour cannot be chosen, and a
+                                             nested button would inherit that and
+                                             answer no clicks at all. That is
+                                             precisely the state this button
+                                             exists to resolve, because "Not
+                                             downloaded yet" is exactly when the
+                                             card is disabled. Overlaid on the
+                                             card's bottom right instead, clear
+                                             of the Recommended tag at the top. -->
+                                        <Button Style="{StaticResource SecondaryButton}"
+                                                Content="{Binding FetchLabel}"
+                                                Command="{Binding DataContext.GetFlavourCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                Margin="0,0,14,12"
+                                                Visibility="{Binding CanFetch, Converter={StaticResource BoolToVisibility}}"
+                                                AutomationProperties.Name="{Binding FetchLabel}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Border Background="{StaticResource BrushAccentTintSoft}"
+                                BorderBrush="{StaticResource BrushAccentBorder}"
+                                BorderThickness="{StaticResource BorderThickness}"
+                                CornerRadius="{StaticResource RadiusDefault}"
+                                Padding="12,9,12,9"
+                                MaxWidth="470"
+                                HorizontalAlignment="Left"
+                                Margin="0,2,0,0"
+                                Visibility="{Binding NeedsRestart, Converter={StaticResource BoolToVisibility}}">
+                            <StackPanel>
+                                <TextBlock Text="Restart BetterTranslator to use this. A runtime already loaded cannot be swapped while the app is open."
+                                           Style="{StaticResource TextMeta}"
+                                           Foreground="{StaticResource BrushText}"
+                                           TextWrapping="Wrap" />
+                                <Button Style="{StaticResource PrimaryButton}"
+                                        Content="Restart now"
+                                        Command="{Binding RestartCommand}"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,10,0,0"
+                                        AutomationProperties.Name="Restart now" />
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Downloads -->
+                <ScrollViewer Grid.Column="1"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="22,14,22,18"
+                              Visibility="{Binding IsDownloadsTab, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <TextBlock Text="Everything this build supports. The download button in the title bar installs any of it."
+                                   Style="{StaticResource TextProse}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextWrapping="Wrap" />
+
+                        <ItemsControl ItemsSource="{Binding Catalogue}" Margin="0,12,0,0" MaxWidth="470" HorizontalAlignment="Left">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource SourceCard}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding Name}" Style="{StaticResource TextCardTitle}" />
+                                                <TextBlock Text="{Binding Note}"
+                                                           Style="{StaticResource TextMeta}"
+                                                           Foreground="{StaticResource BrushTextSecondary}"
+                                                           TextWrapping="Wrap"
+                                                           Margin="0,3,0,0" />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding StateLabel}"
+                                                       Style="{StaticResource TextMeta}"
+                                                       Foreground="{StaticResource BrushTextSecondary}"
+                                                       VerticalAlignment="Top"
+                                                       Margin="10,1,0,0" />
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding SizeLabel}"
+                                                       Style="{StaticResource TextMeta}"
+                                                       Foreground="{StaticResource BrushTextSecondary}"
+                                                       VerticalAlignment="Top"
+                                                       Margin="14,1,0,0" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="Model the app translates with"
+                                   Style="{StaticResource TextCardTitle}"
+                                   Margin="0,20,0,0" />
+                        <TextBlock Text="{Binding ModelsFolderLabel, Mode=OneWay}"
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,3,0,10" />
+
+                        <ItemsControl ItemsSource="{Binding Models}" MaxWidth="470" HorizontalAlignment="Left">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource ChoiceCard}"
+                                            Command="{Binding DataContext.ChooseModelCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}"
+                                            AutomationProperties.Name="{Binding Name}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding Name}" Style="{StaticResource TextCardTitle}" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding Publisher}"
+                                                           Style="{StaticResource TextMeta}"
+                                                           Foreground="{StaticResource BrushTextSecondary}"
+                                                           Margin="0,3,0,0" />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding SizeLabel}"
+                                                       Style="{StaticResource TextMeta}"
+                                                       Foreground="{StaticResource BrushTextSecondary}"
+                                                       VerticalAlignment="Top"
+                                                       Margin="10,1,0,0" />
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="No models found yet."
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   Visibility="{Binding HasModels, Converter={StaticResource InverseBoolToVisibility}}" />
+
+                        <Button Style="{StaticResource SecondaryButton}"
+                                Content="Rescan folders"
+                                Command="{Binding RescanModelsCommand}"
+                                HorizontalAlignment="Left"
+                                Margin="0,10,0,0" />
+                        <TextBlock Text="No download links are configured yet, so nothing can be fetched."
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,10,0,0" />
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Grid.Column="1"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="22,14,22,18"
+                              Visibility="{Binding IsAgentTab, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <controls:ToggleSwitch IsOn="{Binding McpEnabled, Mode=TwoWay}"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,2,12,0"
+                                                   AutomationProperties.Name="Let an AI agent use BetterTranslator" />
+                            <StackPanel MaxWidth="440">
+                                <TextBlock Text="Let an AI agent use BetterTranslator" Style="{StaticResource TextCardTitle}" />
+                                <TextBlock Text="Opens a local endpoint an agent can call to translate. Nothing leaves this machine, and the switch takes effect at once."
+                                           Style="{StaticResource TextMeta}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,3,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <TextBlock Text="{Binding McpStatus}"
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,14,0,0" />
+
+                        <Rectangle Height="{StaticResource BorderWidth}"
+                                   Fill="{StaticResource BrushBorderFaint}"
+                                   Margin="0,18,0,0" />
+
+                        <TextBlock Text="Address" Style="{StaticResource TextCardTitle}" Margin="0,18,0,0" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <StackPanel Width="220">
+                                <TextBlock Text="Host" Style="{StaticResource TextMeta}" Foreground="{StaticResource BrushTextSecondary}" />
+                                <TextBox Style="{StaticResource TextField}"
+                                         Text="{Binding McpHost, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         Margin="0,4,0,0"
+                                         AutomationProperties.Name="Host" />
+                            </StackPanel>
+
+                            <StackPanel Width="110" Margin="12,0,0,0">
+                                <TextBlock Text="Port" Style="{StaticResource TextMeta}" Foreground="{StaticResource BrushTextSecondary}" />
+                                <TextBox Style="{StaticResource TextField}"
+                                         Text="{Binding McpPort, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         Margin="0,4,0,0"
+                                         AutomationProperties.Name="Port" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <TextBlock Text="Token" Style="{StaticResource TextMeta}" Foreground="{StaticResource BrushTextSecondary}" Margin="0,14,0,0" />
+                        <TextBox Style="{StaticResource TextField}"
+                                 Text="{Binding McpToken, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                 Width="342"
+                                 HorizontalAlignment="Left"
+                                 Margin="0,4,0,0"
+                                 AutomationProperties.Name="Token" />
+                        <TextBlock Text="Empty is fine while the host is 127.0.0.1. Any other host reaches this machine from the network, so a token is required and the server refuses to start without one."
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="440"
+                                   HorizontalAlignment="Left"
+                                   Margin="0,6,0,0" />
+
+                        <Rectangle Height="{StaticResource BorderWidth}"
+                                   Fill="{StaticResource BrushBorderFaint}"
+                                   Margin="0,18,0,0" />
+
+                        <TextBlock Text="Register it with the agent" Style="{StaticResource TextCardTitle}" Margin="0,18,0,0" />
+                        <TextBlock Text="Run this once where the agent runs. From then on it discovers everything it needs from the server itself."
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="440"
+                                   HorizontalAlignment="Left"
+                                   Margin="0,3,0,0" />
+
+                        <Border Background="{StaticResource BrushSurfaceSunken}"
+                                BorderBrush="{StaticResource BrushBorderFaint}"
+                                BorderThickness="{StaticResource BorderThickness}"
+                                CornerRadius="{StaticResource RadiusPanel}"
+                                Padding="12,10,12,10"
+                                HorizontalAlignment="Left"
+                                Margin="0,10,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding McpCommand, Mode=OneWay}"
+                                         Style="{StaticResource SelectableMarkdownSyntax}"
+                                         IsReadOnly="True"
+                                         MaxWidth="440"
+                                         VerticalAlignment="Center"
+                                         AutomationProperties.Name="Registration command" />
+                                <Button Style="{StaticResource SecondaryButton}"
+                                        Content="Copy"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding CopyMcpCommandCommand}"
+                                        AutomationProperties.Name="Copy the registration command" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="No address at all"
+                                   Style="{StaticResource TextCardTitle}"
+                                   Margin="0,22,0,0" />
+                        <TextBlock Text="An agent that speaks over a pipe rather than over HTTP needs no host, no port and nothing switched on here. It starts the command line itself and talks to it directly."
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="440"
+                                   HorizontalAlignment="Left"
+                                   Margin="0,3,0,0" />
+
+                        <Border Background="{StaticResource BrushSurfaceSunken}"
+                                BorderBrush="{StaticResource BrushBorderFaint}"
+                                BorderThickness="{StaticResource BorderThickness}"
+                                CornerRadius="{StaticResource RadiusPanel}"
+                                Padding="12,10,12,10"
+                                HorizontalAlignment="Left"
+                                Margin="0,10,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding McpStdioCommand, Mode=OneWay}"
+                                         Style="{StaticResource SelectableMarkdownSyntax}"
+                                         IsReadOnly="True"
+                                         MaxWidth="440"
+                                         VerticalAlignment="Center"
+                                         AutomationProperties.Name="Registration command over a pipe" />
+                                <Button Style="{StaticResource SecondaryButton}"
+                                        Content="Copy"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding CopyMcpStdioCommandCommand}"
+                                        AutomationProperties.Name="Copy the pipe registration command" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Config: the engine's own JSON, editable in place -->
+                <Grid Grid.Column="1"
+                      Margin="22,14,22,18"
+                      Visibility="{Binding IsConfigTab, Converter={StaticResource BoolToVisibility}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="The engine's own configuration. Edits are saved beside your data and take precedence over the files that ship with the app; changes load on the next start."
+                               Style="{StaticResource TextProse}"
+                               Foreground="{StaticResource BrushTextSecondary}"
+                               TextWrapping="Wrap" />
+
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding ConfigFiles}" Margin="0,12,0,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource SecondaryButton}"
+                                        Content="{Binding Name}"
+                                        Margin="0,0,8,0"
+                                        Command="{Binding DataContext.ChooseConfigCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}"
+                                        AutomationProperties.Name="{Binding Name}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Grid Grid.Row="2" Margin="0,12,0,0" DataContext="{Binding SelectedConfig}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0">
+                            <TextBlock Text="{Binding Description}"
+                                       Style="{StaticResource TextMeta}"
+                                       Foreground="{StaticResource BrushTextSecondary}"
+                                       TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding Path}"
+                                       Style="{StaticResource TextMonoSmall}"
+                                       Foreground="{StaticResource BrushTextMuted}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Margin="0,4,0,8" />
+                        </StackPanel>
+
+                        <Border Grid.Row="1"
+                                Background="{StaticResource BrushSurface}"
+                                BorderBrush="{StaticResource BrushBorder}"
+                                BorderThickness="{StaticResource BorderThickness}"
+                                CornerRadius="{StaticResource RadiusRow}">
+                            <!-- Monospaced, because this is JSON and the reader is
+                                 counting braces. Tabs are accepted so the file can
+                                 be indented the way it already is. -->
+                            <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
+                                     FontFamily="{StaticResource FontFamilyMono}"
+                                     FontSize="{StaticResource TextMonoSmallSize}"
+                                     Foreground="{StaticResource BrushText}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     Padding="10,8,10,8"
+                                     AcceptsReturn="True"
+                                     AcceptsTab="True"
+                                     TextWrapping="NoWrap"
+                                     VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     AutomationProperties.Name="Configuration file contents" />
+                        </Border>
+                    </Grid>
+
+                    <Grid Grid.Row="3" Margin="0,10,0,0" DataContext="{Binding SelectedConfig}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Validity as it is typed, so a missing brace is named
+                             while the caret is still near it. -->
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding Message}"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,12,0"
+                                   Visibility="{Binding HasMessage, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource TextMeta}">
+                                    <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsValid}" Value="False">
+                                            <Setter Property="Foreground" Value="{StaticResource BrushDangerText}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <!-- Only while a copy of your own is in force. With
+                                 nothing saved there is nothing to put back, and a
+                                 button that undoes nothing invites the press that
+                                 finds that out. -->
+                            <controls:ChromeButton Icon="{StaticResource IconRefresh}"
+                                                   Margin="0,0,8,0"
+                                                   Command="{Binding ResetCommand}"
+                                                   ToolTip="Throw away your copy and go back to the file that ships with the app"
+                                                   AutomationProperties.Name="Reset to the shipped configuration"
+                                                   Visibility="{Binding IsEdited, Converter={StaticResource BoolToVisibility}}" />
+
+                            <!-- The whole file, in an editor that has search and
+                                 line numbers. Saving there and pressing Reload
+                                 brings it back; the file on disk is what counts
+                                 either way. -->
+                            <controls:ChromeButton Icon="{StaticResource IconRename}"
+                                                   Margin="0,0,8,0"
+                                                   Command="{Binding EditExternallyCommand}"
+                                                   ToolTip="Open this file in your own text editor"
+                                                   AutomationProperties.Name="Open in your text editor" />
+
+                            <controls:ChromeButton Icon="{StaticResource IconArrowRightUndo}"
+                                                   Margin="0,0,8,0"
+                                                   Command="{Binding ReloadCommand}"
+                                                   ToolTip="Read the file back after editing it elsewhere"
+                                                   AutomationProperties.Name="Reload from disk" />
+
+                            <Button Style="{StaticResource SecondaryButton}"
+                                    Content="Show shipped"
+                                    Margin="0,0,8,0"
+                                    Command="{Binding ShowShippedCommand}"
+                                    ToolTip="Load the shipped file into the editor without discarding your saved copy"
+                                    AutomationProperties.Name="Show the shipped file" />
+
+                            <!-- Save is refused rather than allowed to write a
+                                 file the engine could not read. -->
+                            <Button Style="{StaticResource PrimaryButton}"
+                                    Content="Save"
+                                    IsEnabled="{Binding IsValid}"
+                                    Command="{Binding SaveCommand}"
+                                    AutomationProperties.Name="Save this configuration" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

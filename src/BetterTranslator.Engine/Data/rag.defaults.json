@@ -1,0 +1,88 @@
+{
+  "_corpusRoot": [
+    "Where documents are read from, relative to the folder run.bat sits in.",
+    "  '..'  the engine is a folder inside your project - the default",
+    "  '.'   run.bat and scripts were pasted into the project root itself",
+    "An absolute path also works. rag\\ is always created beside run.bat, never here,",
+    "so renaming or moving the engine folder never scatters its state.",
+    "The engine folder is excluded from its own index automatically, whatever you",
+    "have named it - nothing anywhere hardcodes a folder name."
+  ],
+  "corpusRoot": "..",
+
+  "include": ["**"],
+  "exclude": [
+    "**/node_modules/**",
+    "**/vendor/**",
+    "**/.git/**",
+    "**/.claude/**",
+    "**/rag/index/**",
+    "**/_work/**",
+    "**/*.min.js",
+    "**/package-lock.json"
+  ],
+  "types": [".md", ".txt", ".json", ".php", ".docx", ".pdf"],
+  "maxFileMB": 25,
+  "chunkChars": 2000,
+  "embedding": {
+    "model": "text-embedding-nomic-embed-text-v1.5",
+    "dimensions": 768,
+    "batch": 16
+  },
+  "translationMemory": {
+    "source": "",
+    "targets": ""
+  },
+
+  "_doNotTranslate": [
+    "Terms the translator must not turn into the target language.",
+    "  strict      hidden from the model completely, like a code span, so it comes",
+    "              back byte-identical. Use for names that must never inflect:",
+    "              a product, a company, a file format, an acronym.",
+    "  declinable  sent to the model and checked with a relaxed gate that allows",
+    "              a case ending, because the term has become an ordinary noun in",
+    "              the target language.",
+    "ONLY generic technical vocabulary belongs in this file - it ships with the",
+    "engine and is the same for every project. Put your own product and company",
+    "names in rag\\rag.config.json, where they are ADDED to this list rather than",
+    "replacing it, so you never have to restate '.NET' to add your own name.",
+    "Beware of short common words: entries match case-insensitively on a word",
+    "boundary, so adding 'Go' also protects every ordinary 'go' in the document."
+  ],
+  "doNotTranslate": {
+    "strict": [
+      ".NET", "C#", "IL", "CLR", "Argon2", "DLL", "EXE", "GGUF",
+      "JSON", "XML", "YAML", "CSV", "SHA-512", "UTF-8", "BOM",
+      "CPU", "GPU", "RAM", "API", "URL", "HTTP", "HTTPS", "LM Studio"
+    ],
+    "declinable": [
+      "llmster", "lms", "PowerShell", "Windows", "Node"
+    ]
+  },
+  "languages": {
+    "_measured": [
+      "fuzzyExamples and corpusChunks default to false because they were measured, not assumed.",
+      "30 lines with no memory coverage, four arms, identical but for retrieval:",
+      "  none 13/30 (43%) | examples 13/30 (43%) | chunks 5/30 (17%) | both 6/30 (20%)",
+      "Chunks more than halved the pass rate; the rejections were 'backtick count changed'",
+      "and 'answer repeats the instructions' - the model copied the background passages",
+      "instead of translating the line. Examples changed nothing while costing an",
+      "embedding call per line.",
+      "Re-measure with scripts\\rag-experiment.ps1 before turning either on; a larger",
+      "model may well use context the way this one cannot."
+    ],
+    "default": {
+      "exactTmReuse": true,
+      "fuzzyExamples": false,
+      "corpusChunks": false,
+      "fuzzyTmMinScore": 0.80,
+      "maxTerms": 12,
+      "maxExamples": 3,
+      "maxChunks": 2,
+      "secondPass": false
+    },
+    "cs": {
+      "secondPass": true
+    }
+  }
+}

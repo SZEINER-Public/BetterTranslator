@@ -1,0 +1,139 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:BetterTranslator.App.Controls"
+                    xmlns:md="clr-namespace:BetterTranslator.Indexing.Markdown;assembly=BetterTranslator.Indexing">
+
+    <!-- One typed DataTemplate per block. Markdig parses; these render. Shared
+         rather than scoped to a view, because the file preview and a chat entry
+         show the same document and must show it the same way. -->
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/BetterTranslator;component/Themes/Colors.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/BetterTranslator;component/Themes/Typography.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/BetterTranslator;component/Themes/Metrics.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/BetterTranslator;component/Themes/Icons.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <DataTemplate DataType="{x:Type md:MdHeading}">
+        <TextBlock controls:MarkdownText.Inlines="{Binding Inlines}"
+                   TextWrapping="Wrap"
+                   Margin="0,14,0,6">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource TextHeading}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Level}" Value="1">
+                            <Setter Property="FontSize" Value="{StaticResource TextTitleSize}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Level}" Value="3">
+                            <Setter Property="FontSize" Value="{StaticResource TextSubheadingSize}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type md:MdParagraph}">
+        <TextBlock Style="{StaticResource TextProse}"
+                   controls:MarkdownText.Inlines="{Binding Inlines}"
+                   TextWrapping="Wrap"
+                   Margin="0,0,0,10" />
+    </DataTemplate>
+
+    <!-- An item carries its own marker, because an ItemsControl does not hand a
+         template the index and an ordered list rendered as bullets has lost the
+         only thing that made it ordered. A task item swaps the marker for its
+         box; anything nested under the item renders below it, indented by the
+         same gutter the marker sits in. -->
+    <DataTemplate DataType="{x:Type md:MdListItem}">
+        <Grid Margin="0,0,0,3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="Marker"
+                       Grid.Column="0"
+                       Text="{Binding Marker}"
+                       Style="{StaticResource TextProse}"
+                       Foreground="{StaticResource BrushTextTertiary}"
+                       Margin="4,0,10,0" />
+
+            <controls:IconView x:Name="Box"
+                               Grid.Column="0"
+                               Definition="{StaticResource IconCheckCheckbox}"
+                               Foreground="{StaticResource BrushBorderStrong}"
+                               VerticalAlignment="Top"
+                               Margin="4,3,10,0"
+                               Visibility="Collapsed" />
+
+            <StackPanel Grid.Column="1">
+                <TextBlock Style="{StaticResource TextProse}"
+                           controls:MarkdownText.Inlines="{Binding Inlines}"
+                           TextWrapping="Wrap" />
+                <ItemsControl ItemsSource="{Binding Children}" Margin="0,3,0,0" />
+            </StackPanel>
+        </Grid>
+
+        <DataTemplate.Triggers>
+            <!-- Null is "not a task at all", which is a different thing from an
+                 unticked box, so both states are set explicitly. -->
+            <DataTrigger Binding="{Binding Done}" Value="False">
+                <Setter TargetName="Marker" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="Box" Property="Visibility" Value="Visible" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Done}" Value="True">
+                <Setter TargetName="Marker" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="Box" Property="Visibility" Value="Visible" />
+                <Setter TargetName="Box" Property="Definition" Value="{StaticResource IconCheckDone}" />
+                <Setter TargetName="Box" Property="Foreground" Value="{StaticResource BrushSuccessDeep}" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type md:MdBulletList}">
+        <ItemsControl ItemsSource="{Binding Items}" Margin="0,0,0,10" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type md:MdCodeBlock}">
+        <Border Background="{StaticResource BrushSurfaceSunken}"
+                BorderBrush="{StaticResource BrushBorderSoft}"
+                BorderThickness="{StaticResource BorderThickness}"
+                CornerRadius="{StaticResource RadiusDefault}"
+                Padding="12,9,12,9"
+                Margin="0,2,0,12">
+            <TextBlock Text="{Binding Text}"
+                       Style="{StaticResource TextMonoPath}"
+                       TextWrapping="Wrap" />
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type md:MdTable}">
+        <Border BorderBrush="{StaticResource BrushBorderSoft}"
+                BorderThickness="{StaticResource BorderThickness}"
+                CornerRadius="{StaticResource RadiusDefault}"
+                Margin="0,2,0,12">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Disabled"
+                          Focusable="False">
+                <Grid controls:MarkdownTable.Source="{Binding}" />
+            </ScrollViewer>
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type md:MdQuote}">
+        <Border BorderBrush="{StaticResource BrushBorder}"
+                BorderThickness="2,0,0,0"
+                Padding="12,0,0,0"
+                Margin="0,0,0,10">
+            <ItemsControl ItemsSource="{Binding Blocks}" />
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type md:MdThematicBreak}">
+        <Rectangle Height="{StaticResource BorderWidth}"
+                   Fill="{StaticResource BrushBorderSoft}"
+                   Margin="0,10,0,14" />
+    </DataTemplate>
+
+</ResourceDictionary>

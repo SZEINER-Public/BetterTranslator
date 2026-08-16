@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>BetterTranslator.Cli</RootNamespace>
+    <AssemblyName>bt</AssemblyName>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="BetterTranslator.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BetterTranslator.Core\BetterTranslator.Core.csproj" />
+    <ProjectReference Include="..\BetterTranslator.Engine\BetterTranslator.Engine.csproj" />
+    <ProjectReference Include="..\BetterTranslator.Runtime\BetterTranslator.Runtime.csproj" />
+    <ProjectReference Include="..\BetterTranslator.Host\BetterTranslator.Host.csproj"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Content"
+                      CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

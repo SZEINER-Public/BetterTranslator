@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Drives the one file release artifact from Visual Studio: building this
+       project in the SingleFile configuration produces the artifact, and the
+       launch profile in Properties\launchSettings.json starts that artifact
+       directly, so Build then F5 runs exactly what a recipient would double
+       click. Nothing wraps it, so no console window appears.
+
+       It carries no source and no project reference on purpose. The chain shells
+       out to dotnet publish, so the payload is always built in one consistent
+       configuration of its own, and this project cannot drag the application
+       into a configuration its XAML references were never compiled for.
+
+       The artifact follows the configuration this project is built in: Debug
+       lands in bin\Debug, Release in bin\Release, and the SingleFile solution
+       configuration packs a Release payload into bin\Release. The solution
+       builds this project in the SingleFile configuration only, so Build
+       Solution in Debug and Release stays fast and free of any C++ toolchain
+       requirement; build this project on its own to pack the one it is set
+       to. -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Configurations>Debug;Release;SingleFile</Configurations>
+    <AssemblyName>BetterTranslator.SingleFile</AssemblyName>
+    <RootNamespace>BetterTranslator.SingleFile</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <Import Project="SingleFile.targets" />
+
+  <Target Name="BuildSingleFileArtifact"
+          AfterTargets="Build"
+          DependsOnTargets="SingleFile">
+    <Message Importance="high" Text="Single file artifact: $(SingleFileOutput)" />
+  </Target>
+
+</Project>

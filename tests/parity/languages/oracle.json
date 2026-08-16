@@ -1,0 +1,1871 @@
+{
+    "generatedBy":  "tests\\parity\\languages\\oracle.ps1",
+    "systemPrompts":  [
+                          {
+                              "language":  "Czech",
+                              "prompt":  "You are a professional translator. Translate the user\u0027s text into Czech. Reply with the translation only: no commentary, no quotes, no explanations. Never return the source text unchanged. Preserve formatting, line breaks, placeholders such as {name} or %s, and any markup. Tokens of the form [[7]] are protected blocks: reproduce each exactly once, in the same order, and never translate or renumber them."
+                          },
+                          {
+                              "language":  "German",
+                              "prompt":  "You are a professional translator. Translate the user\u0027s text into German. Reply with the translation only: no commentary, no quotes, no explanations. Never return the source text unchanged. Preserve formatting, line breaks, placeholders such as {name} or %s, and any markup. Tokens of the form [[7]] are protected blocks: reproduce each exactly once, in the same order, and never translate or renumber them."
+                          },
+                          {
+                              "language":  "Japanese",
+                              "prompt":  "You are a professional translator. Translate the user\u0027s text into Japanese. Reply with the translation only: no commentary, no quotes, no explanations. Never return the source text unchanged. Preserve formatting, line breaks, placeholders such as {name} or %s, and any markup. Tokens of the form [[7]] are protected blocks: reproduce each exactly once, in the same order, and never translate or renumber them."
+                          }
+                      ],
+    "reference":  "ai-translation\\scripts\\languages.ps1",
+    "total":  51,
+    "resolve":  [
+                    {
+                        "query":  "sq",
+                        "code":  "sq"
+                    },
+                    {
+                        "query":  "SQ",
+                        "code":  "sq"
+                    },
+                    {
+                        "query":  "Albanian",
+                        "code":  "sq"
+                    },
+                    {
+                        "query":  "albanian",
+                        "code":  "sq"
+                    },
+                    {
+                        "query":  "Shqip",
+                        "code":  "sq"
+                    },
+                    {
+                        "query":  "ar",
+                        "code":  "ar"
+                    },
+                    {
+                        "query":  "AR",
+                        "code":  "ar"
+                    },
+                    {
+                        "query":  "Arabic",
+                        "code":  "ar"
+                    },
+                    {
+                        "query":  "arabic",
+                        "code":  "ar"
+                    },
+                    {
+                        "query":  "العربية",
+                        "code":  "ar"
+                    },
+                    {
+                        "query":  "hy",
+                        "code":  "hy"
+                    },
+                    {
+                        "query":  "HY",
+                        "code":  "hy"
+                    },
+                    {
+                        "query":  "Armenian",
+                        "code":  "hy"
+                    },
+                    {
+                        "query":  "armenian",
+                        "code":  "hy"
+                    },
+                    {
+                        "query":  "Հայերեն",
+                        "code":  "hy"
+                    },
+                    {
+                        "query":  "az",
+                        "code":  "az"
+                    },
+                    {
+                        "query":  "AZ",
+                        "code":  "az"
+                    },
+                    {
+                        "query":  "Azerbaijani",
+                        "code":  "az"
+                    },
+                    {
+                        "query":  "azerbaijani",
+                        "code":  "az"
+                    },
+                    {
+                        "query":  "Azərbaycanca",
+                        "code":  "az"
+                    },
+                    {
+                        "query":  "id",
+                        "code":  "id"
+                    },
+                    {
+                        "query":  "ID",
+                        "code":  "id"
+                    },
+                    {
+                        "query":  "Indonesian",
+                        "code":  "id"
+                    },
+                    {
+                        "query":  "indonesian",
+                        "code":  "id"
+                    },
+                    {
+                        "query":  "Bahasa Indonesia",
+                        "code":  "id"
+                    },
+                    {
+                        "query":  "ms",
+                        "code":  "ms"
+                    },
+                    {
+                        "query":  "MS",
+                        "code":  "ms"
+                    },
+                    {
+                        "query":  "Malay",
+                        "code":  "ms"
+                    },
+                    {
+                        "query":  "malay",
+                        "code":  "ms"
+                    },
+                    {
+                        "query":  "Bahasa Melayu",
+                        "code":  "ms"
+                    },
+                    {
+                        "query":  "bn",
+                        "code":  "bn"
+                    },
+                    {
+                        "query":  "BN",
+                        "code":  "bn"
+                    },
+                    {
+                        "query":  "Bengali",
+                        "code":  "bn"
+                    },
+                    {
+                        "query":  "bengali",
+                        "code":  "bn"
+                    },
+                    {
+                        "query":  "বাংলা",
+                        "code":  "bn"
+                    },
+                    {
+                        "query":  "bg",
+                        "code":  "bg"
+                    },
+                    {
+                        "query":  "BG",
+                        "code":  "bg"
+                    },
+                    {
+                        "query":  "Bulgarian",
+                        "code":  "bg"
+                    },
+                    {
+                        "query":  "bulgarian",
+                        "code":  "bg"
+                    },
+                    {
+                        "query":  "Български",
+                        "code":  "bg"
+                    },
+                    {
+                        "query":  "cs",
+                        "code":  "cs"
+                    },
+                    {
+                        "query":  "CS",
+                        "code":  "cs"
+                    },
+                    {
+                        "query":  "Czech",
+                        "code":  "cs"
+                    },
+                    {
+                        "query":  "czech",
+                        "code":  "cs"
+                    },
+                    {
+                        "query":  "Čeština",
+                        "code":  "cs"
+                    },
+                    {
+                        "query":  "da",
+                        "code":  "da"
+                    },
+                    {
+                        "query":  "DA",
+                        "code":  "da"
+                    },
+                    {
+                        "query":  "Danish",
+                        "code":  "da"
+                    },
+                    {
+                        "query":  "danish",
+                        "code":  "da"
+                    },
+                    {
+                        "query":  "Dansk",
+                        "code":  "da"
+                    },
+                    {
+                        "query":  "de",
+                        "code":  "de"
+                    },
+                    {
+                        "query":  "DE",
+                        "code":  "de"
+                    },
+                    {
+                        "query":  "German",
+                        "code":  "de"
+                    },
+                    {
+                        "query":  "german",
+                        "code":  "de"
+                    },
+                    {
+                        "query":  "Deutsch",
+                        "code":  "de"
+                    },
+                    {
+                        "query":  "el",
+                        "code":  "el"
+                    },
+                    {
+                        "query":  "EL",
+                        "code":  "el"
+                    },
+                    {
+                        "query":  "Greek",
+                        "code":  "el"
+                    },
+                    {
+                        "query":  "greek",
+                        "code":  "el"
+                    },
+                    {
+                        "query":  "Ελληνικά",
+                        "code":  "el"
+                    },
+                    {
+                        "query":  "en",
+                        "code":  "en"
+                    },
+                    {
+                        "query":  "EN",
+                        "code":  "en"
+                    },
+                    {
+                        "query":  "English",
+                        "code":  "en"
+                    },
+                    {
+                        "query":  "english",
+                        "code":  "en"
+                    },
+                    {
+                        "query":  "es",
+                        "code":  "es"
+                    },
+                    {
+                        "query":  "ES",
+                        "code":  "es"
+                    },
+                    {
+                        "query":  "Spanish",
+                        "code":  "es"
+                    },
+                    {
+                        "query":  "spanish",
+                        "code":  "es"
+                    },
+                    {
+                        "query":  "Español",
+                        "code":  "es"
+                    },
+                    {
+                        "query":  "fa",
+                        "code":  "fa"
+                    },
+                    {
+                        "query":  "FA",
+                        "code":  "fa"
+                    },
+                    {
+                        "query":  "Persian",
+                        "code":  "fa"
+                    },
+                    {
+                        "query":  "persian",
+                        "code":  "fa"
+                    },
+                    {
+                        "query":  "فارسی",
+                        "code":  "fa"
+                    },
+                    {
+                        "query":  "fil",
+                        "code":  "fil"
+                    },
+                    {
+                        "query":  "FIL",
+                        "code":  "fil"
+                    },
+                    {
+                        "query":  "Filipino",
+                        "code":  "fil"
+                    },
+                    {
+                        "query":  "filipino",
+                        "code":  "fil"
+                    },
+                    {
+                        "query":  "fr",
+                        "code":  "fr"
+                    },
+                    {
+                        "query":  "FR",
+                        "code":  "fr"
+                    },
+                    {
+                        "query":  "French",
+                        "code":  "fr"
+                    },
+                    {
+                        "query":  "french",
+                        "code":  "fr"
+                    },
+                    {
+                        "query":  "Français",
+                        "code":  "fr"
+                    },
+                    {
+                        "query":  "he",
+                        "code":  "he"
+                    },
+                    {
+                        "query":  "HE",
+                        "code":  "he"
+                    },
+                    {
+                        "query":  "Hebrew",
+                        "code":  "he"
+                    },
+                    {
+                        "query":  "hebrew",
+                        "code":  "he"
+                    },
+                    {
+                        "query":  "עברית",
+                        "code":  "he"
+                    },
+                    {
+                        "query":  "hi",
+                        "code":  "hi"
+                    },
+                    {
+                        "query":  "HI",
+                        "code":  "hi"
+                    },
+                    {
+                        "query":  "Hindi",
+                        "code":  "hi"
+                    },
+                    {
+                        "query":  "hindi",
+                        "code":  "hi"
+                    },
+                    {
+                        "query":  "हिन्दी",
+                        "code":  "hi"
+                    },
+                    {
+                        "query":  "hr",
+                        "code":  "hr"
+                    },
+                    {
+                        "query":  "HR",
+                        "code":  "hr"
+                    },
+                    {
+                        "query":  "Croatian",
+                        "code":  "hr"
+                    },
+                    {
+                        "query":  "croatian",
+                        "code":  "hr"
+                    },
+                    {
+                        "query":  "Hrvatski",
+                        "code":  "hr"
+                    },
+                    {
+                        "query":  "hu",
+                        "code":  "hu"
+                    },
+                    {
+                        "query":  "HU",
+                        "code":  "hu"
+                    },
+                    {
+                        "query":  "Hungarian",
+                        "code":  "hu"
+                    },
+                    {
+                        "query":  "hungarian",
+                        "code":  "hu"
+                    },
+                    {
+                        "query":  "Magyar",
+                        "code":  "hu"
+                    },
+                    {
+                        "query":  "it",
+                        "code":  "it"
+                    },
+                    {
+                        "query":  "IT",
+                        "code":  "it"
+                    },
+                    {
+                        "query":  "Italian",
+                        "code":  "it"
+                    },
+                    {
+                        "query":  "italian",
+                        "code":  "it"
+                    },
+                    {
+                        "query":  "Italiano",
+                        "code":  "it"
+                    },
+                    {
+                        "query":  "ja",
+                        "code":  "ja"
+                    },
+                    {
+                        "query":  "JA",
+                        "code":  "ja"
+                    },
+                    {
+                        "query":  "Japanese",
+                        "code":  "ja"
+                    },
+                    {
+                        "query":  "japanese",
+                        "code":  "ja"
+                    },
+                    {
+                        "query":  "日本語",
+                        "code":  "ja"
+                    },
+                    {
+                        "query":  "kk",
+                        "code":  "kk"
+                    },
+                    {
+                        "query":  "KK",
+                        "code":  "kk"
+                    },
+                    {
+                        "query":  "Kazakh",
+                        "code":  "kk"
+                    },
+                    {
+                        "query":  "kazakh",
+                        "code":  "kk"
+                    },
+                    {
+                        "query":  "Қазақша",
+                        "code":  "kk"
+                    },
+                    {
+                        "query":  "ko",
+                        "code":  "ko"
+                    },
+                    {
+                        "query":  "KO",
+                        "code":  "ko"
+                    },
+                    {
+                        "query":  "Korean",
+                        "code":  "ko"
+                    },
+                    {
+                        "query":  "korean",
+                        "code":  "ko"
+                    },
+                    {
+                        "query":  "한국어",
+                        "code":  "ko"
+                    },
+                    {
+                        "query":  "nb",
+                        "code":  "nb"
+                    },
+                    {
+                        "query":  "NB",
+                        "code":  "nb"
+                    },
+                    {
+                        "query":  "Norwegian",
+                        "code":  "nb"
+                    },
+                    {
+                        "query":  "norwegian",
+                        "code":  "nb"
+                    },
+                    {
+                        "query":  "Norsk bokmål",
+                        "code":  "nb"
+                    },
+                    {
+                        "query":  "nl",
+                        "code":  "nl"
+                    },
+                    {
+                        "query":  "NL",
+                        "code":  "nl"
+                    },
+                    {
+                        "query":  "Dutch",
+                        "code":  "nl"
+                    },
+                    {
+                        "query":  "dutch",
+                        "code":  "nl"
+                    },
+                    {
+                        "query":  "Nederlands",
+                        "code":  "nl"
+                    },
+                    {
+                        "query":  "pl",
+                        "code":  "pl"
+                    },
+                    {
+                        "query":  "PL",
+                        "code":  "pl"
+                    },
+                    {
+                        "query":  "Polish",
+                        "code":  "pl"
+                    },
+                    {
+                        "query":  "polish",
+                        "code":  "pl"
+                    },
+                    {
+                        "query":  "Polski",
+                        "code":  "pl"
+                    },
+                    {
+                        "query":  "pt",
+                        "code":  "pt"
+                    },
+                    {
+                        "query":  "PT",
+                        "code":  "pt"
+                    },
+                    {
+                        "query":  "Portuguese",
+                        "code":  "pt"
+                    },
+                    {
+                        "query":  "portuguese",
+                        "code":  "pt"
+                    },
+                    {
+                        "query":  "Português",
+                        "code":  "pt"
+                    },
+                    {
+                        "query":  "ro",
+                        "code":  "ro"
+                    },
+                    {
+                        "query":  "RO",
+                        "code":  "ro"
+                    },
+                    {
+                        "query":  "Romanian",
+                        "code":  "ro"
+                    },
+                    {
+                        "query":  "romanian",
+                        "code":  "ro"
+                    },
+                    {
+                        "query":  "Română",
+                        "code":  "ro"
+                    },
+                    {
+                        "query":  "ru",
+                        "code":  "ru"
+                    },
+                    {
+                        "query":  "RU",
+                        "code":  "ru"
+                    },
+                    {
+                        "query":  "Russian",
+                        "code":  "ru"
+                    },
+                    {
+                        "query":  "russian",
+                        "code":  "ru"
+                    },
+                    {
+                        "query":  "Русский",
+                        "code":  "ru"
+                    },
+                    {
+                        "query":  "sk",
+                        "code":  "sk"
+                    },
+                    {
+                        "query":  "SK",
+                        "code":  "sk"
+                    },
+                    {
+                        "query":  "Slovak",
+                        "code":  "sk"
+                    },
+                    {
+                        "query":  "slovak",
+                        "code":  "sk"
+                    },
+                    {
+                        "query":  "Slovenčina",
+                        "code":  "sk"
+                    },
+                    {
+                        "query":  "sr",
+                        "code":  "sr"
+                    },
+                    {
+                        "query":  "SR",
+                        "code":  "sr"
+                    },
+                    {
+                        "query":  "Serbian",
+                        "code":  "sr"
+                    },
+                    {
+                        "query":  "serbian",
+                        "code":  "sr"
+                    },
+                    {
+                        "query":  "Српски",
+                        "code":  "sr"
+                    },
+                    {
+                        "query":  "sv",
+                        "code":  "sv"
+                    },
+                    {
+                        "query":  "SV",
+                        "code":  "sv"
+                    },
+                    {
+                        "query":  "Swedish",
+                        "code":  "sv"
+                    },
+                    {
+                        "query":  "swedish",
+                        "code":  "sv"
+                    },
+                    {
+                        "query":  "Svenska",
+                        "code":  "sv"
+                    },
+                    {
+                        "query":  "sw",
+                        "code":  "sw"
+                    },
+                    {
+                        "query":  "SW",
+                        "code":  "sw"
+                    },
+                    {
+                        "query":  "Swahili",
+                        "code":  "sw"
+                    },
+                    {
+                        "query":  "swahili",
+                        "code":  "sw"
+                    },
+                    {
+                        "query":  "Kiswahili",
+                        "code":  "sw"
+                    },
+                    {
+                        "query":  "th",
+                        "code":  "th"
+                    },
+                    {
+                        "query":  "TH",
+                        "code":  "th"
+                    },
+                    {
+                        "query":  "Thai",
+                        "code":  "th"
+                    },
+                    {
+                        "query":  "thai",
+                        "code":  "th"
+                    },
+                    {
+                        "query":  "ไทย",
+                        "code":  "th"
+                    },
+                    {
+                        "query":  "tr",
+                        "code":  "tr"
+                    },
+                    {
+                        "query":  "TR",
+                        "code":  "tr"
+                    },
+                    {
+                        "query":  "Turkish",
+                        "code":  "tr"
+                    },
+                    {
+                        "query":  "turkish",
+                        "code":  "tr"
+                    },
+                    {
+                        "query":  "Türkçe",
+                        "code":  "tr"
+                    },
+                    {
+                        "query":  "uk",
+                        "code":  "uk"
+                    },
+                    {
+                        "query":  "UK",
+                        "code":  "uk"
+                    },
+                    {
+                        "query":  "Ukrainian",
+                        "code":  "uk"
+                    },
+                    {
+                        "query":  "ukrainian",
+                        "code":  "uk"
+                    },
+                    {
+                        "query":  "Українська",
+                        "code":  "uk"
+                    },
+                    {
+                        "query":  "ua",
+                        "code":  "uk"
+                    },
+                    {
+                        "query":  "ur",
+                        "code":  "ur"
+                    },
+                    {
+                        "query":  "UR",
+                        "code":  "ur"
+                    },
+                    {
+                        "query":  "Urdu",
+                        "code":  "ur"
+                    },
+                    {
+                        "query":  "urdu",
+                        "code":  "ur"
+                    },
+                    {
+                        "query":  "اردو",
+                        "code":  "ur"
+                    },
+                    {
+                        "query":  "vi",
+                        "code":  "vi"
+                    },
+                    {
+                        "query":  "VI",
+                        "code":  "vi"
+                    },
+                    {
+                        "query":  "Vietnamese",
+                        "code":  "vi"
+                    },
+                    {
+                        "query":  "vietnamese",
+                        "code":  "vi"
+                    },
+                    {
+                        "query":  "Tiếng Việt",
+                        "code":  "vi"
+                    },
+                    {
+                        "query":  "zh-CN",
+                        "code":  "zh-CN"
+                    },
+                    {
+                        "query":  "ZH-CN",
+                        "code":  "zh-CN"
+                    },
+                    {
+                        "query":  "Chinese (Simplified)",
+                        "code":  "zh-CN"
+                    },
+                    {
+                        "query":  "chinese (simplified)",
+                        "code":  "zh-CN"
+                    },
+                    {
+                        "query":  "简体中文",
+                        "code":  "zh-CN"
+                    },
+                    {
+                        "query":  "zh",
+                        "code":  "zh-CN"
+                    },
+                    {
+                        "query":  "zh-Hans",
+                        "code":  "zh-CN"
+                    },
+                    {
+                        "query":  "zh-TW",
+                        "code":  "zh-TW"
+                    },
+                    {
+                        "query":  "ZH-TW",
+                        "code":  "zh-TW"
+                    },
+                    {
+                        "query":  "Chinese (Traditional)",
+                        "code":  "zh-TW"
+                    },
+                    {
+                        "query":  "chinese (traditional)",
+                        "code":  "zh-TW"
+                    },
+                    {
+                        "query":  "繁體中文",
+                        "code":  "zh-TW"
+                    },
+                    {
+                        "query":  "zh-Hant",
+                        "code":  "zh-TW"
+                    },
+                    {
+                        "query":  "fi",
+                        "code":  "fi"
+                    },
+                    {
+                        "query":  "FI",
+                        "code":  "fi"
+                    },
+                    {
+                        "query":  "Finnish",
+                        "code":  "fi"
+                    },
+                    {
+                        "query":  "finnish",
+                        "code":  "fi"
+                    },
+                    {
+                        "query":  "Suomi",
+                        "code":  "fi"
+                    },
+                    {
+                        "query":  "et",
+                        "code":  "et"
+                    },
+                    {
+                        "query":  "ET",
+                        "code":  "et"
+                    },
+                    {
+                        "query":  "Estonian",
+                        "code":  "et"
+                    },
+                    {
+                        "query":  "estonian",
+                        "code":  "et"
+                    },
+                    {
+                        "query":  "Eesti",
+                        "code":  "et"
+                    },
+                    {
+                        "query":  "ga",
+                        "code":  "ga"
+                    },
+                    {
+                        "query":  "GA",
+                        "code":  "ga"
+                    },
+                    {
+                        "query":  "Irish",
+                        "code":  "ga"
+                    },
+                    {
+                        "query":  "irish",
+                        "code":  "ga"
+                    },
+                    {
+                        "query":  "Gaeilge",
+                        "code":  "ga"
+                    },
+                    {
+                        "query":  "lv",
+                        "code":  "lv"
+                    },
+                    {
+                        "query":  "LV",
+                        "code":  "lv"
+                    },
+                    {
+                        "query":  "Latvian",
+                        "code":  "lv"
+                    },
+                    {
+                        "query":  "latvian",
+                        "code":  "lv"
+                    },
+                    {
+                        "query":  "Latviešu",
+                        "code":  "lv"
+                    },
+                    {
+                        "query":  "lt",
+                        "code":  "lt"
+                    },
+                    {
+                        "query":  "LT",
+                        "code":  "lt"
+                    },
+                    {
+                        "query":  "Lithuanian",
+                        "code":  "lt"
+                    },
+                    {
+                        "query":  "lithuanian",
+                        "code":  "lt"
+                    },
+                    {
+                        "query":  "Lietuvių",
+                        "code":  "lt"
+                    },
+                    {
+                        "query":  "mt",
+                        "code":  "mt"
+                    },
+                    {
+                        "query":  "MT",
+                        "code":  "mt"
+                    },
+                    {
+                        "query":  "Maltese",
+                        "code":  "mt"
+                    },
+                    {
+                        "query":  "maltese",
+                        "code":  "mt"
+                    },
+                    {
+                        "query":  "Malti",
+                        "code":  "mt"
+                    },
+                    {
+                        "query":  "sl",
+                        "code":  "sl"
+                    },
+                    {
+                        "query":  "SL",
+                        "code":  "sl"
+                    },
+                    {
+                        "query":  "Slovenian",
+                        "code":  "sl"
+                    },
+                    {
+                        "query":  "slovenian",
+                        "code":  "sl"
+                    },
+                    {
+                        "query":  "Slovenščina",
+                        "code":  "sl"
+                    },
+                    {
+                        "query":  "ca",
+                        "code":  "ca"
+                    },
+                    {
+                        "query":  "CA",
+                        "code":  "ca"
+                    },
+                    {
+                        "query":  "Catalan",
+                        "code":  "ca"
+                    },
+                    {
+                        "query":  "catalan",
+                        "code":  "ca"
+                    },
+                    {
+                        "query":  "Català",
+                        "code":  "ca"
+                    },
+                    {
+                        "query":  "gl",
+                        "code":  "gl"
+                    },
+                    {
+                        "query":  "GL",
+                        "code":  "gl"
+                    },
+                    {
+                        "query":  "Galician",
+                        "code":  "gl"
+                    },
+                    {
+                        "query":  "galician",
+                        "code":  "gl"
+                    },
+                    {
+                        "query":  "Galego",
+                        "code":  "gl"
+                    },
+                    {
+                        "query":  "Norweg",
+                        "code":  "nb"
+                    },
+                    {
+                        "query":  "Czec",
+                        "code":  "cs"
+                    },
+                    {
+                        "query":  "Ch",
+                        "code":  null
+                    },
+                    {
+                        "query":  "C",
+                        "code":  null
+                    },
+                    {
+                        "query":  "",
+                        "code":  null
+                    },
+                    {
+                        "query":  "   ",
+                        "code":  null
+                    },
+                    {
+                        "query":  "Klingon",
+                        "code":  null
+                    },
+                    {
+                        "query":  "zz",
+                        "code":  null
+                    },
+                    {
+                        "query":  "UA",
+                        "code":  "uk"
+                    },
+                    {
+                        "query":  " cs ",
+                        "code":  "cs"
+                    }
+                ],
+    "patterns":  [
+                     {
+                         "code":  "sq",
+                         "native":  "Shqip",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "ar",
+                         "native":  "العربية",
+                         "pattern":  "[؀-ۿݐ-ݿ]"
+                     },
+                     {
+                         "code":  "hy",
+                         "native":  "Հայերեն",
+                         "pattern":  "[԰-֏]"
+                     },
+                     {
+                         "code":  "az",
+                         "native":  "Azərbaycanca",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "id",
+                         "native":  "Bahasa Indonesia",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "ms",
+                         "native":  "Bahasa Melayu",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "bn",
+                         "native":  "বাংলা",
+                         "pattern":  "[ঀ-৿]"
+                     },
+                     {
+                         "code":  "bg",
+                         "native":  "Български",
+                         "pattern":  "[Ѐ-ӿ]"
+                     },
+                     {
+                         "code":  "cs",
+                         "native":  "Čeština",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "da",
+                         "native":  "Dansk",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "de",
+                         "native":  "Deutsch",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "el",
+                         "native":  "Ελληνικά",
+                         "pattern":  "[Ͱ-Ͽἀ-῿]"
+                     },
+                     {
+                         "code":  "en",
+                         "native":  "English",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "es",
+                         "native":  "Español",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "fa",
+                         "native":  "فارسی",
+                         "pattern":  "[؀-ۿݐ-ݿ]"
+                     },
+                     {
+                         "code":  "fil",
+                         "native":  "Filipino",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "fr",
+                         "native":  "Français",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "he",
+                         "native":  "עברית",
+                         "pattern":  "[֐-׿]"
+                     },
+                     {
+                         "code":  "hi",
+                         "native":  "हिन्दी",
+                         "pattern":  "[ऀ-ॿ]"
+                     },
+                     {
+                         "code":  "hr",
+                         "native":  "Hrvatski",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "hu",
+                         "native":  "Magyar",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "it",
+                         "native":  "Italiano",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "ja",
+                         "native":  "日本語",
+                         "pattern":  "[一-鿿]"
+                     },
+                     {
+                         "code":  "kk",
+                         "native":  "Қазақша",
+                         "pattern":  "[Ѐ-ӿ]"
+                     },
+                     {
+                         "code":  "ko",
+                         "native":  "한국어",
+                         "pattern":  "[가-힯ᄀ-ᇿ]"
+                     },
+                     {
+                         "code":  "nb",
+                         "native":  "Norsk bokmål",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "nl",
+                         "native":  "Nederlands",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "pl",
+                         "native":  "Polski",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "pt",
+                         "native":  "Português",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "ro",
+                         "native":  "Română",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "ru",
+                         "native":  "Русский",
+                         "pattern":  "[Ѐ-ӿ]"
+                     },
+                     {
+                         "code":  "sk",
+                         "native":  "Slovenčina",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "sr",
+                         "native":  "Српски",
+                         "pattern":  "[Ѐ-ӿ]"
+                     },
+                     {
+                         "code":  "sv",
+                         "native":  "Svenska",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "sw",
+                         "native":  "Kiswahili",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "th",
+                         "native":  "ไทย",
+                         "pattern":  "[฀-๿]"
+                     },
+                     {
+                         "code":  "tr",
+                         "native":  "Türkçe",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "uk",
+                         "native":  "Українська",
+                         "pattern":  "[Ѐ-ӿ]"
+                     },
+                     {
+                         "code":  "ur",
+                         "native":  "اردو",
+                         "pattern":  "[؀-ۿݐ-ݿ]"
+                     },
+                     {
+                         "code":  "vi",
+                         "native":  "Tiếng Việt",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "zh-CN",
+                         "native":  "简体中文",
+                         "pattern":  "[一-鿿]"
+                     },
+                     {
+                         "code":  "zh-TW",
+                         "native":  "繁體中文",
+                         "pattern":  "[一-鿿]"
+                     },
+                     {
+                         "code":  "fi",
+                         "native":  "Suomi",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "et",
+                         "native":  "Eesti",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "ga",
+                         "native":  "Gaeilge",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "lv",
+                         "native":  "Latviešu",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "lt",
+                         "native":  "Lietuvių",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "mt",
+                         "native":  "Malti",
+                         "pattern":  ""
+                     },
+                     {
+                         "code":  "sl",
+                         "native":  "Slovenščina",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "ca",
+                         "native":  "Català",
+                         "pattern":  "[À-ɏḀ-ỿ]"
+                     },
+                     {
+                         "code":  "gl",
+                         "native":  "Galego",
+                         "pattern":  ""
+                     }
+                 ],
+    "models":  [
+                   {
+                       "modelId":  "",
+                       "flag":  "",
+                       "verified":  false,
+                       "codes":  [
+                                     "sq",
+                                     "ar",
+                                     "hy",
+                                     "az",
+                                     "id",
+                                     "ms",
+                                     "bn",
+                                     "bg",
+                                     "cs",
+                                     "da",
+                                     "de",
+                                     "el",
+                                     "en",
+                                     "es",
+                                     "fa",
+                                     "fil",
+                                     "fr",
+                                     "he",
+                                     "hi",
+                                     "hr",
+                                     "hu",
+                                     "it",
+                                     "ja",
+                                     "kk",
+                                     "ko",
+                                     "nb",
+                                     "nl",
+                                     "pl",
+                                     "pt",
+                                     "ro",
+                                     "ru",
+                                     "sk",
+                                     "sr",
+                                     "sv",
+                                     "sw",
+                                     "th",
+                                     "tr",
+                                     "uk",
+                                     "ur",
+                                     "vi",
+                                     "zh-CN",
+                                     "zh-TW",
+                                     "fi",
+                                     "et",
+                                     "ga",
+                                     "lv",
+                                     "lt",
+                                     "mt",
+                                     "sl",
+                                     "ca",
+                                     "gl"
+                                 ]
+                   },
+                   {
+                       "modelId":  "eurollm",
+                       "flag":  "eurollm",
+                       "verified":  true,
+                       "codes":  [
+                                     "ar",
+                                     "bg",
+                                     "cs",
+                                     "da",
+                                     "de",
+                                     "el",
+                                     "en",
+                                     "es",
+                                     "fr",
+                                     "hi",
+                                     "hr",
+                                     "hu",
+                                     "it",
+                                     "ja",
+                                     "ko",
+                                     "nb",
+                                     "nl",
+                                     "pl",
+                                     "pt",
+                                     "ro",
+                                     "ru",
+                                     "sk",
+                                     "sv",
+                                     "tr",
+                                     "uk",
+                                     "zh-CN",
+                                     "zh-TW",
+                                     "fi",
+                                     "et",
+                                     "ga",
+                                     "lv",
+                                     "lt",
+                                     "mt",
+                                     "sl",
+                                     "ca",
+                                     "gl"
+                                 ]
+                   },
+                   {
+                       "modelId":  "EuroLLM-9B-Instruct-Q4_K_M",
+                       "flag":  "eurollm",
+                       "verified":  true,
+                       "codes":  [
+                                     "ar",
+                                     "bg",
+                                     "cs",
+                                     "da",
+                                     "de",
+                                     "el",
+                                     "en",
+                                     "es",
+                                     "fr",
+                                     "hi",
+                                     "hr",
+                                     "hu",
+                                     "it",
+                                     "ja",
+                                     "ko",
+                                     "nb",
+                                     "nl",
+                                     "pl",
+                                     "pt",
+                                     "ro",
+                                     "ru",
+                                     "sk",
+                                     "sv",
+                                     "tr",
+                                     "uk",
+                                     "zh-CN",
+                                     "zh-TW",
+                                     "fi",
+                                     "et",
+                                     "ga",
+                                     "lv",
+                                     "lt",
+                                     "mt",
+                                     "sl",
+                                     "ca",
+                                     "gl"
+                                 ]
+                   },
+                   {
+                       "modelId":  "translategemma-4b-it.Q4_K_M",
+                       "flag":  "translategemma",
+                       "verified":  true,
+                       "codes":  [
+                                     "sq",
+                                     "ar",
+                                     "hy",
+                                     "az",
+                                     "id",
+                                     "ms",
+                                     "bn",
+                                     "bg",
+                                     "cs",
+                                     "da",
+                                     "de",
+                                     "el",
+                                     "en",
+                                     "es",
+                                     "fa",
+                                     "fil",
+                                     "fr",
+                                     "he",
+                                     "hi",
+                                     "hr",
+                                     "hu",
+                                     "it",
+                                     "ja",
+                                     "kk",
+                                     "ko",
+                                     "nb",
+                                     "nl",
+                                     "pl",
+                                     "pt",
+                                     "ro",
+                                     "ru",
+                                     "sk",
+                                     "sr",
+                                     "sv",
+                                     "sw",
+                                     "th",
+                                     "tr",
+                                     "uk",
+                                     "ur",
+                                     "vi",
+                                     "zh-CN",
+                                     "zh-TW",
+                                     "fi",
+                                     "et",
+                                     "ga",
+                                     "lv",
+                                     "lt",
+                                     "mt",
+                                     "sl",
+                                     "ca",
+                                     "gl"
+                                 ]
+                   },
+                   {
+                       "modelId":  "gemma3-1b",
+                       "flag":  "",
+                       "verified":  false,
+                       "codes":  [
+                                     "sq",
+                                     "ar",
+                                     "hy",
+                                     "az",
+                                     "id",
+                                     "ms",
+                                     "bn",
+                                     "bg",
+                                     "cs",
+                                     "da",
+                                     "de",
+                                     "el",
+                                     "en",
+                                     "es",
+                                     "fa",
+                                     "fil",
+                                     "fr",
+                                     "he",
+                                     "hi",
+                                     "hr",
+                                     "hu",
+                                     "it",
+                                     "ja",
+                                     "kk",
+                                     "ko",
+                                     "nb",
+                                     "nl",
+                                     "pl",
+                                     "pt",
+                                     "ro",
+                                     "ru",
+                                     "sk",
+                                     "sr",
+                                     "sv",
+                                     "sw",
+                                     "th",
+                                     "tr",
+                                     "uk",
+                                     "ur",
+                                     "vi",
+                                     "zh-CN",
+                                     "zh-TW",
+                                     "fi",
+                                     "et",
+                                     "ga",
+                                     "lv",
+                                     "lt",
+                                     "mt",
+                                     "sl",
+                                     "ca",
+                                     "gl"
+                                 ]
+                   },
+                   {
+                       "modelId":  "some-unknown-model",
+                       "flag":  "",
+                       "verified":  false,
+                       "codes":  [
+                                     "sq",
+                                     "ar",
+                                     "hy",
+                                     "az",
+                                     "id",
+                                     "ms",
+                                     "bn",
+                                     "bg",
+                                     "cs",
+                                     "da",
+                                     "de",
+                                     "el",
+                                     "en",
+                                     "es",
+                                     "fa",
+                                     "fil",
+                                     "fr",
+                                     "he",
+                                     "hi",
+                                     "hr",
+                                     "hu",
+                                     "it",
+                                     "ja",
+                                     "kk",
+                                     "ko",
+                                     "nb",
+                                     "nl",
+                                     "pl",
+                                     "pt",
+                                     "ro",
+                                     "ru",
+                                     "sk",
+                                     "sr",
+                                     "sv",
+                                     "sw",
+                                     "th",
+                                     "tr",
+                                     "uk",
+                                     "ur",
+                                     "vi",
+                                     "zh-CN",
+                                     "zh-TW",
+                                     "fi",
+                                     "et",
+                                     "ga",
+                                     "lv",
+                                     "lt",
+                                     "mt",
+                                     "sl",
+                                     "ca",
+                                     "gl"
+                                 ]
+                   }
+               ],
+    "warnings":  [
+                     {
+                         "code":  "cs",
+                         "modelId":  "",
+                         "warning":  ""
+                     },
+                     {
+                         "code":  "cs",
+                         "modelId":  "eurollm",
+                         "warning":  ""
+                     },
+                     {
+                         "code":  "cs",
+                         "modelId":  "translategemma-4b-it",
+                         "warning":  ""
+                     },
+                     {
+                         "code":  "th",
+                         "modelId":  "",
+                         "warning":  "Thai is NOT one of EuroLLM\u0027s 35 trained languages. It will answer anyway, and every gate here checks structure rather than meaning - so a wrong translation will pass. Load a model trained on Thai, or treat the output as a draft."
+                     },
+                     {
+                         "code":  "th",
+                         "modelId":  "eurollm",
+                         "warning":  "Thai is NOT one of EuroLLM\u0027s 35 trained languages. It will answer anyway, and every gate here checks structure rather than meaning - so a wrong translation will pass. Load a model trained on Thai, or treat the output as a draft."
+                     },
+                     {
+                         "code":  "th",
+                         "modelId":  "translategemma-4b-it",
+                         "warning":  "Thai is outside EuroLLM\u0027s 35 trained languages. \u0027translategemma-4b-it\u0027 may handle it; nothing here can check the meaning of what comes back."
+                     },
+                     {
+                         "code":  "ja",
+                         "modelId":  "",
+                         "warning":  ""
+                     },
+                     {
+                         "code":  "ja",
+                         "modelId":  "eurollm",
+                         "warning":  ""
+                     },
+                     {
+                         "code":  "ja",
+                         "modelId":  "translategemma-4b-it",
+                         "warning":  ""
+                     },
+                     {
+                         "code":  "de",
+                         "modelId":  "",
+                         "warning":  ""
+                     },
+                     {
+                         "code":  "de",
+                         "modelId":  "eurollm",
+                         "warning":  ""
+                     },
+                     {
+                         "code":  "de",
+                         "modelId":  "translategemma-4b-it",
+                         "warning":  ""
+                     },
+                     {
+                         "code":  "uk",
+                         "modelId":  "",
+                         "warning":  ""
+                     },
+                     {
+                         "code":  "uk",
+                         "modelId":  "eurollm",
+                         "warning":  ""
+                     },
+                     {
+                         "code":  "uk",
+                         "modelId":  "translategemma-4b-it",
+                         "warning":  ""
+                     }
+                 ],
+    "prompts":  [
+                    {
+                        "modelId":  "",
+                        "target":  "Czech",
+                        "hasShape":  false,
+                        "label":  null,
+                        "role":  null,
+                        "blankLines":  null,
+                        "instruction":  null
+                    },
+                    {
+                        "modelId":  "",
+                        "target":  "German",
+                        "hasShape":  false,
+                        "label":  null,
+                        "role":  null,
+                        "blankLines":  null,
+                        "instruction":  null
+                    },
+                    {
+                        "modelId":  "translategemma-4b-it.Q4_K_M",
+                        "target":  "Czech",
+                        "hasShape":  true,
+                        "label":  "TranslateGemma",
+                        "role":  "user",
+                        "blankLines":  2,
+                        "instruction":  "You are a professional English (en) to Czech (cs) translator. Your goal is to accurately convey the meaning and nuances of the original English text while adhering to Czech grammar, vocabulary, and cultural sensitivities. Produce only the Czech translation, without any additional explanations or commentary. Please translate the following English text into Czech:"
+                    },
+                    {
+                        "modelId":  "translategemma-4b-it.Q4_K_M",
+                        "target":  "German",
+                        "hasShape":  true,
+                        "label":  "TranslateGemma",
+                        "role":  "user",
+                        "blankLines":  2,
+                        "instruction":  "You are a professional English (en) to German (de) translator. Your goal is to accurately convey the meaning and nuances of the original English text while adhering to German grammar, vocabulary, and cultural sensitivities. Produce only the German translation, without any additional explanations or commentary. Please translate the following English text into German:"
+                    },
+                    {
+                        "modelId":  "TRANSLATEGEMMA",
+                        "target":  "Czech",
+                        "hasShape":  true,
+                        "label":  "TranslateGemma",
+                        "role":  "user",
+                        "blankLines":  2,
+                        "instruction":  "You are a professional English (en) to Czech (cs) translator. Your goal is to accurately convey the meaning and nuances of the original English text while adhering to Czech grammar, vocabulary, and cultural sensitivities. Produce only the Czech translation, without any additional explanations or commentary. Please translate the following English text into Czech:"
+                    },
+                    {
+                        "modelId":  "TRANSLATEGEMMA",
+                        "target":  "German",
+                        "hasShape":  true,
+                        "label":  "TranslateGemma",
+                        "role":  "user",
+                        "blankLines":  2,
+                        "instruction":  "You are a professional English (en) to German (de) translator. Your goal is to accurately convey the meaning and nuances of the original English text while adhering to German grammar, vocabulary, and cultural sensitivities. Produce only the German translation, without any additional explanations or commentary. Please translate the following English text into German:"
+                    },
+                    {
+                        "modelId":  "eurollm",
+                        "target":  "Czech",
+                        "hasShape":  false,
+                        "label":  null,
+                        "role":  null,
+                        "blankLines":  null,
+                        "instruction":  null
+                    },
+                    {
+                        "modelId":  "eurollm",
+                        "target":  "German",
+                        "hasShape":  false,
+                        "label":  null,
+                        "role":  null,
+                        "blankLines":  null,
+                        "instruction":  null
+                    },
+                    {
+                        "modelId":  "EuroLLM-9B-Instruct-Q4_K_M",
+                        "target":  "Czech",
+                        "hasShape":  false,
+                        "label":  null,
+                        "role":  null,
+                        "blankLines":  null,
+                        "instruction":  null
+                    },
+                    {
+                        "modelId":  "EuroLLM-9B-Instruct-Q4_K_M",
+                        "target":  "German",
+                        "hasShape":  false,
+                        "label":  null,
+                        "role":  null,
+                        "blankLines":  null,
+                        "instruction":  null
+                    },
+                    {
+                        "modelId":  "gemma3-1b",
+                        "target":  "Czech",
+                        "hasShape":  false,
+                        "label":  null,
+                        "role":  null,
+                        "blankLines":  null,
+                        "instruction":  null
+                    },
+                    {
+                        "modelId":  "gemma3-1b",
+                        "target":  "German",
+                        "hasShape":  false,
+                        "label":  null,
+                        "role":  null,
+                        "blankLines":  null,
+                        "instruction":  null
+                    },
+                    {
+                        "modelId":  "unknown-model",
+                        "target":  "Czech",
+                        "hasShape":  false,
+                        "label":  null,
+                        "role":  null,
+                        "blankLines":  null,
+                        "instruction":  null
+                    },
+                    {
+                        "modelId":  "unknown-model",
+                        "target":  "German",
+                        "hasShape":  false,
+                        "label":  null,
+                        "role":  null,
+                        "blankLines":  null,
+                        "instruction":  null
+                    }
+                ]
+}

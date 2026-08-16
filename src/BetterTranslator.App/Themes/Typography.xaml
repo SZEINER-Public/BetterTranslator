@@ -1,0 +1,337 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <!-- Colour tokens are merged in so this dictionary resolves standalone;
+         WPF caches Source-loaded dictionaries per URI, so App.xaml merging
+         Colors.xaml as well costs nothing. -->
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/BetterTranslator;component/Themes/Colors.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- Type tokens. Two weights only: 400 and 600.
+
+         Each text token is published three ways so that every use site can
+         reach it without writing a literal:
+           TextDefault        a TextBlock Style, for text elements
+           TextDefaultSize    a Double, for FontSize on Button, TextBox, ...
+           TextDefaultWeight  a FontWeight, for FontWeight on the same
+         WPF has no tracking property, so no token expresses letter spacing.
+         Map zone labels apply their tracking on the Skia canvas instead. -->
+
+    <FontFamily x:Key="FontFamilyUi">Segoe UI Variable Text, Segoe UI, Selawik</FontFamily>
+    <FontFamily x:Key="FontFamilyMono">Cascadia Mono, Consolas, Courier New</FontFamily>
+
+    <!-- Line height, applied with LineStackingStrategy BlockLineHeight -->
+    <sys:Double x:Key="BodyLineHeight">20</sys:Double>
+    <sys:Double x:Key="ProseLineHeight">21</sys:Double>
+    <sys:Double x:Key="DenseLineHeight">18</sys:Double>
+
+    <FontWeight x:Key="WeightRegular">Normal</FontWeight>
+    <FontWeight x:Key="WeightSemiBold">SemiBold</FontWeight>
+
+    <sys:Double x:Key="TextTitleSize">16</sys:Double>
+    <sys:Double x:Key="TextHeadingSize">15</sys:Double>
+    <sys:Double x:Key="TextChatNameSize">14.5</sys:Double>
+    <sys:Double x:Key="TextSubheadingSize">14</sys:Double>
+    <sys:Double x:Key="TextBodySize">14</sys:Double>
+    <sys:Double x:Key="TextCardTitleSize">13.5</sys:Double>
+    <sys:Double x:Key="TextDefaultSize">13</sys:Double>
+    <sys:Double x:Key="TextSecondarySize">12.5</sys:Double>
+    <sys:Double x:Key="TextMetaSize">12</sys:Double>
+    <sys:Double x:Key="TextFineSize">11.5</sys:Double>
+    <sys:Double x:Key="TextMicroSize">11</sys:Double>
+    <sys:Double x:Key="TextMonoPathSize">11.5</sys:Double>
+    <sys:Double x:Key="TextMonoSmallSize">10.5</sys:Double>
+
+    <FontWeight x:Key="TextTitleWeight">SemiBold</FontWeight>
+    <FontWeight x:Key="TextHeadingWeight">SemiBold</FontWeight>
+    <FontWeight x:Key="TextChatNameWeight">SemiBold</FontWeight>
+    <FontWeight x:Key="TextSubheadingWeight">SemiBold</FontWeight>
+    <FontWeight x:Key="TextBodyWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextCardTitleWeight">SemiBold</FontWeight>
+    <FontWeight x:Key="TextDefaultWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextSecondaryWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextMetaWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextFineWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextMicroWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextMonoPathWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextMonoSmallWeight">Normal</FontWeight>
+
+    <Style x:Key="TextTitle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextTitleSize}" />
+        <Setter Property="FontWeight" Value="{StaticResource TextTitleWeight}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+    </Style>
+
+    <Style x:Key="TextHeading" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}">
+        <Setter Property="FontSize" Value="{StaticResource TextHeadingSize}" />
+    </Style>
+
+    <Style x:Key="TextChatName" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}">
+        <Setter Property="FontSize" Value="{StaticResource TextChatNameSize}" />
+    </Style>
+
+    <Style x:Key="TextSubheading" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}">
+        <Setter Property="FontSize" Value="{StaticResource TextSubheadingSize}" />
+    </Style>
+
+    <Style x:Key="TextBody" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}">
+        <Setter Property="FontSize" Value="{StaticResource TextBodySize}" />
+        <Setter Property="FontWeight" Value="{StaticResource TextBodyWeight}" />
+        <Setter Property="LineHeight" Value="{StaticResource BodyLineHeight}" />
+        <Setter Property="LineStackingStrategy" Value="BlockLineHeight" />
+    </Style>
+
+    <Style x:Key="TextCardTitle" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}">
+        <Setter Property="FontSize" Value="{StaticResource TextCardTitleSize}" />
+    </Style>
+
+    <Style x:Key="TextDefault" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}">
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="FontWeight" Value="{StaticResource TextDefaultWeight}" />
+    </Style>
+
+    <Style x:Key="TextSecondary" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="FontSize" Value="{StaticResource TextSecondarySize}" />
+    </Style>
+
+    <Style x:Key="TextMeta" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="FontSize" Value="{StaticResource TextMetaSize}" />
+    </Style>
+
+    <Style x:Key="TextTableHeader" TargetType="TextBlock" BasedOn="{StaticResource TextSecondary}">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+    </Style>
+
+    <Style x:Key="TextFine" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="FontSize" Value="{StaticResource TextFineSize}" />
+    </Style>
+
+    <Style x:Key="TextMicro" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="FontSize" Value="{StaticResource TextMicroSize}" />
+    </Style>
+
+    <Style x:Key="TextMonoPath" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyMono}" />
+        <Setter Property="FontSize" Value="{StaticResource TextMonoPathSize}" />
+    </Style>
+
+    <Style x:Key="TextMonoSmall" TargetType="TextBlock" BasedOn="{StaticResource TextMonoPath}">
+        <Setter Property="FontSize" Value="{StaticResource TextMonoSmallSize}" />
+    </Style>
+
+    <!-- Prose: translated sentences, dialog body copy, file preview paragraphs -->
+    <Style x:Key="TextProse" TargetType="TextBlock" BasedOn="{StaticResource TextBody}">
+        <Setter Property="LineHeight" Value="{StaticResource ProseLineHeight}" />
+    </Style>
+
+    <!-- A chat entry sets its source against its result rather than beside it:
+         the source is smaller and grey, the result larger and full strength, so
+         the eye lands on the translation. -->
+    <Style x:Key="TextEntrySource" TargetType="TextBlock" BasedOn="{StaticResource TextProse}">
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextTertiary}" />
+    </Style>
+
+    <Style x:Key="TextEntryResult" TargetType="TextBlock" BasedOn="{StaticResource TextProse}">
+        <Setter Property="FontSize" Value="{StaticResource TextHeadingSize}" />
+    </Style>
+
+    <!-- The SOURCE and language headings over an entry's two columns. -->
+    <Style x:Key="TextEntryHeading" TargetType="TextBlock" BasedOn="{StaticResource TextMicro}">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSubtle}" />
+    </Style>
+
+    <!-- A word entry sets its two sides apart the same way a sentence does, at
+         its own smaller pair of sizes. -->
+    <Style x:Key="TextWordSource" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+    </Style>
+
+    <Style x:Key="TextWordResult" TargetType="TextBlock" BasedOn="{StaticResource TextBody}" />
+
+    <!-- Selectable text.
+
+         A WPF TextBlock cannot be selected with the mouse at all: there is no
+         property for it and no attached behaviour that does not reimplement hit
+         testing. A read-only TextBox is the one control that selects, copies and
+         supports Ctrl+A without bringing a FlowDocument with it, so entry text
+         is a TextBox stripped of every piece of its chrome.
+
+         These mirror their TextBlock counterparts rather than deriving from them,
+         because a Style cannot change TargetType. They read the same tokens, so
+         a change to a size or a colour still moves both. One property does not
+         survive the crossing: TextBox has no LineHeight, so wrapped prose sets
+         slightly tighter here than a TextBlock would. That is the whole cost of
+         being able to select it. -->
+    <Style x:Key="SelectableText" TargetType="TextBox">
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="IsReadOnlyCaretVisible" Value="False" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="AcceptsReturn" Value="True" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Cursor" Value="IBeam" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextBodySize}" />
+        <Setter Property="FontWeight" Value="{StaticResource TextBodyWeight}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="SelectionBrush" Value="{StaticResource BrushAccent}" />
+        <Setter Property="SelectionOpacity" Value="0.28" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
+
+        <!-- The stock template paints a border and a focus ring however the
+             properties above are set, so the whole chrome is replaced with the
+             content host alone. Without this the chat fills with input boxes. -->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <ScrollViewer x:Name="PART_ContentHost"
+                                  Focusable="False"
+                                  HorizontalScrollBarVisibility="Hidden"
+                                  VerticalScrollBarVisibility="Hidden" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SelectableEntrySource" TargetType="TextBox" BasedOn="{StaticResource SelectableText}">
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextTertiary}" />
+    </Style>
+
+    <Style x:Key="SelectableEntryResult" TargetType="TextBox" BasedOn="{StaticResource SelectableText}">
+        <Setter Property="FontSize" Value="{StaticResource TextHeadingSize}" />
+    </Style>
+
+    <Style x:Key="SelectableWordSource" TargetType="TextBox" BasedOn="{StaticResource SelectableText}">
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="FontWeight" Value="{StaticResource TextDefaultWeight}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+    </Style>
+
+    <Style x:Key="SelectableWordResult" TargetType="TextBox" BasedOn="{StaticResource SelectableText}" />
+
+    <!-- Source mode: the raw Markdown of a message, as it would be pasted
+         elsewhere. Monospaced because the indentation of a nested list and the
+         columns of a table are the content, and a proportional face hides both.
+         Selectable for the same reason every other entry text is. -->
+    <Style x:Key="SelectableMarkdownSyntax" TargetType="TextBox" BasedOn="{StaticResource SelectableText}">
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyMono}" />
+        <Setter Property="FontSize" Value="{StaticResource TextMonoPathSize}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+    </Style>
+
+    <!-- Rendered Markdown that can be selected. The document is built by
+         Controls/MarkdownFlow from the same block model the TextBlock templates
+         read, and hosted here rather than in a FlowDocumentScrollViewer because
+         that control brings a scroller of its own: with both scrollbars disabled
+         a RichTextBox measures to its content and the panel around it does the
+         scrolling, exactly as the selectable text boxes above already do. -->
+    <Style x:Key="SelectableMarkdownFlow" TargetType="RichTextBox">
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="IsReadOnlyCaretVisible" Value="False" />
+        <Setter Property="IsDocumentEnabled" Value="True" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Cursor" Value="IBeam" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="SelectionBrush" Value="{StaticResource BrushAccent}" />
+        <Setter Property="SelectionOpacity" Value="0.28" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RichTextBox">
+                    <ScrollViewer x:Name="PART_ContentHost"
+                                  Focusable="False"
+                                  HorizontalScrollBarVisibility="Hidden"
+                                  VerticalScrollBarVisibility="Hidden" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Dense: log rows and dense notes -->
+    <Style x:Key="TextDense" TargetType="TextBlock" BasedOn="{StaticResource TextSecondary}">
+        <Setter Property="LineHeight" Value="{StaticResource DenseLineHeight}" />
+        <Setter Property="LineStackingStrategy" Value="BlockLineHeight" />
+    </Style>
+
+    <!--
+        The readout under a chat entry: what the run cost, and under that what
+        the audit measured. The second tier is subordinate on three axes at
+        once, because no single one carries it in this palette: a step down
+        the ramp (12 to 11), a step down the text role, and the only weight
+        contrast on the surface. Fourteen points of grey separate the two
+        inks, #5D5D5D at 6.59:1 against #6B6B6B at 5.33:1 on the surface,
+        which is not enough on its own to say which line is the main one.
+
+        The first tier sits at the stamp's own size deliberately. Weight and
+        ink already rank it above the second, and a readout that outgrew the
+        entry's own headings as well would be the loudest thing on a row
+        whose subject is the translation above it.
+
+        The gap between two figures is declared once, here, as the cell's own
+        left margin; whichever figure opens a run clears it at the use site.
+        Nothing else separates two figures: no glyph, no rule, no fill.
+
+        Both tiers stand on DenseLineHeight, so the pair keeps one pitch
+        whatever the sizes are and needs no margin between the rows. The
+        audit tier trims rather than clips: its findings cell is the one
+        string here with no bound, and a narrow window must not push it
+        through the column's right edge.
+    -->
+    <Style x:Key="TextEntryCost" TargetType="TextBlock" BasedOn="{StaticResource TextMeta}">
+        <Setter Property="FontWeight" Value="{StaticResource WeightSemiBold}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+        <Setter Property="LineHeight" Value="{StaticResource DenseLineHeight}" />
+        <Setter Property="LineStackingStrategy" Value="BlockLineHeight" />
+        <Setter Property="Margin" Value="10,0,0,0" />
+    </Style>
+
+    <Style x:Key="TextEntryAudit" TargetType="TextBlock" BasedOn="{StaticResource TextMicro}">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSubtle}" />
+        <Setter Property="LineHeight" Value="{StaticResource DenseLineHeight}" />
+        <Setter Property="LineStackingStrategy" Value="BlockLineHeight" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="Margin" Value="10,0,0,0" />
+    </Style>
+
+    <!-- A kept span, a lost citation and a markup defect are the only figures
+         on this surface anyone can act on, so a double gap sets them apart from
+         the counts and they are the one class that leaves the grey. The words
+         carry the meaning by themselves; the colour only arrives when something
+         was found, and only reinforces them. -->
+    <Style x:Key="TextEntryAuditFindings" TargetType="TextBlock" BasedOn="{StaticResource TextEntryAudit}">
+        <Setter Property="Margin" Value="20,0,0,0" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding HasDefects}" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource BrushWarnText}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- The whole-chat total over the history. The same cell contract as an
+         entry row, keeping the header's own size and colour: it sits under the
+         stamp rather than over the rows. -->
+    <Style x:Key="TextChatCost" TargetType="TextBlock" BasedOn="{StaticResource TextMeta}">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+        <Setter Property="LineHeight" Value="{StaticResource DenseLineHeight}" />
+        <Setter Property="LineStackingStrategy" Value="BlockLineHeight" />
+        <Setter Property="Margin" Value="10,0,0,0" />
+    </Style>
+
+</ResourceDictionary>

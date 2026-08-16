@@ -1,0 +1,215 @@
+﻿<UserControl x:Class="BetterTranslator.App.Views.FilePreviewView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:BetterTranslator.App.Controls"
+             Background="{StaticResource BrushSurface}">
+
+    <!-- The block DataTemplates live in Themes/Markdown.xaml: the chat renders
+         the same document model and has to render it the same way. -->
+
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="18,16,10,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="{Binding FileName}"
+                           Style="{StaticResource TextCardTitle}"
+                           TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="{Binding FilePath}"
+                           Style="{StaticResource TextMonoSmall}"
+                           Foreground="{StaticResource BrushTextSubtle}"
+                           TextTrimming="CharacterEllipsis"
+                           Margin="0,3,0,0" />
+            </StackPanel>
+
+            <controls:ChromeButton Grid.Column="1"
+                                   Icon="{StaticResource IconCloseSmall}"
+                                   Command="{Binding CloseCommand}"
+                                   VerticalAlignment="Top"
+                                   ToolTip="Close the preview"
+                                   AutomationProperties.Name="Close the preview" />
+        </Grid>
+
+        <!-- Version and, for Markdown only, the rendering switch -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="18,14,18,14">
+            <!-- Choosing a version selects what to show and starts nothing. -->
+            <Button x:Name="VersionButton"
+                    Style="{StaticResource SecondaryButton}"
+                    Height="{StaticResource SegmentHeight}"
+                    Padding="10,0,8,0"
+                    Command="{Binding ToggleVersionMenuCommand}"
+                    AutomationProperties.Name="Version">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding VersionLabel}"
+                               Style="{StaticResource TextSecondary}"
+                               VerticalAlignment="Center" />
+                    <controls:IconView Definition="{StaticResource IconChevronDown}"
+                                       Foreground="{StaticResource BrushTextSecondary}"
+                                       Margin="7,0,0,0"
+                                       VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+
+            <Popup PlacementTarget="{Binding ElementName=VersionButton}"
+                   Placement="Bottom"
+                   VerticalOffset="4"
+                   StaysOpen="False"
+                   AllowsTransparency="True"
+                   PopupAnimation="Fade"
+                   IsOpen="{Binding IsVersionMenuOpen, Mode=TwoWay}">
+                <Border Background="{StaticResource BrushSurface}"
+                        BorderBrush="{StaticResource BrushBorder}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusCard}"
+                        Padding="{StaticResource Space2Thickness}"
+                        Effect="{StaticResource ShadowPopover}"
+                        MinWidth="150">
+                    <StackPanel>
+                        <Button Style="{StaticResource MenuRowButton}"
+                                Content="Source"
+                                AutomationProperties.Name="Source"
+                                Command="{Binding ShowSourceVersionCommand}" />
+                        <Button Style="{StaticResource MenuRowButton}"
+                                Content="Translate"
+                                AutomationProperties.Name="Translate"
+                                Command="{Binding ShowTranslatedVersionCommand}" />
+                    </StackPanel>
+                </Border>
+            </Popup>
+
+            <Border Background="{StaticResource BrushTrack}"
+                    CornerRadius="{StaticResource RadiusDefault}"
+                    Padding="{StaticResource Space1Thickness}"
+                    Margin="10,0,0,0"
+                    Visibility="{Binding HasRenderingSwitch, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel Orientation="Horizontal">
+                    <controls:ChromeButton Icon="{StaticResource IconEyeFormatted}"
+                                           Width="{StaticResource ChromeButtonSizeSmall}"
+                                           Height="{StaticResource SegmentHeight}"
+                                           IsActive="{Binding ShowFormatted}"
+                                           Command="{Binding ShowFormattedViewCommand}"
+                                           ToolTip="Formatted"
+                                           AutomationProperties.Name="Formatted" />
+                    <controls:ChromeButton Icon="{StaticResource IconCodeBrackets}"
+                                           Width="{StaticResource ChromeButtonSizeSmall}"
+                                           Height="{StaticResource SegmentHeight}"
+                                           IsActive="{Binding ShowSourceText}"
+                                           Command="{Binding ShowSourceViewCommand}"
+                                           ToolTip="Source"
+                                           AutomationProperties.Name="Source" />
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="{Binding VersionNotice}"
+                       Style="{StaticResource TextMeta}"
+                       Foreground="{StaticResource BrushTextMuted}"
+                       VerticalAlignment="Center"
+                       Margin="12,0,0,0"
+                       Visibility="{Binding ShowVersionNotice, Converter={StaticResource BoolToVisibility}}" />
+
+            <!--
+                Running it is its own action, not a side effect of the dropdown.
+                A whole document is a model call per paragraph and minutes on a
+                long file: a version picker that silently began that would be
+                indistinguishable from a frozen window.
+            -->
+            <Button Style="{StaticResource SecondaryButton}"
+                    Height="{StaticResource SegmentHeight}"
+                    Padding="12,0,12,0"
+                    Margin="12,0,0,0"
+                    Content="Stop"
+                    Command="{Binding StopTranslatingCommand}"
+                    Visibility="{Binding IsTranslating, Converter={StaticResource BoolToVisibility}}"
+                    ToolTip="Stop translating"
+                    AutomationProperties.Name="Stop translating" />
+        </StackPanel>
+
+        <!--
+            What the run is doing, and what it produced. A document pass is many
+            model calls; a silent one looks like a hang, and a finished one that
+            says nothing leaves a third of the file in English unexplained.
+        -->
+        <StackPanel Grid.Row="2"
+                    Margin="18,0,18,14"
+                    Visibility="{Binding HasRunNote, Converter={StaticResource BoolToVisibility}}">
+            <ProgressBar Style="{StaticResource AppProgressBar}"
+                         Value="{Binding Percent, Mode=OneWay}"
+                         Maximum="100"
+                         Visibility="{Binding IsTranslating, Converter={StaticResource BoolToVisibility}}" />
+
+            <TextBlock Text="{Binding RunNote}"
+                       Style="{StaticResource TextMeta}"
+                       Foreground="{StaticResource BrushTextMuted}"
+                       TextWrapping="Wrap"
+                       Margin="0,6,0,0" />
+        </StackPanel>
+
+        <!-- Content -->
+        <Border Grid.Row="3"
+                Background="{StaticResource BrushSurface}"
+                BorderBrush="{StaticResource BrushBorderSoft}"
+                BorderThickness="0,1,0,0">
+            <!--
+                Horizontal scrolling is off, and that is load-bearing rather than
+                a preference. An Auto horizontal bar measures the content with
+                infinite width, so every TextWrapping="Wrap" block lays out on one
+                line: measured at 58779 x 94 for a document that should have been
+                484 wide and thousands tall, which left the wheel with nothing to
+                scroll. Wide content carries its own horizontal scroller (a table)
+                or wraps (a code block).
+            -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="18,14,18,18">
+                <Grid>
+                    <!-- Formatted: Markdown only -->
+                    <RichTextBox controls:MarkdownFlow.Blocks="{Binding Blocks}"
+                                 Style="{StaticResource SelectableMarkdownFlow}"
+                                 AutomationProperties.Name="File contents, formatted"
+                                 Visibility="{Binding ShowFormatted, Converter={StaticResource BoolToVisibility}}" />
+
+                    <!--
+                        Source, and the single view every other format shows. A
+                        read-only TextBox rather than a TextBlock, because a
+                        TextBlock cannot be selected and a reader who wants one
+                        line of a translation out of the panel has no way to take
+                        it. Same styles the chat entries use, so the chrome is a
+                        content host and nothing else.
+                    -->
+                    <TextBox Text="{Binding SourceText, Mode=OneWay}"
+                             Visibility="{Binding ShowSourceText, Converter={StaticResource BoolToVisibility}}"
+                             AutomationProperties.Name="File contents">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox" BasedOn="{StaticResource SelectableMarkdownSyntax}">
+                                <Style.Triggers>
+                                    <!-- DOCX and PDF are extracted prose, not code. -->
+                                    <DataTrigger Binding="{Binding HasRenderingSwitch}" Value="False">
+                                        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+                                        <Setter Property="FontSize" Value="{StaticResource TextBodySize}" />
+                                        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsMonospace}" Value="True">
+                                        <Setter Property="FontFamily" Value="{StaticResource FontFamilyMono}" />
+                                        <Setter Property="FontSize" Value="{StaticResource TextMonoPathSize}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                </Grid>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ComposerDisclaimer" xml:space="preserve">
+    <value>Output is AI generated. Some words may be wrong.</value>
+  </data>
+  <data name="EntrySourceLabel" xml:space="preserve">
+    <value>SOURCE</value>
+  </data>
+  <data name="EntryResultLabel" xml:space="preserve">
+    <value>RESULT</value>
+  </data>
+  <data name="EntryFailed" xml:space="preserve">
+    <value>Could not translate</value>
+  </data>
+  <data name="EntryRetry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="EntryQueued" xml:space="preserve">
+    <value>Waiting</value>
+  </data>
+  <data name="EntryNothingCameBack" xml:space="preserve">
+    <value>Nothing came back</value>
+  </data>
+  <data name="EntryPreviewToggle" xml:space="preserve">
+    <value>Show the file</value>
+  </data>
+  <data name="EntryExportSource" xml:space="preserve">
+    <value>Save the source file</value>
+  </data>
+  <data name="EntryExportResult" xml:space="preserve">
+    <value>Save the translated file</value>
+  </data>
+  <data name="EntryExportTitle" xml:space="preserve">
+    <value>Save file</value>
+  </data>
+  <data name="EntryExportFilter" xml:space="preserve">
+    <value>All files (*.*)|*.*</value>
+  </data>
+  <data name="EntryPreviewExpanded" xml:space="preserve">
+    <value>Expanded</value>
+  </data>
+  <data name="EntryPreviewCollapsed" xml:space="preserve">
+    <value>Collapsed</value>
+  </data>
+  <data name="DirectionSourceLabel" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="DirectionTargetLabel" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="DirectionUnknownLanguage" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="DirectionSwap" xml:space="preserve">
+    <value>Swap source and target</value>
+  </data>
+  <data name="DirectionChooseSource" xml:space="preserve">
+    <value>Choose the language the text is written in</value>
+  </data>
+  <data name="DirectionChooseTarget" xml:space="preserve">
+    <value>Choose the target language</value>
+  </data>
+  <data name="DirectionSameLanguage" xml:space="preserve">
+    <value>Source and target are the same language, so there is nothing to translate. Swap them or choose another target.</value>
+  </data>
+  <data name="DirectionUnknownSource" xml:space="preserve">
+    <value>The source language is not set. Choose the language the text is written in.</value>
+  </data>
+  <data name="DirectionUnknownTarget" xml:space="preserve">
+    <value>The target language is not set. Choose one to translate into.</value>
+  </data>
+  <data name="DirectionSourceUnsupported" xml:space="preserve">
+    <value>{1} does not support {0} as a source language. Switch model or change the source.</value>
+  </data>
+  <data name="DirectionTargetUnsupported" xml:space="preserve">
+    <value>{1} does not support {0} as a target language. Switch model or change the target.</value>
+  </data>
+</root>

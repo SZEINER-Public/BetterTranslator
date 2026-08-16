@@ -1,0 +1,110 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <RepositoryRoot Condition="'$(RepositoryRoot)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</RepositoryRoot>
+    <SingleFileConfiguration Condition="'$(SingleFileConfiguration)' == '' and '$(Configuration)' != '' and '$(Configuration)' != 'SingleFile'">$(Configuration)</SingleFileConfiguration>
+    <SingleFileConfiguration Condition="'$(SingleFileConfiguration)' == ''">Release</SingleFileConfiguration>
+    <SingleFileRuntimeIdentifier Condition="'$(SingleFileRuntimeIdentifier)' == ''">win-x64</SingleFileRuntimeIdentifier>
+    <SingleFilePlatform Condition="'$(SingleFilePlatform)' == ''">x64</SingleFilePlatform>
+    <SingleFileAlgorithm Condition="'$(SingleFileAlgorithm)' == ''">lzms</SingleFileAlgorithm>
+    <!-- BetterTranslator.exe here is the .NET apphost, not the artifact. The
+         bootstrap starts BetterTranslator.dll through hostfxr and never launches
+         an extracted executable, so packing the apphost would only drop a
+         runnable exe into the cache for someone to shortcut to. -->
+    <SingleFileExclude Condition="'$(SingleFileExclude)' == ''">*.pdb;BetterTranslator.exe</SingleFileExclude>
+
+    <!-- bin holds the deliverable and nothing else, so the promise that exactly
+         one file ships stays checkable by looking at the directory. Everything
+         the build needs on the way there is intermediate and lives in obj. -->
+    <SingleFileReleaseDir Condition="'$(SingleFileReleaseDir)' == ''">$(RepositoryRoot)bin\$(SingleFileConfiguration)</SingleFileReleaseDir>
+    <SingleFileStageRoot Condition="'$(SingleFileStageRoot)' == ''">$(RepositoryRoot)obj\single-file\$(SingleFileConfiguration)\</SingleFileStageRoot>
+    <SingleFilePayloadDir>$(SingleFileStageRoot)payload</SingleFilePayloadDir>
+    <SingleFileReportPath>$(SingleFileStageRoot)pack-report.txt</SingleFileReportPath>
+    <SingleFileOutput>$(SingleFileReleaseDir)\BetterTranslator.exe</SingleFileOutput>
+
+    <BootstrapProject>$(RepositoryRoot)native\BetterTranslator.Bootstrap\BetterTranslator.Bootstrap.vcxproj</BootstrapProject>
+    <BootstrapBinary>$(RepositoryRoot)native\BetterTranslator.Bootstrap\bin\$(SingleFileConfiguration)\$(SingleFilePlatform)\BetterTranslator.Bootstrap.exe</BootstrapBinary>
+    <PackerProject>$(RepositoryRoot)tools\BetterTranslator.Packer\BetterTranslator.Packer.csproj</PackerProject>
+    <PackerBinary>$(RepositoryRoot)tools\BetterTranslator.Packer\bin\$(SingleFileConfiguration)\net10.0\BetterTranslator.Packer.dll</PackerBinary>
+
+    <AppProject>$(RepositoryRoot)src\BetterTranslator.App\BetterTranslator.App.csproj</AppProject>
+    <CliProject>$(RepositoryRoot)src\BetterTranslator.Cli\BetterTranslator.Cli.csproj</CliProject>
+
+    <SingleFileSignToolPath Condition="'$(SingleFileSignToolPath)' == ''">signtool.exe</SingleFileSignToolPath>
+    <SingleFileTimestampUrl Condition="'$(SingleFileTimestampUrl)' == ''">http://timestamp.digicert.com</SingleFileTimestampUrl>
+  </PropertyGroup>
+
+  <Target Name="LocateNativeToolchain">
+    <PropertyGroup>
+      <VsWherePath>$(MSBuildProgramFiles32)\Microsoft Visual Studio\Installer\vswhere.exe</VsWherePath>
+    </PropertyGroup>
+
+    <Error Condition="!Exists('$(VsWherePath)')"
+           Text="vswhere.exe was not found. Install Visual Studio with the Desktop development with C++ workload; the bootstrap is a .vcxproj and needs MSBuild.exe from that install." />
+
+    <Exec Command="&quot;$(VsWherePath)&quot; -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath"
+          ConsoleToMSBuild="true"
+          StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="VisualStudioInstall" />
+    </Exec>
+
+    <PropertyGroup>
+      <NativeMSBuild>$(VisualStudioInstall)\MSBuild\Current\Bin\MSBuild.exe</NativeMSBuild>
+    </PropertyGroup>
+
+    <Error Condition="!Exists('$(NativeMSBuild)')"
+           Text="MSBuild.exe was not found under '$(VisualStudioInstall)'. The C++ toolchain is required to build the bootstrap." />
+  </Target>
+
+  <Target Name="BuildBootstrap" DependsOnTargets="LocateNativeToolchain">
+    <Exec Command="&quot;$(NativeMSBuild)&quot; &quot;$(BootstrapProject)&quot; -nologo -v:minimal -nodeReuse:false -p:Configuration=$(SingleFileConfiguration) -p:Platform=$(SingleFilePlatform)" />
+
+    <Error Condition="!Exists('$(BootstrapBinary)')"
+           Text="The bootstrap build reported success but $(BootstrapBinary) is not there." />
+  </Target>
+
+  <Target Name="BuildPacker">
+    <Exec Command="dotnet build &quot;$(PackerProject)&quot; -c $(SingleFileConfiguration) --nologo -nodeReuse:false" />
+    <Error Condition="!Exists('$(PackerBinary)')" Text="The packer build produced no $(PackerBinary)." />
+  </Target>
+
+  <Target Name="PublishSingleFilePayload">
+    <RemoveDir Directories="$(SingleFilePayloadDir)" />
+
+    <Exec Command="dotnet publish &quot;$(CliProject)&quot; -c $(SingleFileConfiguration) -r $(SingleFileRuntimeIdentifier) --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishDir=bin/$(SingleFileConfiguration)/net10.0/$(SingleFileRuntimeIdentifier)/publish/ --nologo -nodeReuse:false" />
+
+    <Exec Command="dotnet publish &quot;$(AppProject)&quot; -c $(SingleFileConfiguration) -r $(SingleFileRuntimeIdentifier) --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:PublishReadyToRun=false -p:PublishDir=&quot;$(SingleFilePayloadDir)\\&quot; --nologo -nodeReuse:false" />
+
+    <Error Condition="!Exists('$(SingleFilePayloadDir)\BetterTranslator.dll')"
+           Text="The payload publish produced no managed entry assembly at $(SingleFilePayloadDir)\BetterTranslator.dll." />
+    <Error Condition="!Exists('$(SingleFilePayloadDir)\hostfxr.dll')"
+           Text="The payload publish is not self-contained: hostfxr.dll is missing from $(SingleFilePayloadDir)." />
+  </Target>
+
+  <Target Name="PackSingleFile" DependsOnTargets="BuildBootstrap;BuildPacker;PublishSingleFilePayload">
+    <RemoveDir Directories="$(SingleFileReleaseDir)" />
+    <MakeDir Directories="$(SingleFileReleaseDir)" />
+
+    <Exec Command="dotnet &quot;$(PackerBinary)&quot; pack --payload &quot;$(SingleFilePayloadDir)&quot; --bootstrap &quot;$(BootstrapBinary)&quot; --output &quot;$(SingleFileOutput)&quot; --algorithm $(SingleFileAlgorithm) --exclude &quot;$(SingleFileExclude)&quot; --report &quot;$(SingleFileReportPath)&quot;" />
+
+    <Error Condition="!Exists('$(SingleFileOutput)')" Text="The packer produced no $(SingleFileOutput)." />
+  </Target>
+
+  <Target Name="SignSingleFile"
+          Condition="'$(SingleFileCertificateThumbprint)' != '' or '$(SingleFileCertificatePath)' != ''">
+    <PropertyGroup>
+      <SignToolSelector Condition="'$(SingleFileCertificateThumbprint)' != ''">/sha1 $(SingleFileCertificateThumbprint)</SignToolSelector>
+      <SignToolSelector Condition="'$(SingleFileCertificatePath)' != ''">/f "$(SingleFileCertificatePath)"</SignToolSelector>
+      <SignToolPassword Condition="'$(SingleFileCertificatePassword)' != ''">/p "$(SingleFileCertificatePassword)"</SignToolPassword>
+    </PropertyGroup>
+
+    <Exec Command="&quot;$(SingleFileSignToolPath)&quot; sign $(SignToolSelector) $(SignToolPassword) /fd SHA256 /tr $(SingleFileTimestampUrl) /td SHA256 &quot;$(SingleFileOutput)&quot;" />
+  </Target>
+
+  <Target Name="VerifySingleFile" Condition="'$(SingleFileSkipSelfTest)' != 'true'">
+    <Exec Command="start &quot;&quot; /b /wait &quot;$(SingleFileOutput)&quot; --bt-selftest" />
+  </Target>
+
+  <Target Name="SingleFile" DependsOnTargets="PackSingleFile;SignSingleFile;VerifySingleFile" />
+
+</Project>

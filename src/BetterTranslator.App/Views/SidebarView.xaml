@@ -1,0 +1,171 @@
+<UserControl x:Class="BetterTranslator.App.Views.SidebarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:BetterTranslator.App.Controls"
+             Background="{StaticResource BrushSurfaceMuted}">
+
+    <Grid Margin="0,10,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- New chat, with the search field sweeping over it -->
+        <Grid Grid.Row="0" Margin="12,0,12,0" Height="{StaticResource ChromeButtonSize}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid x:Name="SweepHost" Grid.Column="0" Margin="0,0,8,0">
+                <!-- Padding 10 and a gap of 8, which is what the reference sets
+                     on this button; the shared 14 sat the plus too far in. -->
+                <Button Style="{StaticResource SecondaryButton}"
+                        Command="{Binding NewChatCommand}"
+                        HorizontalContentAlignment="Left"
+                        Padding="10,0,10,0"
+                        Height="{StaticResource ChromeButtonSize}"
+                        AutomationProperties.Name="New chat">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:IconView Definition="{StaticResource IconPlus}"
+                                           VerticalAlignment="Center" />
+                        <TextBlock Text="New chat"
+                                   Style="{StaticResource TextDefault}"
+                                   VerticalAlignment="Center"
+                                   Margin="8,0,0,0" />
+                    </StackPanel>
+                </Button>
+
+                <!-- The sweep: a clipping container whose width animates over
+                     320 with EaseStandard, wiping the field across the button. -->
+                <Border x:Name="SearchSweep"
+                        ClipToBounds="True"
+                        HorizontalAlignment="Right"
+                        Width="0"
+                        Background="{StaticResource BrushSurfaceMuted}">
+                    <Grid x:Name="SearchFieldHost" Width="{Binding ActualWidth, ElementName=SweepHost}">
+                        <TextBox x:Name="SearchField"
+                                 Style="{StaticResource TextField}"
+                                 Height="{StaticResource ChromeButtonSize}"
+                                 Padding="10,0,10,0"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                 AutomationProperties.Name="Search chats, words..."
+                                 KeyDown="OnSearchKeyDown" />
+                        <!-- 11, not 10: the field's own text sits inside its
+                             1 border and then its 10 of padding, and the
+                             placeholder has to land on the same pixel. -->
+                        <TextBlock Text="Search chats, words..."
+                                   Style="{StaticResource PlaceholderText}"
+                                   Margin="11,0,0,0"
+                                   Visibility="{Binding SearchText, Converter={StaticResource StringEmptyToVisibility}}" />
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <controls:ChromeButton x:Name="SearchToggle"
+                                   Grid.Column="1"
+                                   Icon="{StaticResource IconSearch}"
+                                   Command="{Binding ToggleSearchCommand}"
+                                   ToolTip="Search chats"
+                                   AutomationProperties.Name="Search chats" />
+        </Grid>
+
+        <!-- Empty state -->
+        <TextBlock Grid.Row="1"
+                   Text="No chats yet. Your first translation starts one."
+                   Style="{StaticResource TextSecondary}"
+                   Foreground="{StaticResource BrushTextSecondary}"
+                   TextWrapping="Wrap"
+                   Margin="16,14,16,0"
+                   Visibility="{Binding HasChats, Converter={StaticResource InverseBoolToVisibility}}" />
+
+        <!-- Each section scrolls itself rather than sharing one scroller. A
+             list only virtualizes when it owns its scroll viewer: inside a
+             stack panel it is measured with infinite height and every chat row
+             is realized. Pinned is bounded so it cannot push Chats off. -->
+        <Grid Grid.Row="2"
+              Margin="0,10,0,0"
+              Visibility="{Binding HasChats, Converter={StaticResource BoolToVisibility}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+                <!-- Pinned -->
+                <StackPanel Grid.Row="0" Visibility="{Binding HasPinned, Converter={StaticResource BoolToVisibility}}">
+                    <Button Style="{StaticResource ToolbarChromeButton}"
+                            Command="{Binding TogglePinnedSectionCommand}"
+                            HorizontalContentAlignment="Left"
+                            Margin="10,0,10,0"
+                            AutomationProperties.Name="Pinned">
+                        <StackPanel Orientation="Horizontal">
+                            <controls:IconView Definition="{StaticResource IconChevronDown}"
+                                               Foreground="{StaticResource BrushTextTertiary}"
+                                               VerticalAlignment="Center"
+                                               RenderTransformOrigin="0.5,0.5" />
+                            <TextBlock Text="PINNED"
+                                       Style="{StaticResource TextMeta}"
+                                       Foreground="{StaticResource BrushTextTertiary}"
+                                       VerticalAlignment="Center"
+                                       Margin="4,0,0,0" />
+                            <TextBlock Text="{Binding PinnedCount}"
+                                       Style="{StaticResource TextMicro}"
+                                       Foreground="{StaticResource BrushTextMuted}"
+                                       VerticalAlignment="Center"
+                                       Margin="6,0,0,0"
+                                       Visibility="{Binding IsPinnedSectionExpanded, Converter={StaticResource InverseBoolToVisibility}}" />
+                        </StackPanel>
+                    </Button>
+
+                    <ListBox ItemsSource="{Binding PinnedView}"
+                             SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+                             Style="{StaticResource ChatRowList}"
+                             MaxHeight="{StaticResource PinnedSectionMaxHeight}"
+                             Visibility="{Binding IsPinnedSectionExpanded, Converter={StaticResource BoolToVisibility}}" />
+                </StackPanel>
+
+                <!-- Ruled off from Pinned above it, so the two sections read as
+                     separate lists rather than one run of rows. Only when there
+                     is a Pinned section to be separated from. -->
+                <Border BorderBrush="{StaticResource BrushBorderSoft}"
+                        BorderThickness="0,1,0,0"
+                        Margin="12,8,12,8"
+                        Grid.Row="1"
+                        Visibility="{Binding HasPinned, Converter={StaticResource BoolToVisibility}}" />
+
+                <!-- Chats -->
+                <Button Grid.Row="2"
+                        Style="{StaticResource ToolbarChromeButton}"
+                        Command="{Binding ToggleChatsSectionCommand}"
+                        HorizontalContentAlignment="Left"
+                        Margin="10,4,10,0"
+                        AutomationProperties.Name="Chats">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:IconView Definition="{StaticResource IconChevronDown}"
+                                           Foreground="{StaticResource BrushTextTertiary}"
+                                           VerticalAlignment="Center" />
+                        <TextBlock Text="CHATS"
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextTertiary}"
+                                   VerticalAlignment="Center"
+                                   Margin="4,0,0,0" />
+                        <TextBlock Text="{Binding ChatsCount}"
+                                   Style="{StaticResource TextMicro}"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   VerticalAlignment="Center"
+                                   Margin="6,0,0,0"
+                                   Visibility="{Binding IsChatsSectionExpanded, Converter={StaticResource InverseBoolToVisibility}}" />
+                    </StackPanel>
+                </Button>
+
+                <ListBox Grid.Row="3"
+                         ItemsSource="{Binding ChatsView}"
+                         SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+                         Style="{StaticResource ChatRowList}"
+                         Visibility="{Binding IsChatsSectionExpanded, Converter={StaticResource BoolToVisibility}}" />
+        </Grid>
+    </Grid>
+</UserControl>

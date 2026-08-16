@@ -1,0 +1,107 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- The Windows 10 platform version is pinned because SkiaSharp.Views.WPF
+         only ships .NET 10 assets under net10.0-windows10.0.19041; plain
+         net10.0-windows falls back to its .NET Framework assets and drags in
+         OpenTK. It matches the supportedOS range in app.manifest. -->
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>BetterTranslator.App</RootNamespace>
+    <AssemblyName>BetterTranslator</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\app-icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\app-icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="ModelContextProtocol" Version="2.1.0" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.1.0" />
+    <PackageReference Include="SkiaSharp.Views.WPF" Version="4.151.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <!-- bt travels with the app, in a folder of its own, so the Agent screen can
+       render a registration command pointing at a file that is really there.
+       An agent told to run a bare "bt" reports "connection closed" on every
+       machine where it is not on PATH, which is most of them. -->
+  <Target Name="CopyCommandLineBeside" AfterTargets="Build">
+    <ItemGroup>
+      <CommandLineFiles Include="$(MSBuildThisFileDirectory)..\BetterTranslator.Cli\bin\$(Configuration)\net10.0\**\*.*"
+                        Exclude="$(MSBuildThisFileDirectory)..\BetterTranslator.Cli\bin\$(Configuration)\net10.0\win-x64\**\*.*" />
+    </ItemGroup>
+    <!-- A running agent server holds these files open, and an agent server is
+         running whenever someone has this application registered with a client.
+         That must not be a build failure: the copy exists so the folder is
+         current, and a locked file is one that is already there. It warns and
+         the build goes on; the publish copy below is the one that must not be
+         skipped, and build.ps1 fails if the published cli is missing. -->
+    <Copy SourceFiles="@(CommandLineFiles)"
+          DestinationFolder="$(OutDir)cli\%(RecursiveDir)"
+          SkipUnchangedFiles="true"
+          ContinueOnError="WarnAndContinue"
+          Retries="0"
+          Condition="'@(CommandLineFiles)' != ''" />
+  </Target>
+
+  <!-- The build output above is framework-dependent, which is wrong beside a
+       self-contained app: the machine it ships to has no runtime to resolve it
+       against. The published bt is preferred when it is there, and it is a
+       single file, so publish the command line before the app. -->
+  <Target Name="CopyCommandLineBesidePublish" AfterTargets="Publish">
+    <PropertyGroup>
+      <CommandLineOutput>$(MSBuildThisFileDirectory)..\BetterTranslator.Cli\bin\$(Configuration)\net10.0\</CommandLineOutput>
+      <CommandLineSource Condition="Exists('$(CommandLineOutput)win-x64\publish\bt.exe')">$(CommandLineOutput)win-x64\publish\</CommandLineSource>
+      <CommandLineSource Condition="'$(CommandLineSource)' == ''">$(CommandLineOutput)</CommandLineSource>
+    </PropertyGroup>
+    <ItemGroup>
+      <PublishedCommandLine Include="$(CommandLineSource)**\*.*"
+                            Exclude="$(CommandLineSource)win-x64\**\*.*;$(CommandLineSource)**\*.pdb" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PublishedCommandLine)"
+          DestinationFolder="$(PublishDir)cli\%(RecursiveDir)"
+          SkipUnchangedFiles="true"
+          Condition="'@(PublishedCommandLine)' != ''" />
+  </Target>
+
+  <ItemGroup>
+    <!-- The loading placeholder derives its geometry from the source length.
+         That arithmetic is asserted directly, because it is the part that can
+         be wrong without looking wrong on screen. -->
+    <InternalsVisibleTo Include="BetterTranslator.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BetterTranslator.Core\BetterTranslator.Core.csproj" />
+    <ProjectReference Include="..\BetterTranslator.Indexing\BetterTranslator.Indexing.csproj" />
+    <ProjectReference Include="..\BetterTranslator.Map\BetterTranslator.Map.csproj" />
+    <ProjectReference Include="..\BetterTranslator.Runtime\BetterTranslator.Runtime.csproj" />
+    <ProjectReference Include="..\BetterTranslator.Engine\BetterTranslator.Engine.csproj" />
+
+    <!-- The inference host is a sibling executable the app starts, not a library
+         it calls, so its assembly is not referenced. It still has to land beside
+         BetterTranslator.exe: LocalTranslator looks for it there and quietly
+         falls back to in-process inference when it is missing, which would turn
+         a packaging slip into the crash this exists to prevent. -->
+    <ProjectReference Include="..\BetterTranslator.Host\BetterTranslator.Host.csproj"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Content"
+                      CopyToOutputDirectory="PreserveNewest" />
+
+    <!-- Built before the app so the copy below always has something to take,
+         but not copied flat: bt resolves its own dependency closure from its
+         own folder, and this one is missing the assemblies the app gets from
+         the ASP.NET shared framework. -->
+    <ProjectReference Include="..\BetterTranslator.Cli\BetterTranslator.Cli.csproj"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>

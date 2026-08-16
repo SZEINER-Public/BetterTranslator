@@ -1,0 +1,397 @@
+﻿{
+    "_about":  [
+                   "The target languages: canonical code, English name, endonym, script and text direction.",
+                   "",
+                   "51 rows, and the only list of languages in the tree. What a given model can actually do",
+                   "with them is not here: per model support is a set of references into these codes, each",
+                   "carrying the source it was read from, in model-languages.json. The flag or code badge a",
+                   "row is drawn with is a second explicit table, language-assets.json, so nothing anywhere",
+                   "derives artwork from a code.",
+                   "",
+                   "\u0027script\u0027 is the ISO 15924 code for the writing system, which is why zh-CN and zh-TW are",
+                   "Hans and Hant rather than one Chinese.",
+                   "",
+                   "\u0027dir\u0027 is rtl for Arabic, Persian, Hebrew and Urdu. Nothing in the engine reorders text",
+                   "for them; it is carried so a host can set dir= on its output.",
+                   "",
+                   "\u0027alias\u0027 exists for codes that are commonly written wrong. Ukrainian is uk in ISO 639-1;",
+                   "ua is the country code, and i18n tooling that expects uk will not find a ua file."
+               ],
+    "languages":  [
+                      {
+                          "code":  "sq",
+                          "name":  "Albanian",
+                          "native":  "Shqip",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "ar",
+                          "name":  "Arabic",
+                          "native":  "العربية",
+                          "script":  "Arab",
+                          "dir":  "rtl"
+                      },
+                      {
+                          "code":  "hy",
+                          "name":  "Armenian",
+                          "native":  "Հայերեն",
+                          "script":  "Armn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "az",
+                          "name":  "Azerbaijani",
+                          "native":  "Azərbaycanca",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "id",
+                          "name":  "Indonesian",
+                          "native":  "Bahasa Indonesia",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "ms",
+                          "name":  "Malay",
+                          "native":  "Bahasa Melayu",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "bn",
+                          "name":  "Bengali",
+                          "native":  "বাংলা",
+                          "script":  "Beng",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "bg",
+                          "name":  "Bulgarian",
+                          "native":  "Български",
+                          "script":  "Cyrl",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "cs",
+                          "name":  "Czech",
+                          "native":  "Čeština",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "da",
+                          "name":  "Danish",
+                          "native":  "Dansk",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "de",
+                          "name":  "German",
+                          "native":  "Deutsch",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "el",
+                          "name":  "Greek",
+                          "native":  "Ελληνικά",
+                          "script":  "Grek",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "en",
+                          "name":  "English",
+                          "native":  "English",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "es",
+                          "name":  "Spanish",
+                          "native":  "Español",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "fa",
+                          "name":  "Persian",
+                          "native":  "فارسی",
+                          "script":  "Arab",
+                          "dir":  "rtl"
+                      },
+                      {
+                          "code":  "fil",
+                          "name":  "Filipino",
+                          "native":  "Filipino",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "fr",
+                          "name":  "French",
+                          "native":  "Français",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "he",
+                          "name":  "Hebrew",
+                          "native":  "עברית",
+                          "script":  "Hebr",
+                          "dir":  "rtl"
+                      },
+                      {
+                          "code":  "hi",
+                          "name":  "Hindi",
+                          "native":  "हिन्दी",
+                          "script":  "Deva",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "hr",
+                          "name":  "Croatian",
+                          "native":  "Hrvatski",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "hu",
+                          "name":  "Hungarian",
+                          "native":  "Magyar",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "it",
+                          "name":  "Italian",
+                          "native":  "Italiano",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "ja",
+                          "name":  "Japanese",
+                          "native":  "日本語",
+                          "script":  "Jpan",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "kk",
+                          "name":  "Kazakh",
+                          "native":  "Қазақша",
+                          "script":  "Cyrl",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "ko",
+                          "name":  "Korean",
+                          "native":  "한국어",
+                          "script":  "Kore",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "nb",
+                          "name":  "Norwegian",
+                          "native":  "Norsk bokmål",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "nl",
+                          "name":  "Dutch",
+                          "native":  "Nederlands",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "pl",
+                          "name":  "Polish",
+                          "native":  "Polski",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "pt",
+                          "name":  "Portuguese",
+                          "native":  "Português",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "ro",
+                          "name":  "Romanian",
+                          "native":  "Română",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "ru",
+                          "name":  "Russian",
+                          "native":  "Русский",
+                          "script":  "Cyrl",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "sk",
+                          "name":  "Slovak",
+                          "native":  "Slovenčina",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "sr",
+                          "name":  "Serbian",
+                          "native":  "Српски",
+                          "script":  "Cyrl",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "sv",
+                          "name":  "Swedish",
+                          "native":  "Svenska",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "sw",
+                          "name":  "Swahili",
+                          "native":  "Kiswahili",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "th",
+                          "name":  "Thai",
+                          "native":  "ไทย",
+                          "script":  "Thai",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "tr",
+                          "name":  "Turkish",
+                          "native":  "Türkçe",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "uk",
+                          "name":  "Ukrainian",
+                          "native":  "Українська",
+                          "script":  "Cyrl",
+                          "dir":  "ltr",
+                          "alias":  [
+                                        "ua"
+                                    ]
+                      },
+                      {
+                          "code":  "ur",
+                          "name":  "Urdu",
+                          "native":  "اردو",
+                          "script":  "Arab",
+                          "dir":  "rtl"
+                      },
+                      {
+                          "code":  "vi",
+                          "name":  "Vietnamese",
+                          "native":  "Tiếng Việt",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "zh-CN",
+                          "name":  "Chinese (Simplified)",
+                          "native":  "简体中文",
+                          "script":  "Hans",
+                          "dir":  "ltr",
+                          "alias":  [
+                                        "zh",
+                                        "zh-Hans"
+                                    ]
+                      },
+                      {
+                          "code":  "zh-TW",
+                          "name":  "Chinese (Traditional)",
+                          "native":  "繁體中文",
+                          "script":  "Hant",
+                          "dir":  "ltr",
+                          "alias":  [
+                                        "zh-Hant"
+                                    ]
+                      },
+                      {
+                          "code":  "fi",
+                          "name":  "Finnish",
+                          "native":  "Suomi",
+                          "script":  "Latn",
+                          "dir":  "ltr"
+                      },
+                      {
+                          "code":  "et",
+                          "name":  "Estonian",
+                          "native":  "Eesti",
+                          "script":  "Latn",
+                          "dir":  "ltr",
+                          "note":  "EuroLLM supports this; not in the original target list"
+                      },
+                      {
+                          "code":  "ga",
+                          "name":  "Irish",
+                          "native":  "Gaeilge",
+                          "script":  "Latn",
+                          "dir":  "ltr",
+                          "note":  "EuroLLM supports this; not in the original target list"
+                      },
+                      {
+                          "code":  "lv",
+                          "name":  "Latvian",
+                          "native":  "Latviešu",
+                          "script":  "Latn",
+                          "dir":  "ltr",
+                          "note":  "EuroLLM supports this; not in the original target list"
+                      },
+                      {
+                          "code":  "lt",
+                          "name":  "Lithuanian",
+                          "native":  "Lietuvių",
+                          "script":  "Latn",
+                          "dir":  "ltr",
+                          "note":  "EuroLLM supports this; not in the original target list"
+                      },
+                      {
+                          "code":  "mt",
+                          "name":  "Maltese",
+                          "native":  "Malti",
+                          "script":  "Latn",
+                          "dir":  "ltr",
+                          "note":  "EuroLLM supports this; not in the original target list"
+                      },
+                      {
+                          "code":  "sl",
+                          "name":  "Slovenian",
+                          "native":  "Slovenščina",
+                          "script":  "Latn",
+                          "dir":  "ltr",
+                          "note":  "EuroLLM supports this; not in the original target list"
+                      },
+                      {
+                          "code":  "ca",
+                          "name":  "Catalan",
+                          "native":  "Català",
+                          "script":  "Latn",
+                          "dir":  "ltr",
+                          "note":  "EuroLLM supports this; not in the original target list"
+                      },
+                      {
+                          "code":  "gl",
+                          "name":  "Galician",
+                          "native":  "Galego",
+                          "script":  "Latn",
+                          "dir":  "ltr",
+                          "note":  "EuroLLM supports this; not in the original target list"
+                      }
+                  ]
+}
