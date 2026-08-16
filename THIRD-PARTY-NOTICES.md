@@ -8,21 +8,37 @@ Every row was read from the `.nuspec` of the exact restored package version, or 
 file the package carries when its nuspec declares one by file rather than by expression. Nothing
 here is quoted from memory.
 
-## Needs attention before you rely on this file
+## Hunspell notice
 
-`WeCantSpell.Hunspell` 7.0.1 does not declare a license expression. It ships a `license.txt` that
-reads:
+`WeCantSpell.Hunspell` is a C# port of Hunspell and carries Hunspell's own tri-license. Its
+`license.txt` states `Version: MPL 1.1/GPL 2.0/LGPL 2.1`, with the Mozilla Public License 1.1
+governing and the GPL and LGPL offered as alternatives a recipient may elect instead:
 
-> Version: MPL 1.1/GPL 2.0/LGPL 2.1
->
-> Note that this license is inherited from the original Hunspell project as this is derived from
-> that work.
+> Alternatively, the contents of this file may be used under the terms of either the GNU General
+> Public License Version 2 or later (the "GPL"), or the GNU Lesser General Public License Version
+> 2.1 or later (the "LGPL"), in which case the provisions of the GPL or the LGPL are applicable
+> instead.
 
-That is a copyleft family tri-license, not a permissive one, and the package is referenced by
-`BetterTranslator.Engine`, so it ships inside the application. A tri-license lets the distributor
-pick one of the three, and the obligations differ under each. This interacts with the single file
-self-contained executable, where the runtime and its dependencies are bundled rather than left as
-separate loadable files. Have this reviewed before publishing a binary.
+BetterTranslator does not elect the GPL or the LGPL. This software is distributed under the MPL 1.1
+terms of that tri-license, which permit combining the covered code with code under other terms in a
+Larger Work.
+
+The library is used unmodified. `src/BetterTranslator.Engine/Verification/Signals/LexicalSignals.cs`
+calls `WordList.CreateFromFiles` and `WordList.Check` and nothing else. No Hunspell source is
+altered, so there are no Modifications to publish under MPL 1.1 section 3.2.
+
+The license text is reproduced verbatim at
+[`third-party/WeCantSpell.Hunspell/LICENSE.txt`](third-party/WeCantSpell.Hunspell/LICENSE.txt).
+
+Source for the covered code:
+
+- Port: https://github.com/aarondandy/WeCantSpell.Hunspell
+- Original Hunspell: https://github.com/hunspell/hunspell
+
+Hunspell dictionaries are not distributed with BetterTranslator. The `.dic` and `.aff` pair is
+supplied by the person running it, and the dictionary folder is created empty on first run. Czech
+and other Hunspell dictionaries commonly carry their own licenses, frequently GPL or LGPL, and
+those terms would apply separately to anyone who chooses to bundle one.
 
 ## Shipped with the application
 
@@ -73,7 +89,7 @@ These are the 43 distinct packages in the restored dependency graph of `BetterTr
 | SkiaSharp.Views.Desktop.Common | 4.151.0 | MIT |
 | SkiaSharp.Views.WPF | 4.151.0 | MIT |
 | System.IO.Packaging | 10.0.2 | MIT |
-| WeCantSpell.Hunspell | 7.0.1 | MPL-1.1 / GPL-2.0 / LGPL-2.1 tri-license, in the package's `license.txt`. See the section above |
+| WeCantSpell.Hunspell | 7.0.1 | MPL-1.1, from the MPL-1.1 / GPL-2.0 / LGPL-2.1 tri-license in the package's `license.txt`. See the Hunspell notice above |
 
 Some of these carry prebuilt native binaries that are redistributed as they are, rather than
 compiled from source in this repository: `SkiaSharp.NativeAssets.Win32` and
