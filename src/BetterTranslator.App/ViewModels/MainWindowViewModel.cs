@@ -288,6 +288,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     public partial SettingsViewModel? Settings { get; set; }
 
+    public UpdatesViewModel Updates { get; } = new();
+
     /// <summary>
     /// The flavour this process actually loaded. Fixed at startup, and what the
     /// settings screen compares against to decide whether to ask for a restart.
@@ -306,7 +308,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
             ApplySettingsAsync,
             () => Settings = null,
             ReloadAfterDeletionAsync,
-            OpenDownloads);
+            OpenDownloads)
+        {
+            Updates = Updates,
+        };
 
         settings.RunningBackend = RunningBackend;
 
@@ -626,6 +631,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             FirstRun = Installer();
         }
+
+        await Updates.LoadAsync(cancellationToken).ConfigureAwait(true);
+
+        _ = Updates.WatchAsync(cancellationToken);
     }
 
     /// <summary>

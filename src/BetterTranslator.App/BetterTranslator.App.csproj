@@ -81,6 +81,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BetterTranslator.Core\BetterTranslator.Core.csproj" />
+    <ProjectReference Include="..\BetterTranslator.Updates\BetterTranslator.Updates.csproj" />
     <ProjectReference Include="..\BetterTranslator.Indexing\BetterTranslator.Indexing.csproj" />
     <ProjectReference Include="..\BetterTranslator.Map\BetterTranslator.Map.csproj" />
     <ProjectReference Include="..\BetterTranslator.Runtime\BetterTranslator.Runtime.csproj" />
@@ -102,6 +103,38 @@
          the ASP.NET shared framework. -->
     <ProjectReference Include="..\BetterTranslator.Cli\BetterTranslator.Cli.csproj"
                       ReferenceOutputAssembly="false" />
+
+    <ProjectReference Include="..\BetterTranslator.UpdateService\BetterTranslator.UpdateService.csproj"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
+
+  <Target Name="CopyUpdaterBeside" AfterTargets="Build">
+    <ItemGroup>
+      <UpdaterFiles Include="$(MSBuildThisFileDirectory)..\BetterTranslator.UpdateService\bin\$(Configuration)\net10.0-windows\**\*.*"
+                    Exclude="$(MSBuildThisFileDirectory)..\BetterTranslator.UpdateService\bin\$(Configuration)\net10.0-windows\win-x64\**\*.*;$(MSBuildThisFileDirectory)..\BetterTranslator.UpdateService\bin\$(Configuration)\net10.0-windows\**\*.pdb" />
+    </ItemGroup>
+    <Copy SourceFiles="@(UpdaterFiles)"
+          DestinationFolder="$(OutDir)updater\%(RecursiveDir)"
+          SkipUnchangedFiles="true"
+          ContinueOnError="WarnAndContinue"
+          Retries="0"
+          Condition="'@(UpdaterFiles)' != ''" />
+  </Target>
+
+  <Target Name="CopyUpdaterBesidePublish" AfterTargets="Publish">
+    <PropertyGroup>
+      <UpdaterOutput>$(MSBuildThisFileDirectory)..\BetterTranslator.UpdateService\bin\$(Configuration)\net10.0-windows\</UpdaterOutput>
+      <UpdaterSource Condition="Exists('$(UpdaterOutput)win-x64\publish\BetterTranslatorUpdater.exe')">$(UpdaterOutput)win-x64\publish\</UpdaterSource>
+      <UpdaterSource Condition="'$(UpdaterSource)' == ''">$(UpdaterOutput)</UpdaterSource>
+    </PropertyGroup>
+    <ItemGroup>
+      <PublishedUpdater Include="$(UpdaterSource)**\*.*"
+                        Exclude="$(UpdaterSource)win-x64\**\*.*;$(UpdaterSource)**\*.pdb" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PublishedUpdater)"
+          DestinationFolder="$(PublishDir)updater\%(RecursiveDir)"
+          SkipUnchangedFiles="true"
+          Condition="'@(PublishedUpdater)' != ''" />
+  </Target>
 
 </Project>

@@ -18,6 +18,7 @@ public enum SettingsTab
     Downloads,
     Agent,
     Config,
+    Updates,
 }
 
 /// <summary>
@@ -399,6 +400,13 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     public bool IsAgentTab => Tab == SettingsTab.Agent;
 
+    public bool IsUpdatesTab => Tab == SettingsTab.Updates;
+
+    public UpdatesViewModel Updates { get; init; } = new();
+
+    [RelayCommand]
+    private void ShowUpdates() => Tab = SettingsTab.Updates;
+
     [ObservableProperty]
     public partial bool McpEnabled { get; set; }
 
@@ -626,6 +634,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         _loading = false;
 
         await RefreshDataAsync(cancellationToken).ConfigureAwait(true);
+        await Updates.LoadAsync(cancellationToken).ConfigureAwait(true);
     }
 
     /// <summary>Re-reads sizes from disk. Called after every delete.</summary>
@@ -1147,6 +1156,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         OnPropertyChanged(nameof(IsConfigTab));
         OnPropertyChanged(nameof(IsDownloadsTab));
         OnPropertyChanged(nameof(IsAgentTab));
+        OnPropertyChanged(nameof(IsUpdatesTab));
     }
 
     partial void OnSelectedBackendChanged(RuntimeBackend value)

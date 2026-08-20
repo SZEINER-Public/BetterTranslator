@@ -1,0 +1,22 @@
+{
+  "tag_name": "v1.0.1",
+  "target_commitish": "b7d41c9e2f3a5061728394a5b6c7d8e9f0a1b2c3",
+  "name": "BetterTranslator 1.0.1",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-08-18T07:15:00Z",
+  "assets": [
+    {
+      "name": "BetterTranslator.exe",
+      "state": "uploaded",
+      "size": 105630000,
+      "browser_download_url": "https://github.com/SZEINER-Public/BetterTranslator/releases/download/v1.0.1/BetterTranslator.exe"
+    },
+    {
+      "name": "checksums.txt",
+      "state": "uploaded",
+      "size": 92,
+      "browser_download_url": "https://github.com/SZEINER-Public/BetterTranslator/releases/download/v1.0.1/checksums.txt"
+    }
+  ]
+}

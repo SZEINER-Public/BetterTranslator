@@ -29,6 +29,7 @@
 
     <AppProject>$(RepositoryRoot)src\BetterTranslator.App\BetterTranslator.App.csproj</AppProject>
     <CliProject>$(RepositoryRoot)src\BetterTranslator.Cli\BetterTranslator.Cli.csproj</CliProject>
+    <UpdaterProject>$(RepositoryRoot)src\BetterTranslator.UpdateService\BetterTranslator.UpdateService.csproj</UpdaterProject>
 
     <SingleFileSignToolPath Condition="'$(SingleFileSignToolPath)' == ''">signtool.exe</SingleFileSignToolPath>
     <SingleFileTimestampUrl Condition="'$(SingleFileTimestampUrl)' == ''">http://timestamp.digicert.com</SingleFileTimestampUrl>
@@ -72,6 +73,8 @@
     <RemoveDir Directories="$(SingleFilePayloadDir)" />
 
     <Exec Command="dotnet publish &quot;$(CliProject)&quot; -c $(SingleFileConfiguration) -r $(SingleFileRuntimeIdentifier) --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishDir=bin/$(SingleFileConfiguration)/net10.0/$(SingleFileRuntimeIdentifier)/publish/ --nologo -nodeReuse:false" />
+
+    <Exec Command="dotnet publish &quot;$(UpdaterProject)&quot; -c $(SingleFileConfiguration) -r $(SingleFileRuntimeIdentifier) --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishDir=bin/$(SingleFileConfiguration)/net10.0-windows/$(SingleFileRuntimeIdentifier)/publish/ --nologo -nodeReuse:false" />
 
     <Exec Command="dotnet publish &quot;$(AppProject)&quot; -c $(SingleFileConfiguration) -r $(SingleFileRuntimeIdentifier) --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:PublishReadyToRun=false -p:PublishDir=&quot;$(SingleFilePayloadDir)\\&quot; --nologo -nodeReuse:false" />
 

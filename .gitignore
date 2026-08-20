@@ -4,6 +4,7 @@
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+!src/BetterTranslator.Updates/Releases/
 [Oo]ut/
 bld/
 x64/

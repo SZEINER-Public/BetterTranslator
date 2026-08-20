@@ -75,6 +75,12 @@
                                    Style="{StaticResource TextSecondary}"
                                    VerticalAlignment="Center"
                                    Margin="{StaticResource TitlebarMarkGap}" />
+                        <TextBlock Text="{Binding Updates.InstalledVersion}"
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   VerticalAlignment="Center"
+                                   Margin="{StaticResource TitlebarMarkGap}"
+                                   AutomationProperties.Name="Installed version" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal">
@@ -1018,6 +1024,39 @@
                 </StackPanel>
             </Border>
         </Grid>
+
+        <Border HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="0,0,22,22"
+                MaxWidth="360"
+                Background="{StaticResource BrushSurface}"
+                BorderBrush="{StaticResource BrushBorder}"
+                BorderThickness="{StaticResource BorderThickness}"
+                CornerRadius="{StaticResource RadiusPanel}"
+                Padding="16,14,16,14"
+                DataContext="{Binding Updates}"
+                Visibility="{Binding ShowNotice, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+                <TextBlock Text="An update is ready" Style="{StaticResource TextCardTitle}" />
+                <TextBlock Text="It is downloaded and checked against its published checksum. Restarting saves your work first and reopens on the new build."
+                           Style="{StaticResource TextMeta}"
+                           Foreground="{StaticResource BrushTextSecondary}"
+                           TextWrapping="Wrap"
+                           Margin="0,4,0,0" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                    <Button Style="{StaticResource SecondaryButton}"
+                            Content="Later"
+                            Command="{Binding DismissCommand}"
+                            AutomationProperties.Name="Update later" />
+                    <Button Style="{StaticResource PrimaryButton}"
+                            Content="Restart now"
+                            Margin="8,0,0,0"
+                            IsEnabled="{Binding CanInteract}"
+                            Command="{Binding RestartCommand}"
+                            AutomationProperties.Name="Restart now to finish the update" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
 
         <!-- Resize grip, faded in while the pointer is over the window. -->
         <controls:IconView x:Name="ResizeGrip"

@@ -22,6 +22,9 @@
          default suite can compare without launching PowerShell. -->
     <None Include="Fixtures\TranslationAudit\*.md"
           CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Fixtures\Updates\*.json"
+          Link="Fixtures\Updates\%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\parity\**\*.json"
           Link="parity\%(RecursiveDir)%(Filename)%(Extension)"
           CopyToOutputDirectory="PreserveNewest" />
@@ -34,6 +37,7 @@
     <ProjectReference Include="..\..\src\BetterTranslator.Indexing\BetterTranslator.Indexing.csproj" />
     <ProjectReference Include="..\..\src\BetterTranslator.Map\BetterTranslator.Map.csproj" />
     <ProjectReference Include="..\..\src\BetterTranslator.Runtime\BetterTranslator.Runtime.csproj" />
+    <ProjectReference Include="..\..\src\BetterTranslator.Updates\BetterTranslator.Updates.csproj" />
     <ProjectReference Include="..\..\src\BetterTranslator.Engine\BetterTranslator.Engine.csproj" />
 
     <ProjectReference Include="..\..\tools\BetterTranslator.Packer\BetterTranslator.Packer.csproj" />
