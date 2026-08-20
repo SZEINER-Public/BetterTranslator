@@ -1037,8 +1037,8 @@
                 DataContext="{Binding Updates}"
                 Visibility="{Binding ShowNotice, Converter={StaticResource BoolToVisibility}}">
             <StackPanel>
-                <TextBlock Text="An update is ready" Style="{StaticResource TextCardTitle}" />
-                <TextBlock Text="It is downloaded and checked against its published checksum. Restarting saves your work first and reopens on the new build."
+                <TextBlock Text="{Binding NoticeTitle}" Style="{StaticResource TextCardTitle}" />
+                <TextBlock Text="{Binding NoticeDetail}"
                            Style="{StaticResource TextMeta}"
                            Foreground="{StaticResource BrushTextSecondary}"
                            TextWrapping="Wrap"
@@ -1049,9 +1049,17 @@
                             Command="{Binding DismissCommand}"
                             AutomationProperties.Name="Update later" />
                     <Button Style="{StaticResource PrimaryButton}"
+                            Content="Download"
+                            Margin="8,0,0,0"
+                            IsEnabled="{Binding CanInteract}"
+                            Visibility="{Binding CanDownload, Converter={StaticResource BoolToVisibility}}"
+                            Command="{Binding DownloadCommand}"
+                            AutomationProperties.Name="Download the update" />
+                    <Button Style="{StaticResource PrimaryButton}"
                             Content="Restart now"
                             Margin="8,0,0,0"
                             IsEnabled="{Binding CanInteract}"
+                            Visibility="{Binding UpdateReady, Converter={StaticResource BoolToVisibility}}"
                             Command="{Binding RestartCommand}"
                             AutomationProperties.Name="Restart now to finish the update" />
                 </StackPanel>

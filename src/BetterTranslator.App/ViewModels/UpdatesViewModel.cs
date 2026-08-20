@@ -1,5 +1,7 @@
 using BetterTranslator.App.Services;
 using BetterTranslator.Updates;
+using BetterTranslator.Updates.Install;
+using BetterTranslator.Updates.Logging;
 using BetterTranslator.Updates.Releases;
 using BetterTranslator.Updates.Service;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,6 +13,8 @@ public sealed partial class UpdatesViewModel : ObservableObject
 {
     private readonly IUpdaterHost _host;
 
+    private readonly IUpdateLog _log;
+
     private bool _syncing;
 
     private Task _pending = Task.CompletedTask;
@@ -18,13 +22,14 @@ public sealed partial class UpdatesViewModel : ObservableObject
     internal Task Pending => _pending;
 
     public UpdatesViewModel()
-        : this(new UpdaterGateway())
+        : this(new UpdaterGateway(), new RollingFileLog(UpdatePaths.ForCurrentUser().LogFolder, "updates.log"))
     {
     }
 
-    public UpdatesViewModel(IUpdaterHost host)
+    public UpdatesViewModel(IUpdaterHost host, IUpdateLog? log = null)
     {
         _host = host;
+        _log = log ?? NullUpdateLog.Instance;
         InstalledVersion = host.Installed.Version;
         InstalledLabel = Describe(host.Installed.Version, host.Installed.HasCommit ? host.Installed.Commit : string.Empty);
         Channel = host.Installed.Channel;
@@ -45,7 +50,8 @@ public sealed partial class UpdatesViewModel : ObservableObject
     public partial string LatestLabel { get; set; } = "Not checked yet.";
 
     [ObservableProperty]
-    public partial string CheckStatus { get; set; } = "Press Check for updates to ask GitHub for the latest release.";
+    public partial string CheckStatus { get; set; } =
+        "This build was checked against GitHub when the application started. Press Check for updates to ask again.";
 
     [ObservableProperty]
     public partial bool IsWorking { get; set; }
@@ -66,9 +72,21 @@ public sealed partial class UpdatesViewModel : ObservableObject
 
     public bool CanInteract => !IsWorking;
 
-    public bool ShowNotice => UpdateReady && !NoticeDismissed;
+    public bool ShowNotice => (UpdateReady || UpdateFound) && !NoticeDismissed;
 
     public bool CanDownload => UpdateFound && !UpdateReady && !IsWorking;
+
+    /// <summary>
+    /// The notice carries two states: a build already downloaded and waiting to
+    /// go in, and one that has only been seen on GitHub.
+    /// </summary>
+    public string NoticeTitle => UpdateReady ? "An update is ready" : "An update is available";
+
+    public string NoticeDetail => UpdateReady
+        ? "It is downloaded and checked against its published checksum. Restarting saves your work "
+          + "first and reopens on the new build."
+        : "It has not been downloaded yet. Taking it checks the download against the checksum "
+          + "published with the release before anything is replaced.";
 
     partial void OnIsWorkingChanged(bool value)
     {
@@ -80,9 +98,15 @@ public sealed partial class UpdatesViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(ShowNotice));
         OnPropertyChanged(nameof(CanDownload));
+        OnPropertyChanged(nameof(NoticeTitle));
+        OnPropertyChanged(nameof(NoticeDetail));
     }
 
-    partial void OnUpdateFoundChanged(bool value) => OnPropertyChanged(nameof(CanDownload));
+    partial void OnUpdateFoundChanged(bool value)
+    {
+        OnPropertyChanged(nameof(CanDownload));
+        OnPropertyChanged(nameof(ShowNotice));
+    }
 
     partial void OnNoticeDismissedChanged(bool value) => OnPropertyChanged(nameof(ShowNotice));
 
@@ -103,8 +127,15 @@ public sealed partial class UpdatesViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Asks GitHub once for this start, then keeps an eye on the service if one
+    /// is registered. Started without being awaited, because a start must not
+    /// wait on the network to put a window up.
+    /// </summary>
     public async Task WatchAsync(CancellationToken cancellationToken)
     {
+        await CheckOnStartAsync(cancellationToken).ConfigureAwait(true);
+
         if (_host.State() == ServiceState.NotInstalled)
         {
             return;
@@ -126,6 +157,54 @@ public sealed partial class UpdatesViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
+        }
+    }
+
+    /// <summary>
+    /// The check a start makes on its own. It reports nothing when it does not
+    /// finish: a machine that opened the application on a train has no use for a
+    /// banner saying GitHub could not be reached, and the Check for updates
+    /// button is there to say so on request.
+    /// </summary>
+    private async Task CheckOnStartAsync(CancellationToken cancellationToken)
+    {
+        if (IsWorking || UpdateReady)
+        {
+            return;
+        }
+
+        _log.Write("Asking GitHub for the latest release, because the application has just started.");
+
+        try
+        {
+            var status = await _host.CheckAsync(cancellationToken).ConfigureAwait(true);
+
+            _log.Write($"The start check answered {status.Outcome}. {status.Detail}");
+
+            if (status.Outcome == UpdateOutcome.CheckFailed)
+            {
+                return;
+            }
+
+            if (status.LatestVersion.Length > 0)
+            {
+                LatestLabel = Describe(status.LatestVersion, status.LatestCommit);
+            }
+
+            UpdateReady = status.Ready;
+            UpdateFound = status.Outcome == UpdateOutcome.UpdateAvailable && !status.Ready;
+
+            if (UpdateFound || UpdateReady)
+            {
+                CheckStatus = "An update is available. " + status.Detail;
+            }
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            // Reported to the log and nowhere else. A start with no connection
+            // has no use for a banner, but a check that fails every time and
+            // leaves no trace cannot be diagnosed on someone else's machine.
+            _log.Write("The check this start made did not finish", ex);
         }
     }
 

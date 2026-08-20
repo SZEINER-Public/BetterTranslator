@@ -180,9 +180,10 @@ public sealed class UpdateNotifications(
         new ShellRegistration(new UserRegistryStore(), new StartMenuShortcut(), executable).Remove();
     }
 
-    public static string UserLogFolder => System.IO.Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "BetterTranslator",
-        "updates",
-        "logs");
+    /// <summary>
+    /// Where anything running as the user rather than as the service logs.
+    /// Taken from <see cref="UpdatePaths.ForCurrentUser"/> so there is one such
+    /// folder rather than one per caller.
+    /// </summary>
+    public static string UserLogFolder => UpdatePaths.ForCurrentUser().LogFolder;
 }

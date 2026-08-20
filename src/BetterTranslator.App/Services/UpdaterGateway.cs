@@ -40,15 +40,36 @@ public sealed class UpdaterGateway : IUpdaterHost
     public const string UninstallVerb = "--uninstall-updater";
     public const string FinishVerb = "--finish-update";
 
+    /// <summary>The shared root the service owns. Read here, written by SYSTEM.</summary>
     private readonly UpdatePaths _paths;
+
+    /// <summary>This user's own root, the only one an unelevated download can write.</summary>
+    private readonly UpdatePaths _mine;
+
     private readonly UpdaterPipeClient _pipe = new();
 
     public UpdaterGateway()
-        : this(new UpdatePaths())
+        : this(new UpdatePaths(), UpdatePaths.ForCurrentUser())
     {
     }
 
-    public UpdaterGateway(UpdatePaths paths) => _paths = paths;
+    public UpdaterGateway(UpdatePaths paths)
+        : this(paths, paths)
+    {
+    }
+
+    public UpdaterGateway(UpdatePaths paths, UpdatePaths mine)
+    {
+        _paths = paths;
+        _mine = mine;
+    }
+
+    /// <summary>
+    /// A build the service staged is preferred: it was verified as SYSTEM in a
+    /// folder no standard user can write to.
+    /// </summary>
+    private StagedUpdate? StagedBuild() =>
+        new StagedUpdateStore(_paths.ReadyFile).Read() ?? new StagedUpdateStore(_mine.ReadyFile).Read();
 
     public BuildIdentity Installed => BuildIdentity.Current;
 
@@ -89,7 +110,9 @@ public sealed class UpdaterGateway : IUpdaterHost
 
         using var http = GitHubReleaseClient.CreateHttpClient();
 
-        var workflow = new UpdateWorkflow(new GitHubReleaseClient(http, _paths), http, _paths);
+        var log = new RollingFileLog(_mine.LogFolder, "updates.log");
+
+        var workflow = new UpdateWorkflow(new GitHubReleaseClient(http, _mine, log), http, _mine, log);
 
         return await workflow.CheckFetchAndApplyAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -106,7 +129,7 @@ public sealed class UpdaterGateway : IUpdaterHost
             }
         }
 
-        var staged = new StagedUpdateStore(_paths.ReadyFile).Read();
+        var staged = StagedBuild();
 
         if (staged is not null && IsThisBuild(staged))
         {
@@ -157,7 +180,7 @@ public sealed class UpdaterGateway : IUpdaterHost
             return new ElevationOutcome(false, "The installed application could not be located on disk.");
         }
 
-        var staged = new StagedUpdateStore(_paths.ReadyFile).Read();
+        var staged = StagedBuild();
 
         if (staged is null)
         {
@@ -211,11 +234,16 @@ public sealed class UpdaterGateway : IUpdaterHost
         }
 
         var installed = arguments[2];
-        var paths = new UpdatePaths();
-        var log = new RollingFileLog(paths.LogFolder, "handover.log");
+        var shared = new UpdatePaths();
+        var mine = UpdatePaths.ForCurrentUser();
+
+        // This runs as the user rather than as the service, so it logs where the
+        // user can write even when the shared root has been locked to SYSTEM.
+        var log = new RollingFileLog(mine.LogFolder, "handover.log");
 
         await WaitForExitAsync(pid).ConfigureAwait(false);
 
+        var paths = new StagedUpdateStore(shared.ReadyFile).Read() is not null ? shared : mine;
         var staged = new StagedUpdateStore(paths.ReadyFile).Read();
         var applied = 0;
 
@@ -299,7 +327,12 @@ public sealed class UpdaterGateway : IUpdaterHost
     {
         using var http = GitHubReleaseClient.CreateHttpClient();
 
-        var workflow = new UpdateWorkflow(new GitHubReleaseClient(http, _paths), http, _paths);
+        // The user's own root, so that the entity tag this caches survives on a
+        // machine where the shared folder has been locked to SYSTEM. Without it
+        // every check spends a request against an hourly limit of sixty.
+        var log = new RollingFileLog(_mine.LogFolder, "updates.log");
+
+        var workflow = new UpdateWorkflow(new GitHubReleaseClient(http, _mine, log), http, _mine, log);
 
         return await workflow.CheckAsync(cancellationToken).ConfigureAwait(false);
     }

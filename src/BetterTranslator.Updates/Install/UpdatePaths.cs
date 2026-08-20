@@ -18,6 +18,19 @@ public sealed class UpdatePaths
         Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
         "BetterTranslator");
 
+    /// <summary>
+    /// Where a download the user asked for is staged. Registering the updater
+    /// locks the shared root down to SYSTEM and the administrators, so that no
+    /// standard user can leave a payload for a SYSTEM service to install. That
+    /// is the right boundary and it stays, which leaves the user's own profile
+    /// as the only place an unelevated download can be written.
+    /// </summary>
+    public static string UserRoot => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "BetterTranslator");
+
+    public static UpdatePaths ForCurrentUser() => new(UserRoot);
+
     public UpdatePaths()
         : this(DefaultRoot)
     {

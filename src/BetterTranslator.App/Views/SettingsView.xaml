@@ -947,7 +947,7 @@
                                                    AutomationProperties.Name="Automatic updates" />
                             <StackPanel MaxWidth="440">
                                 <TextBlock Text="Automatic updates" Style="{StaticResource TextCardTitle}" />
-                                <TextBlock Text="Registers a Windows service that looks for a new release, checks it against its published checksum and installs it while the application is closed. Turning this on or off asks for administrator rights once. With it off, nothing runs in the background."
+                                <TextBlock Text="Registers a Windows service that looks for a new release, checks it against its published checksum and installs it while the application is closed. Turning this on or off asks for administrator rights once. With it off, nothing runs in the background: the application asks GitHub once when it starts, tells you what it found, and downloads nothing until you ask it to."
                                            Style="{StaticResource TextMeta}"
                                            Foreground="{StaticResource BrushTextSecondary}"
                                            TextWrapping="Wrap"

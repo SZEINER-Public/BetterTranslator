@@ -438,3 +438,112 @@ public sealed class UpdateDownloadTests
         updates.CheckStatus.Should().Contain("the connection was reset");
     }
 }
+
+public sealed class UpdateStartupCheckTests
+{
+    private static UpdateStatus Available() => new(
+        UpdateOutcome.UpdateAvailable,
+        "1.0.3 is newer than the installed 1.0.0.",
+        "1.0.0",
+        "a54ff15",
+        "1.0.3",
+        "b71cc02",
+        Ready: false,
+        DateTimeOffset.UnixEpoch);
+
+    [Fact]
+    public async Task A_start_asks_github_and_surfaces_what_it_finds()
+    {
+        var host = new FakeUpdaterHost { Current = ServiceState.NotInstalled, Answer = Available() };
+        var updates = new UpdatesViewModel(host);
+
+        await updates.LoadAsync(CancellationToken.None);
+
+        host.Checks.Should().Be(0, "loading the screen reads local state and nothing else");
+
+        await updates.WatchAsync(CancellationToken.None);
+
+        host.Checks.Should().Be(1, "a start asks once");
+        host.Fetches.Should().Be(0, "nothing is downloaded until someone asks for it");
+        updates.CanDownload.Should().BeTrue();
+        updates.ShowNotice.Should().BeTrue("a check nobody is shown is no use");
+        updates.NoticeTitle.Should().Be("An update is available");
+    }
+
+    [Fact]
+    public async Task A_start_with_no_connection_says_nothing()
+    {
+        var host = new FakeUpdaterHost
+        {
+            Current = ServiceState.NotInstalled,
+            CheckThrows = new HttpRequestException("no such host is known"),
+        };
+
+        var updates = new UpdatesViewModel(host);
+        string before = updates.CheckStatus;
+
+        await updates.WatchAsync(CancellationToken.None);
+
+        updates.CheckStatus.Should().Be(before, "starting without a connection is not a fault to report");
+        updates.ShowNotice.Should().BeFalse();
+        updates.CanDownload.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task A_start_where_the_check_does_not_finish_says_nothing()
+    {
+        var host = new FakeUpdaterHost
+        {
+            Current = ServiceState.NotInstalled,
+            Answer = new UpdateStatus(
+                UpdateOutcome.CheckFailed,
+                "GitHub answered 403 because its rate limit is spent.",
+                "1.0.0",
+                "a54ff15",
+                string.Empty,
+                string.Empty,
+                Ready: false,
+                DateTimeOffset.UnixEpoch),
+        };
+
+        var updates = new UpdatesViewModel(host);
+        string before = updates.CheckStatus;
+
+        await updates.WatchAsync(CancellationToken.None);
+
+        updates.CheckStatus.Should().Be(before, "a spent rate limit at startup is not worth a banner");
+        updates.ShowNotice.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task A_start_on_the_latest_build_shows_no_notice()
+    {
+        var host = new FakeUpdaterHost { Current = ServiceState.NotInstalled };
+        var updates = new UpdatesViewModel(host);
+
+        await updates.WatchAsync(CancellationToken.None);
+
+        host.Checks.Should().Be(1);
+        updates.ShowNotice.Should().BeFalse();
+        updates.CanDownload.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task A_build_already_downloaded_is_not_checked_for_again()
+    {
+        var host = new FakeUpdaterHost
+        {
+            Current = ServiceState.NotInstalled,
+            Staged = Available() with { Ready = true, Detail = "1.0.3 is downloaded and verified." },
+        };
+
+        var updates = new UpdatesViewModel(host);
+
+        await updates.LoadAsync(CancellationToken.None);
+        await updates.WatchAsync(CancellationToken.None);
+
+        host.Checks.Should().Be(0, "there is already a verified build waiting; asking again changes nothing");
+        updates.ShowNotice.Should().BeTrue();
+        updates.NoticeTitle.Should().Be("An update is ready");
+    }
+}
