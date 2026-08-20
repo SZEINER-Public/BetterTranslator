@@ -1,3 +1,4 @@
+using System.Net.Http;
 using BetterTranslator.App.Services;
 using BetterTranslator.App.ViewModels;
 using BetterTranslator.Core.Services;
@@ -37,9 +38,16 @@ internal sealed class FakeUpdaterHost : IUpdaterHost
 
     public UpdateStatus? Staged { get; set; }
 
+    /// <summary>What the fetch answers. Falls back to <see cref="Answer"/>.</summary>
+    public UpdateStatus? FetchAnswer { get; set; }
+
     public Exception? CheckThrows { get; set; }
 
+    public Exception? FetchThrows { get; set; }
+
     public int Checks { get; private set; }
+
+    public int Fetches { get; private set; }
 
     public int Enables { get; private set; }
 
@@ -52,6 +60,15 @@ internal sealed class FakeUpdaterHost : IUpdaterHost
         Checks++;
 
         return CheckThrows is not null ? Task.FromException<UpdateStatus>(CheckThrows) : Task.FromResult(Answer);
+    }
+
+    public Task<UpdateStatus> FetchAsync(CancellationToken cancellationToken)
+    {
+        Fetches++;
+
+        return FetchThrows is not null
+            ? Task.FromException<UpdateStatus>(FetchThrows)
+            : Task.FromResult(FetchAnswer ?? Answer);
     }
 
     public Task<UpdateStatus?> ReadyAsync(CancellationToken cancellationToken) => Task.FromResult(Staged);
@@ -337,5 +354,87 @@ public sealed class UpdateSettingsTests
         identity.Display.Should().StartWith(identity.Version);
 
         BuildIdentity.Read(typeof(UpdatePaths).Assembly).Version.Should().Be(identity.Version);
+    }
+}
+
+public sealed class UpdateDownloadTests
+{
+    private static UpdateStatus Available(bool ready = false) => new(
+        UpdateOutcome.UpdateAvailable,
+        "1.0.3 is newer than the installed 1.0.0.",
+        "1.0.0",
+        "a54ff15",
+        "1.0.3",
+        "b71cc02",
+        Ready: ready,
+        DateTimeOffset.UnixEpoch);
+
+    [Fact]
+    public async Task A_check_that_finds_an_update_offers_to_fetch_it()
+    {
+        var host = new FakeUpdaterHost { Current = ServiceState.NotInstalled, Answer = Available() };
+        var updates = new UpdatesViewModel(host);
+
+        updates.CanDownload.Should().BeFalse("nothing has been asked for yet");
+
+        await updates.CheckCommand.ExecuteAsync(null);
+
+        updates.CanDownload.Should().BeTrue(
+            "with no service to fetch it, this screen is the only thing that can, and saying an "
+            + "update exists while offering no way to take it is a dead end");
+        updates.UpdateReady.Should().BeFalse("nothing has been downloaded yet");
+        host.Fetches.Should().Be(0, "the check asks GitHub and stops there");
+    }
+
+    [Fact]
+    public async Task A_check_that_finds_nothing_offers_no_download()
+    {
+        var host = new FakeUpdaterHost { Current = ServiceState.NotInstalled };
+        var updates = new UpdatesViewModel(host);
+
+        await updates.CheckCommand.ExecuteAsync(null);
+
+        updates.CanDownload.Should().BeFalse("this is the latest build");
+    }
+
+    [Fact]
+    public async Task Downloading_stages_the_build_and_hands_over_to_the_restart_card()
+    {
+        var host = new FakeUpdaterHost
+        {
+            Current = ServiceState.NotInstalled,
+            Answer = Available(),
+            FetchAnswer = Available(ready: true) with { Detail = "1.0.3 is staged and verified." },
+        };
+
+        var updates = new UpdatesViewModel(host);
+
+        await updates.CheckCommand.ExecuteAsync(null);
+        await updates.DownloadCommand.ExecuteAsync(null);
+
+        host.Fetches.Should().Be(1);
+        updates.UpdateReady.Should().BeTrue("a verified payload is waiting");
+        updates.CanDownload.Should().BeFalse("it is downloaded; the restart card is the next step");
+        updates.CheckStatus.Should().Contain("staged");
+    }
+
+    [Fact]
+    public async Task A_download_that_fails_says_so_and_stays_offered()
+    {
+        var host = new FakeUpdaterHost
+        {
+            Current = ServiceState.NotInstalled,
+            Answer = Available(),
+            FetchThrows = new HttpRequestException("the connection was reset"),
+        };
+
+        var updates = new UpdatesViewModel(host);
+
+        await updates.CheckCommand.ExecuteAsync(null);
+        await updates.DownloadCommand.ExecuteAsync(null);
+
+        updates.UpdateReady.Should().BeFalse();
+        updates.CanDownload.Should().BeTrue("a failed download is worth another try");
+        updates.CheckStatus.Should().Contain("the connection was reset");
     }
 }

@@ -22,26 +22,28 @@ public partial class App : Application
 
         var verb = e.Args.Length > 0 ? e.Args[0] : string.Empty;
 
+        // Each of these runs the application with no window at all. The main
+        // window is opened at the end of this method rather than by a StartupUri
+        // in App.xaml, because a StartupUri is navigated to after OnStartup
+        // returns whatever this does, and the property refuses to be cleared:
+        // assigning null to it throws, which took every one of these verbs down
+        // before it reached its handler.
         switch (verb)
         {
             case UpdaterGateway.InstallVerb:
             case UpdaterGateway.UninstallVerb:
-                StartupUri = null!;
                 Shutdown(UpdaterGateway.RunElevatedVerb(verb));
                 return;
 
             case UpdaterGateway.FinishVerb:
-                StartupUri = null!;
                 Shutdown(UpdaterGateway.FinishAsync(e.Args).GetAwaiter().GetResult());
                 return;
 
             case UpdateNotifications.NotifyVerb:
-                StartupUri = null!;
                 Shutdown(RaisePendingNotice());
                 return;
 
             case ShellIdentity.ActivatedVerb:
-                StartupUri = null!;
                 WaitForActivation();
                 return;
         }
@@ -57,6 +59,9 @@ public partial class App : Application
         base.OnStartup(e);
 
         _ = Task.Run(PrepareNotifications);
+
+        MainWindow = new MainWindow();
+        MainWindow.Show();
     }
 
     protected override void OnExit(ExitEventArgs e)

@@ -23,6 +23,8 @@ public interface IUpdaterHost
 
     Task<UpdateStatus> CheckAsync(CancellationToken cancellationToken);
 
+    Task<UpdateStatus> FetchAsync(CancellationToken cancellationToken);
+
     Task<UpdateStatus?> ReadyAsync(CancellationToken cancellationToken);
 
     Task<ElevationOutcome> EnableAsync(CancellationToken cancellationToken);
@@ -65,6 +67,31 @@ public sealed class UpdaterGateway : IUpdaterHost
         }
 
         return await InProcessAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Fetches the newest release, checks it against its published checksum and
+    /// stages it. This is what the Updates screen offers when no service is
+    /// registered: without it a check can report that a newer build exists and
+    /// leave no way to take it.
+    /// </summary>
+    public async Task<UpdateStatus> FetchAsync(CancellationToken cancellationToken)
+    {
+        if (State() == ServiceState.Running)
+        {
+            var answered = await _pipe.AskAsync(UpdaterVerb.Check, cancellationToken).ConfigureAwait(false);
+
+            if (answered?.Status is { } status)
+            {
+                return status;
+            }
+        }
+
+        using var http = GitHubReleaseClient.CreateHttpClient();
+
+        var workflow = new UpdateWorkflow(new GitHubReleaseClient(http, _paths), http, _paths);
+
+        return await workflow.CheckFetchAndApplyAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<UpdateStatus?> ReadyAsync(CancellationToken cancellationToken)

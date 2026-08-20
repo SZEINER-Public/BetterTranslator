@@ -56,15 +56,33 @@ public sealed partial class UpdatesViewModel : ObservableObject
     [ObservableProperty]
     public partial bool NoticeDismissed { get; set; }
 
+    /// <summary>
+    /// A check found a newer release and nothing has been downloaded for it yet.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool UpdateFound { get; set; }
+
     public string Channel { get; }
 
     public bool CanInteract => !IsWorking;
 
     public bool ShowNotice => UpdateReady && !NoticeDismissed;
 
-    partial void OnIsWorkingChanged(bool value) => OnPropertyChanged(nameof(CanInteract));
+    public bool CanDownload => UpdateFound && !UpdateReady && !IsWorking;
 
-    partial void OnUpdateReadyChanged(bool value) => OnPropertyChanged(nameof(ShowNotice));
+    partial void OnIsWorkingChanged(bool value)
+    {
+        OnPropertyChanged(nameof(CanInteract));
+        OnPropertyChanged(nameof(CanDownload));
+    }
+
+    partial void OnUpdateReadyChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShowNotice));
+        OnPropertyChanged(nameof(CanDownload));
+    }
+
+    partial void OnUpdateFoundChanged(bool value) => OnPropertyChanged(nameof(CanDownload));
 
     partial void OnNoticeDismissedChanged(bool value) => OnPropertyChanged(nameof(ShowNotice));
 
@@ -138,11 +156,52 @@ public sealed partial class UpdatesViewModel : ObservableObject
             };
 
             UpdateReady = status.Ready;
+            UpdateFound = status.Outcome == UpdateOutcome.UpdateAvailable && !status.Ready;
         }
         catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             LatestLabel = "The latest release could not be read.";
             CheckStatus = "The check did not finish. " + ex.Message;
+        }
+        finally
+        {
+            IsWorking = false;
+            ReadServiceState();
+        }
+    }
+
+    /// <summary>
+    /// Takes the release the check found. The service does this on its own when
+    /// it is registered; with automatic updates off this is the only way to get
+    /// a build from inside the application.
+    /// </summary>
+    [RelayCommand]
+    private async Task DownloadAsync()
+    {
+        if (IsWorking)
+        {
+            return;
+        }
+
+        IsWorking = true;
+        CheckStatus = "Downloading the release and checking it against its published checksum.";
+
+        try
+        {
+            var status = await _host.FetchAsync(CancellationToken.None).ConfigureAwait(true);
+
+            CheckStatus = status.Detail;
+            UpdateReady = status.Ready;
+            UpdateFound = status.Outcome == UpdateOutcome.UpdateAvailable && !status.Ready;
+
+            if (status.LatestVersion.Length > 0)
+            {
+                LatestLabel = Describe(status.LatestVersion, status.LatestCommit);
+            }
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            CheckStatus = "The download did not finish. " + ex.Message;
         }
         finally
         {

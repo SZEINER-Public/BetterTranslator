@@ -996,6 +996,13 @@
                                     IsEnabled="{Binding CanInteract}"
                                     Command="{Binding CheckCommand}"
                                     AutomationProperties.Name="Check for updates" />
+                            <Button Style="{StaticResource PrimaryButton}"
+                                    Content="Download and install"
+                                    Margin="8,0,0,0"
+                                    IsEnabled="{Binding CanInteract}"
+                                    Visibility="{Binding CanDownload, Converter={StaticResource BoolToVisibility}}"
+                                    Command="{Binding DownloadCommand}"
+                                    AutomationProperties.Name="Download and install the update" />
                         </StackPanel>
 
                         <TextBlock Text="{Binding CheckStatus}"
