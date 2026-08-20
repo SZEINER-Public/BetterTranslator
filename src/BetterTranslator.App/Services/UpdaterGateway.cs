@@ -109,6 +109,32 @@ public sealed class UpdaterGateway : IUpdaterHost
     }
 
     /// <summary>
+    /// Whether the service was registered against the executable running here.
+    /// </summary>
+    internal static bool Maintains(string? recorded, string? running)
+    {
+        if (recorded is not { Length: > 0 } || running is not { Length: > 0 })
+        {
+            return false;
+        }
+
+        try
+        {
+            return string.Equals(
+                Path.GetFullPath(recorded),
+                Path.GetFullPath(running),
+                StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return false;
+        }
+    }
+
+    private bool MaintainsThisBuild() =>
+        Maintains(new InstalledAppStore(_paths).Read(), Environment.ProcessPath);
+
+    /// <summary>
     /// A build the service staged is preferred: it was verified as SYSTEM in a
     /// folder no standard user can write to.
     /// </summary>
@@ -142,7 +168,12 @@ public sealed class UpdaterGateway : IUpdaterHost
     /// </summary>
     public async Task<UpdateStatus> FetchAsync(CancellationToken cancellationToken)
     {
-        if (State() == ServiceState.Running)
+        // Only the executable the service was registered against can be handed
+        // to the service. It fetches and installs for that one, so asking it on
+        // behalf of a copy running from somewhere else has it answer about a
+        // build that is already current, download nothing, and leave this one
+        // exactly where it was with a button that appears to do nothing.
+        if (State() == ServiceState.Running && MaintainsThisBuild())
         {
             var answered = await _pipe.AskAsync(UpdaterVerb.Check, cancellationToken).ConfigureAwait(false);
 

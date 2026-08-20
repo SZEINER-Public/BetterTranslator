@@ -106,3 +106,48 @@ public sealed class UpdateIdentityTests
         mine.Outcome.Should().Be(UpdateOutcome.UpdateAvailable);
     }
 }
+
+/// <summary>
+/// The service fetches and installs for the one executable it was registered
+/// against. Handing it a download meant for a different copy asks it to do work
+/// it will correctly decline, and the button appears to do nothing at all.
+/// </summary>
+public sealed class UpdateFetchRoutingTests
+{
+    [Fact]
+    public void The_service_is_asked_only_when_it_maintains_this_very_executable()
+    {
+        UpdaterGateway.Maintains(
+                @"C:\Program Files\BetterTranslator\BetterTranslator.exe",
+                @"C:\Program Files\BetterTranslator\BetterTranslator.exe")
+            .Should().BeTrue();
+    }
+
+    [Fact]
+    public void A_path_that_differs_only_in_case_or_shape_is_the_same_executable()
+    {
+        UpdaterGateway.Maintains(
+                @"C:\Program Files\BetterTranslator\BetterTranslator.exe",
+                @"c:\program files\BetterTranslator\.\BetterTranslator.exe")
+            .Should().BeTrue();
+    }
+
+    [Fact]
+    public void A_copy_running_from_somewhere_else_fetches_for_itself()
+    {
+        UpdaterGateway.Maintains(
+                @"H:\build\bin\Release\BetterTranslator.exe",
+                @"C:\Users\someone\Programs\BetterTranslator\BetterTranslator.exe")
+            .Should().BeFalse(
+                "the service would fetch for the build it keeps, which leaves this one exactly where it was");
+    }
+
+    [Theory]
+    [InlineData(null, @"C:\x\BetterTranslator.exe")]
+    [InlineData(@"C:\x\BetterTranslator.exe", null)]
+    [InlineData("", "")]
+    public void Nothing_recorded_or_nothing_running_is_not_a_match(string? recorded, string? running)
+    {
+        UpdaterGateway.Maintains(recorded, running).Should().BeFalse();
+    }
+}
