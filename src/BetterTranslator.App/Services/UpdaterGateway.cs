@@ -65,6 +65,30 @@ public sealed class UpdaterGateway : IUpdaterHost
     }
 
     /// <summary>
+    /// Judges what the service found against the build that is actually asking.
+    ///
+    /// The service maintains one recorded executable and answers about that one.
+    /// The application asking may be a different copy: run from somewhere else,
+    /// or left recorded by an install that pointed at another folder. Taking its
+    /// answer at face value then reports up to date and hides the update, which
+    /// is worse than reporting nothing, so only the release it found is kept and
+    /// the comparison is made again here.
+    /// </summary>
+    internal static UpdateStatus ForBuild(BuildIdentity installed, UpdateStatus answered)
+    {
+        if (answered.Outcome == UpdateOutcome.CheckFailed || answered.LatestVersion.Length == 0)
+        {
+            return answered;
+        }
+
+        var comparison = UpdateComparer.Compare(
+            installed,
+            new ReleaseInfo(answered.LatestVersion, answered.LatestCommit, DateTimeOffset.UnixEpoch, []));
+
+        return UpdateStatus.From(comparison, answered.Ready, answered.CheckedUtc);
+    }
+
+    /// <summary>
     /// A build the service staged is preferred: it was verified as SYSTEM in a
     /// folder no standard user can write to.
     /// </summary>
@@ -83,7 +107,7 @@ public sealed class UpdaterGateway : IUpdaterHost
 
             if (answered?.Status is { } status)
             {
-                return status;
+                return ForBuild(Installed, status);
             }
         }
 
@@ -104,7 +128,7 @@ public sealed class UpdaterGateway : IUpdaterHost
 
             if (answered?.Status is { } status)
             {
-                return status;
+                return ForBuild(Installed, status);
             }
         }
 
@@ -112,7 +136,7 @@ public sealed class UpdaterGateway : IUpdaterHost
 
         var log = new RollingFileLog(_mine.LogFolder, "updates.log");
 
-        var workflow = new UpdateWorkflow(new GitHubReleaseClient(http, _mine, log), http, _mine, log);
+        var workflow = new UpdateWorkflow(new GitHubReleaseClient(http, _mine, log), http, _mine, log, Installed);
 
         return await workflow.CheckFetchAndApplyAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -123,9 +147,10 @@ public sealed class UpdaterGateway : IUpdaterHost
         {
             var answered = await _pipe.AskAsync(UpdaterVerb.Status, cancellationToken).ConfigureAwait(false);
 
-            if (answered?.Status is { Ready: true } status)
+            if (answered?.Status is { Ready: true } status
+                && ForBuild(Installed, status) is { Outcome: UpdateOutcome.UpdateAvailable } mine)
             {
-                return status;
+                return mine;
             }
         }
 
@@ -332,7 +357,7 @@ public sealed class UpdaterGateway : IUpdaterHost
         // every check spends a request against an hourly limit of sixty.
         var log = new RollingFileLog(_mine.LogFolder, "updates.log");
 
-        var workflow = new UpdateWorkflow(new GitHubReleaseClient(http, _mine, log), http, _mine, log);
+        var workflow = new UpdateWorkflow(new GitHubReleaseClient(http, _mine, log), http, _mine, log, Installed);
 
         return await workflow.CheckAsync(cancellationToken).ConfigureAwait(false);
     }
