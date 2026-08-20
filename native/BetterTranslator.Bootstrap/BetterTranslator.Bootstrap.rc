@@ -3,11 +3,11 @@
 #include "src/resource.h"
 
 #ifndef BOOTSTRAP_VERSION_FIELDS
-#define BOOTSTRAP_VERSION_FIELDS 1, 0, 0, 0
+#define BOOTSTRAP_VERSION_FIELDS 1, 0, 2, 0
 #endif
 
 #ifndef BOOTSTRAP_VERSION_TEXT
-#define BOOTSTRAP_VERSION_TEXT "1.0.0.0"
+#define BOOTSTRAP_VERSION_TEXT "1.0.2.0"
 #endif
 
 IDI_APPLICATION_ICON ICON "../../src/BetterTranslator.App/Assets/app-icon.ico"
