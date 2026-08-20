@@ -1005,6 +1005,16 @@
                                     AutomationProperties.Name="Download and install the update" />
                         </StackPanel>
 
+                        <ProgressBar Height="4"
+                                     Minimum="0"
+                                     Maximum="100"
+                                     Value="{Binding DownloadPercent, Mode=OneWay}"
+                                     MaxWidth="440"
+                                     HorizontalAlignment="Left"
+                                     Margin="0,12,0,0"
+                                     Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVisibility}}"
+                                     AutomationProperties.Name="Download progress" />
+
                         <TextBlock Text="{Binding CheckStatus}"
                                    Style="{StaticResource TextMeta}"
                                    Foreground="{StaticResource BrushTextSecondary}"

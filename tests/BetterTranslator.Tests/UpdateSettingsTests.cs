@@ -62,8 +62,10 @@ internal sealed class FakeUpdaterHost : IUpdaterHost
         return CheckThrows is not null ? Task.FromException<UpdateStatus>(CheckThrows) : Task.FromResult(Answer);
     }
 
-    public Task<UpdateStatus> FetchAsync(CancellationToken cancellationToken)
+    public Task<UpdateStatus> FetchAsync(CancellationToken cancellationToken, IProgress<double>? progress = null)
     {
+        progress?.Report(0.5);
+
         Fetches++;
 
         return FetchThrows is not null
@@ -547,5 +549,114 @@ public sealed class UpdateStartupCheckTests
         updates.ShowNotice.Should().BeTrue();
         updates.NoticeTitle.Should().Be("Update is available");
         updates.NoticeDetail.Should().Be("1.0.0 → 1.0.3");
+    }
+}
+
+/// <summary>
+/// A payload of well over a hundred megabytes arrives over half a minute or
+/// more. Without something moving on screen the button simply disappears and
+/// the window sits there, which reads as a press that did nothing.
+/// </summary>
+public sealed class UpdateProgressTests
+{
+    private static UpdateStatus Available(bool ready = false) => new(
+        UpdateOutcome.UpdateAvailable,
+        "1.0.6 is newer than the installed 1.0.5.",
+        "1.0.5",
+        "a54ff15",
+        "1.0.6",
+        "b71cc02",
+        Ready: ready,
+        DateTimeOffset.UnixEpoch);
+
+    [Fact]
+    public async Task Nothing_is_downloading_before_the_button_is_pressed()
+    {
+        var host = new FakeUpdaterHost { Current = ServiceState.NotInstalled, Answer = Available() };
+        var updates = new UpdatesViewModel(host);
+
+        await updates.CheckCommand.ExecuteAsync(null);
+
+        updates.IsDownloading.Should().BeFalse();
+        updates.DownloadPercent.Should().Be(0);
+    }
+
+    /// <summary>
+    /// Progress is handed over through <see cref="Progress{T}"/>, which posts to
+    /// the context it was built on. The window has one and the callback lands on
+    /// the interface thread; a test has none and the callback would go to the
+    /// thread pool and arrive after the assertion. This gives it one that runs
+    /// the callback where it is raised.
+    /// </summary>
+    private sealed class InlineContext : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback callback, object? state) => callback(state);
+    }
+
+    [Fact]
+    public async Task A_download_reports_how_far_along_it_is()
+    {
+        var host = new FakeUpdaterHost
+        {
+            Current = ServiceState.NotInstalled,
+            Answer = Available(),
+            FetchAnswer = Available(ready: true) with { Detail = "1.0.6 is staged and verified." },
+        };
+
+        var restore = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(new InlineContext());
+
+        try
+        {
+            var updates = new UpdatesViewModel(host);
+
+            await updates.CheckCommand.ExecuteAsync(null);
+            await updates.DownloadCommand.ExecuteAsync(null);
+
+            // The fake reports half way through before answering.
+            updates.HighestPercentSeen.Should().Be(50, "the bar has to move while the bytes arrive");
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(restore);
+        }
+    }
+
+    [Fact]
+    public async Task A_finished_download_stops_reporting_progress()
+    {
+        var host = new FakeUpdaterHost
+        {
+            Current = ServiceState.NotInstalled,
+            Answer = Available(),
+            FetchAnswer = Available(ready: true) with { Detail = "1.0.6 is staged and verified." },
+        };
+
+        var updates = new UpdatesViewModel(host);
+
+        await updates.CheckCommand.ExecuteAsync(null);
+        await updates.DownloadCommand.ExecuteAsync(null);
+
+        updates.IsDownloading.Should().BeFalse("the payload is on disk; the next step is the restart");
+        updates.UpdateReady.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task A_download_that_fails_stops_reporting_progress_too()
+    {
+        var host = new FakeUpdaterHost
+        {
+            Current = ServiceState.NotInstalled,
+            Answer = Available(),
+            FetchThrows = new HttpRequestException("the connection was reset"),
+        };
+
+        var updates = new UpdatesViewModel(host);
+
+        await updates.CheckCommand.ExecuteAsync(null);
+        await updates.DownloadCommand.ExecuteAsync(null);
+
+        updates.IsDownloading.Should().BeFalse();
+        updates.CanDownload.Should().BeTrue("a failed download is worth another try");
     }
 }

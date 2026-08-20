@@ -23,7 +23,7 @@ public interface IUpdaterHost
 
     Task<UpdateStatus> CheckAsync(CancellationToken cancellationToken);
 
-    Task<UpdateStatus> FetchAsync(CancellationToken cancellationToken);
+    Task<UpdateStatus> FetchAsync(CancellationToken cancellationToken, IProgress<double>? progress = null);
 
     Task<UpdateStatus?> ReadyAsync(CancellationToken cancellationToken);
 
@@ -166,7 +166,9 @@ public sealed class UpdaterGateway : IUpdaterHost
     /// registered: without it a check can report that a newer build exists and
     /// leave no way to take it.
     /// </summary>
-    public async Task<UpdateStatus> FetchAsync(CancellationToken cancellationToken)
+    public async Task<UpdateStatus> FetchAsync(
+        CancellationToken cancellationToken,
+        IProgress<double>? progress = null)
     {
         // Only the executable the service was registered against can be handed
         // to the service. It fetches and installs for that one, so asking it on
@@ -189,7 +191,7 @@ public sealed class UpdaterGateway : IUpdaterHost
 
         var workflow = new UpdateWorkflow(new GitHubReleaseClient(http, _mine, log), http, _mine, log, Installed);
 
-        return await workflow.CheckFetchAndApplyAsync(cancellationToken).ConfigureAwait(false);
+        return await workflow.CheckFetchAndApplyAsync(cancellationToken, progress).ConfigureAwait(false);
     }
 
     public async Task<UpdateStatus?> ReadyAsync(CancellationToken cancellationToken)

@@ -72,7 +72,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
 
     public bool CanInteract => !IsWorking;
 
-    public bool ShowNotice => (UpdateReady || UpdateFound) && !NoticeDismissed;
+    public bool ShowNotice => (UpdateReady || UpdateFound || IsDownloading) && !NoticeDismissed;
 
     public bool CanDownload => UpdateFound && !UpdateReady && !IsWorking;
 
@@ -80,14 +80,26 @@ public sealed partial class UpdatesViewModel : ObservableObject
     [ObservableProperty]
     public partial string LatestVersion { get; set; } = string.Empty;
 
-    public string NoticeTitle => "Update is available";
+    /// <summary>A payload is arriving. Drives the bar on the notice.</summary>
+    [ObservableProperty]
+    public partial bool IsDownloading { get; set; }
+
+    [ObservableProperty]
+    public partial int DownloadPercent { get; set; }
+
+    /// <summary>The furthest the bar reached, kept for the tests to read.</summary>
+    internal int HighestPercentSeen { get; private set; }
+
+    public string NoticeTitle => IsDownloading ? "Downloading the update" : "Update is available";
 
     /// <summary>
     /// The two version numbers and nothing else. What the buttons underneath do
     /// says the rest, and what changed is in the release notes.
     /// </summary>
     public string NoticeDetail =>
-        LatestVersion.Length > 0 ? $"{InstalledVersion} → {LatestVersion}" : string.Empty;
+        IsDownloading
+            ? $"{InstalledVersion} → {LatestVersion}   {DownloadPercent}%"
+            : LatestVersion.Length > 0 ? $"{InstalledVersion} → {LatestVersion}" : string.Empty;
 
     partial void OnIsWorkingChanged(bool value)
     {
@@ -102,6 +114,23 @@ public sealed partial class UpdatesViewModel : ObservableObject
     }
 
     partial void OnLatestVersionChanged(string value) => OnPropertyChanged(nameof(NoticeDetail));
+
+    partial void OnIsDownloadingChanged(bool value)
+    {
+        OnPropertyChanged(nameof(NoticeTitle));
+        OnPropertyChanged(nameof(NoticeDetail));
+        OnPropertyChanged(nameof(ShowNotice));
+    }
+
+    partial void OnDownloadPercentChanged(int value)
+    {
+        if (value > HighestPercentSeen)
+        {
+            HighestPercentSeen = value;
+        }
+
+        OnPropertyChanged(nameof(NoticeDetail));
+    }
 
     partial void OnUpdateFoundChanged(bool value)
     {
@@ -267,11 +296,16 @@ public sealed partial class UpdatesViewModel : ObservableObject
         }
 
         IsWorking = true;
+        IsDownloading = true;
+        DownloadPercent = 0;
         CheckStatus = "Downloading the release and checking it against its published checksum.";
 
         try
         {
-            var status = await _host.FetchAsync(CancellationToken.None).ConfigureAwait(true);
+            var progress = new Progress<double>(fraction =>
+                DownloadPercent = (int)Math.Round(Math.Clamp(fraction, 0, 1) * 100));
+
+            var status = await _host.FetchAsync(CancellationToken.None, progress).ConfigureAwait(true);
 
             CheckStatus = status.Detail;
             UpdateReady = status.Ready;
@@ -289,6 +323,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
         }
         finally
         {
+            IsDownloading = false;
             IsWorking = false;
             ReadServiceState();
         }

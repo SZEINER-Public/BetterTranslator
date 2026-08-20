@@ -31,7 +31,8 @@ public sealed class UpdateDownloader(HttpClient http, UpdatePaths paths, IUpdate
         ReleaseInfo release,
         UpdateComparison comparison,
         string? expected,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        IProgress<double>? progress = null)
     {
         var asset = release.Payload(UpdatePaths.PayloadAssetName);
 
@@ -63,7 +64,7 @@ public sealed class UpdateDownloader(HttpClient http, UpdatePaths paths, IUpdate
 
         try
         {
-            await DownloadAsync(asset, cancellationToken).ConfigureAwait(false);
+            await DownloadAsync(asset, progress, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is HttpRequestException or IOException or TaskCanceledException)
         {
@@ -105,7 +106,10 @@ public sealed class UpdateDownloader(HttpClient http, UpdatePaths paths, IUpdate
         return new FetchVerdict(true, $"{comparison.LatestVersion} is staged and verified.", staged);
     }
 
-    private async Task DownloadAsync(ReleaseAsset asset, CancellationToken cancellationToken)
+    private async Task DownloadAsync(
+        ReleaseAsset asset,
+        IProgress<double>? progress,
+        CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, asset.DownloadUrl);
         request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/octet-stream"));
@@ -134,6 +138,7 @@ public sealed class UpdateDownloader(HttpClient http, UpdatePaths paths, IUpdate
 
         var buffer = new byte[BufferSize];
         long written = 0;
+        var reported = -1;
 
         while (true)
         {
@@ -152,6 +157,20 @@ public sealed class UpdateDownloader(HttpClient http, UpdatePaths paths, IUpdate
             }
 
             await target.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+
+            // Reported a percent at a time. A hundred or so updates is enough to
+            // show a bar moving, where one per buffer would be thousands of
+            // dispatches to the interface for no more information.
+            if (progress is not null && declared > 0)
+            {
+                var whole = (int)(written * 100 / declared);
+
+                if (whole > reported)
+                {
+                    reported = whole;
+                    progress.Report(Math.Clamp(whole / 100d, 0, 1));
+                }
+            }
         }
     }
 

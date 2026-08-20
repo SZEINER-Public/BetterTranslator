@@ -125,7 +125,9 @@ public sealed class UpdateWorkflow
         return InstalledAppStore.IsPlausible(running) && File.Exists(running) ? running : null;
     }
 
-    public async Task<UpdateStatus> CheckFetchAndApplyAsync(CancellationToken cancellationToken)
+    public async Task<UpdateStatus> CheckFetchAndApplyAsync(
+        CancellationToken cancellationToken,
+        IProgress<double>? progress = null)
     {
         var lookup = await _client.LatestAsync(cancellationToken).ConfigureAwait(false);
         LastRelease = lookup.Release;
@@ -165,7 +167,7 @@ public sealed class UpdateWorkflow
         _applier.Discard();
 
         var fetched = await _downloader
-            .FetchAsync(lookup.Release, comparison, expected, cancellationToken)
+            .FetchAsync(lookup.Release, comparison, expected, cancellationToken, progress)
             .ConfigureAwait(false);
 
         if (!fetched.Staged || fetched.Update is null)
