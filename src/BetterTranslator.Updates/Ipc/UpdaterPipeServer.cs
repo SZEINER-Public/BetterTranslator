@@ -9,7 +9,8 @@ namespace BetterTranslator.Updates.Ipc;
 [SupportedOSPlatform("windows")]
 public sealed class UpdaterPipeServer(
     Func<UpdaterRequest, CancellationToken, Task<UpdaterResponse>> handle,
-    IUpdateLog? log = null)
+    IUpdateLog? log = null,
+    string pipeName = UpdaterProtocol.PipeName)
 {
     private const int MaxInstances = 4;
 
@@ -46,7 +47,7 @@ public sealed class UpdaterPipeServer(
     private async Task ServeOneAsync(CancellationToken cancellationToken)
     {
         await using var pipe = NamedPipeServerStreamAcl.Create(
-            UpdaterProtocol.PipeName,
+            pipeName,
             PipeDirection.InOut,
             MaxInstances,
             PipeTransmissionMode.Message,

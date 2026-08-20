@@ -86,7 +86,7 @@ public sealed class UpdateNotificationTests
     }
 
     [Fact]
-    public void Release_text_is_escaped_rather_than_pasted_into_the_notification()
+    public void Release_text_never_reaches_the_notification_at_all()
     {
         var notice = Waiting() with
         {
@@ -95,9 +95,12 @@ public sealed class UpdateNotificationTests
 
         var xml = ToastContent.Build(notice, "1.0.0", null);
 
-        xml.Should().NotContain("<image src=\"file://evil\"");
-        xml.Should().Contain("&lt;image");
-        xml.Should().Contain("&amp;");
+        // The notification carries the two version numbers and the actions. Text
+        // written by whoever published the release is not part of it, which is a
+        // stronger guarantee than escaping it on the way in.
+        xml.Should().NotContain("evil");
+        xml.Should().NotContain("&lt;image");
+        xml.Should().NotContain("quoted");
         System.Xml.Linq.XDocument.Parse(xml).Should().NotBeNull();
     }
 
@@ -114,8 +117,8 @@ public sealed class UpdateNotificationTests
         var xml = ToastContent.Build(Waiting(), "1.0.0", null);
         var document = System.Xml.Linq.XDocument.Parse(xml);
 
-        xml.Should().Contain("BetterTranslator 1.0.1 is available");
-        xml.Should().Contain("You are on 1.0.0.");
+        xml.Should().Contain("Update is available");
+        xml.Should().Contain("1.0.0 → 1.0.1", "the toast carries the two versions and no prose");
 
         document.Root!.Attribute("scenario").Should().BeNull("the default scenario respects quiet hours");
 

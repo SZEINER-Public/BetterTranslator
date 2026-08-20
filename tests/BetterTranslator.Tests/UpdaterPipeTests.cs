@@ -139,16 +139,24 @@ public sealed class UpdaterPipeTests
             Ready: false,
             DateTimeOffset.UtcNow);
 
-        var server = new UpdaterPipeServer((request, _) =>
-            Task.FromResult(request.Verb == UpdaterVerb.Status
-                ? new UpdaterResponse(true, answered.Detail, answered)
-                : UpdaterResponse.Refused("That verb is not one this accepts.")));
+        // A name of its own. The well known one belongs to the service, and on a
+        // machine where that service is registered it answers first and this
+        // asserts against whatever that machine happens to be updating.
+        var pipeName = "BetterTranslator.Updater.Test." + Guid.NewGuid().ToString("n");
+
+        var server = new UpdaterPipeServer(
+            (request, _) =>
+                Task.FromResult(request.Verb == UpdaterVerb.Status
+                    ? new UpdaterResponse(true, answered.Detail, answered)
+                    : UpdaterResponse.Refused("That verb is not one this accepts.")),
+            null,
+            pipeName);
 
         var serving = server.RunAsync(stopping.Token);
 
         try
         {
-            var response = await new UpdaterPipeClient().AskAsync(UpdaterVerb.Status, stopping.Token);
+            var response = await new UpdaterPipeClient(pipeName).AskAsync(UpdaterVerb.Status, stopping.Token);
 
             response.Should().NotBeNull();
             response!.Ok.Should().BeTrue();

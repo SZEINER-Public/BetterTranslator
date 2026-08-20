@@ -76,17 +76,18 @@ public sealed partial class UpdatesViewModel : ObservableObject
 
     public bool CanDownload => UpdateFound && !UpdateReady && !IsWorking;
 
-    /// <summary>
-    /// The notice carries two states: a build already downloaded and waiting to
-    /// go in, and one that has only been seen on GitHub.
-    /// </summary>
-    public string NoticeTitle => UpdateReady ? "An update is ready" : "An update is available";
+    /// <summary>The release a check found, with no commit on it.</summary>
+    [ObservableProperty]
+    public partial string LatestVersion { get; set; } = string.Empty;
 
-    public string NoticeDetail => UpdateReady
-        ? "It is downloaded and checked against its published checksum. Restarting saves your work "
-          + "first and reopens on the new build."
-        : "It has not been downloaded yet. Taking it checks the download against the checksum "
-          + "published with the release before anything is replaced.";
+    public string NoticeTitle => "Update is available";
+
+    /// <summary>
+    /// The two version numbers and nothing else. What the buttons underneath do
+    /// says the rest, and what changed is in the release notes.
+    /// </summary>
+    public string NoticeDetail =>
+        LatestVersion.Length > 0 ? $"{InstalledVersion} → {LatestVersion}" : string.Empty;
 
     partial void OnIsWorkingChanged(bool value)
     {
@@ -98,9 +99,9 @@ public sealed partial class UpdatesViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(ShowNotice));
         OnPropertyChanged(nameof(CanDownload));
-        OnPropertyChanged(nameof(NoticeTitle));
-        OnPropertyChanged(nameof(NoticeDetail));
     }
+
+    partial void OnLatestVersionChanged(string value) => OnPropertyChanged(nameof(NoticeDetail));
 
     partial void OnUpdateFoundChanged(bool value)
     {
@@ -122,6 +123,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
         if (ready is not null)
         {
             UpdateReady = true;
+            LatestVersion = ready.LatestVersion;
             LatestLabel = Describe(ready.LatestVersion, ready.LatestCommit);
             CheckStatus = ready.Detail;
         }
@@ -188,6 +190,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
 
             if (status.LatestVersion.Length > 0)
             {
+                LatestVersion = status.LatestVersion;
                 LatestLabel = Describe(status.LatestVersion, status.LatestCommit);
             }
 
@@ -223,6 +226,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
         {
             var status = await _host.CheckAsync(CancellationToken.None).ConfigureAwait(true);
 
+            LatestVersion = status.LatestVersion;
             LatestLabel = status.LatestVersion.Length == 0
                 ? "The latest release could not be read."
                 : Describe(status.LatestVersion, status.LatestCommit);
@@ -275,6 +279,7 @@ public sealed partial class UpdatesViewModel : ObservableObject
 
             if (status.LatestVersion.Length > 0)
             {
+                LatestVersion = status.LatestVersion;
                 LatestLabel = Describe(status.LatestVersion, status.LatestCommit);
             }
         }

@@ -32,20 +32,12 @@ public static class ToastContent
             writer.WriteAttributeString("template", "ToastGeneric");
 
             writer.WriteStartElement("text");
-            writer.WriteString($"BetterTranslator {notice.Version} is available");
+            writer.WriteString("Update is available");
             writer.WriteEndElement();
 
             writer.WriteStartElement("text");
             writer.WriteString(Summary(notice, installedVersion));
             writer.WriteEndElement();
-
-            if (Notes(notice.Notes) is { Length: > 0 } notes)
-            {
-                writer.WriteStartElement("text");
-                writer.WriteAttributeString("placement", "attribution");
-                writer.WriteString(notes);
-                writer.WriteEndElement();
-            }
 
             if (logoFile is { Length: > 0 } && File.Exists(logoFile))
             {
@@ -88,16 +80,15 @@ public static class ToastContent
         writer.WriteEndElement();
     }
 
+    /// <summary>
+    /// The two version numbers and nothing else. What changed belongs in the
+    /// release notes the notification already links to, not in a toast.
+    /// </summary>
     private static string Summary(PendingUpdateNotice notice, string installedVersion)
     {
         var current = installedVersion.Length > 0 ? installedVersion : notice.InstalledVersion;
-        var published = notice.PublishedUtc > DateTimeOffset.UnixEpoch
-            ? notice.PublishedUtc.ToLocalTime().ToString("d MMMM yyyy", CultureInfo.CurrentCulture)
-            : string.Empty;
 
-        var text = current.Length > 0 ? $"You are on {current}." : "A newer build is ready to install.";
-
-        return published.Length > 0 ? $"{text} Published {published}." : text;
+        return current.Length > 0 ? $"{current} → {notice.Version}" : notice.Version;
     }
 
     public static string Notes(string body)

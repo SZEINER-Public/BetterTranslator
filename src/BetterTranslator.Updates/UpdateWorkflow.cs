@@ -78,7 +78,51 @@ public sealed class UpdateWorkflow
 
         var comparison = UpdateComparer.Compare(Identity, lookup);
 
+        // A release carrying the version already installed is an update only if
+        // its bytes differ from the bytes running here. The version and commit a
+        // build reports cannot settle that on their own: a tag can point at a
+        // commit no published binary was ever built from, and then the two never
+        // agree and the same release is offered, taken and offered again for
+        // ever. The published checksum is the one account of it that converges.
+        if (comparison.IsUpdate && AtTheSameVersion(comparison) && lookup.Release is { } release)
+        {
+            var published = await _downloader.ExpectedChecksumAsync(release, cancellationToken).ConfigureAwait(false);
+
+            if (published is not null
+                && await IsAlreadyInstalledAsync(published, comparison, cancellationToken).ConfigureAwait(false))
+            {
+                return UpdateStatus.From(comparison, ready: false, DateTimeOffset.UtcNow) with
+                {
+                    Outcome = UpdateOutcome.UpToDate,
+                    Detail = $"{comparison.LatestVersion} is the build already installed here.",
+                };
+            }
+        }
+
         return UpdateStatus.From(comparison, _staged.Read() is not null, DateTimeOffset.UtcNow);
+    }
+
+    private static bool AtTheSameVersion(UpdateComparison comparison) =>
+        SemanticVersion.TryParse(comparison.InstalledVersion, out var installed)
+        && SemanticVersion.TryParse(comparison.LatestVersion, out var latest)
+        && latest.CompareTo(installed) == 0;
+
+    /// <summary>
+    /// The build this workflow speaks for. The service is told which executable
+    /// it maintains; running inside the application there is no record, and the
+    /// answer is the process itself. The name check keeps the updater service
+    /// from ever nominating its own executable.
+    /// </summary>
+    private string? InstalledExecutable()
+    {
+        if (_installed.Read() is { } recorded)
+        {
+            return recorded;
+        }
+
+        var running = Environment.ProcessPath ?? string.Empty;
+
+        return InstalledAppStore.IsPlausible(running) && File.Exists(running) ? running : null;
     }
 
     public async Task<UpdateStatus> CheckFetchAndApplyAsync(CancellationToken cancellationToken)
@@ -175,7 +219,7 @@ public sealed class UpdateWorkflow
         string expected,
         CancellationToken cancellationToken)
     {
-        var executable = _installed.Read();
+        var executable = InstalledExecutable();
 
         if (executable is null)
         {
@@ -231,25 +275,18 @@ public sealed class UpdateWorkflow
         UpdateComparison comparison,
         CancellationToken cancellationToken)
     {
-        var executable = _installed.Read();
+        var executable = InstalledExecutable();
 
         if (executable is null)
         {
             return false;
         }
 
+        string actual;
+
         try
         {
-            var actual = await PayloadVerifier.ComputeSha256Async(executable, cancellationToken).ConfigureAwait(false);
-
-            if (!string.Equals(actual, expected, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            _installed.Write(executable, comparison.LatestVersion, comparison.LatestCommit);
-
-            return true;
+            actual = await PayloadVerifier.ComputeSha256Async(executable, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -257,6 +294,24 @@ public sealed class UpdateWorkflow
 
             return false;
         }
+
+        if (!string.Equals(actual, expected, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        // The bytes match, so this is the release whatever happens next. Failing
+        // to write that down must not turn into offering the same build again.
+        try
+        {
+            _installed.Write(executable, comparison.LatestVersion, comparison.LatestCommit);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _log.Write("The installed build matched the release but could not be recorded", ex);
+        }
+
+        return true;
     }
 
     public void ForgetStaged() => _applier.Discard();

@@ -467,7 +467,8 @@ public sealed class UpdateStartupCheckTests
         host.Fetches.Should().Be(0, "nothing is downloaded until someone asks for it");
         updates.CanDownload.Should().BeTrue();
         updates.ShowNotice.Should().BeTrue("a check nobody is shown is no use");
-        updates.NoticeTitle.Should().Be("An update is available");
+        updates.NoticeTitle.Should().Be("Update is available");
+        updates.NoticeDetail.Should().Be("1.0.0 → 1.0.3", "the notice carries the two versions and nothing else");
     }
 
     [Fact]
@@ -544,6 +545,7 @@ public sealed class UpdateStartupCheckTests
 
         host.Checks.Should().Be(0, "there is already a verified build waiting; asking again changes nothing");
         updates.ShowNotice.Should().BeTrue();
-        updates.NoticeTitle.Should().Be("An update is ready");
+        updates.NoticeTitle.Should().Be("Update is available");
+        updates.NoticeDetail.Should().Be("1.0.0 → 1.0.3");
     }
 }

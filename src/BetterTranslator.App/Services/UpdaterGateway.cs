@@ -48,6 +48,13 @@ public sealed class UpdaterGateway : IUpdaterHost
 
     private readonly UpdaterPipeClient _pipe = new();
 
+    /// <summary>
+    /// How the service manager is asked. Injected so that a test reads its own
+    /// fixture rather than whatever service happens to be registered on the
+    /// machine running it.
+    /// </summary>
+    private readonly Func<ServiceState> _state;
+
     public UpdaterGateway()
         : this(new UpdatePaths(), UpdatePaths.ForCurrentUser())
     {
@@ -58,10 +65,11 @@ public sealed class UpdaterGateway : IUpdaterHost
     {
     }
 
-    public UpdaterGateway(UpdatePaths paths, UpdatePaths mine)
+    public UpdaterGateway(UpdatePaths paths, UpdatePaths mine, Func<ServiceState>? state = null)
     {
         _paths = paths;
         _mine = mine;
+        _state = state ?? (() => ServiceControl.Query(UpdatePaths.ServiceName));
     }
 
     /// <summary>
@@ -77,6 +85,18 @@ public sealed class UpdaterGateway : IUpdaterHost
     internal static UpdateStatus ForBuild(BuildIdentity installed, UpdateStatus answered)
     {
         if (answered.Outcome == UpdateOutcome.CheckFailed || answered.LatestVersion.Length == 0)
+        {
+            return answered;
+        }
+
+        // The service answered about the executable it maintains. When that is
+        // the same version as this build, its answer already covers this one,
+        // checksum comparison included, and repeating the comparison here would
+        // throw that away and offer a build already installed. Only a different
+        // version needs judging again.
+        if (SemanticVersion.TryParse(answered.InstalledVersion, out var theirs)
+            && SemanticVersion.TryParse(installed.Version, out var mine)
+            && theirs.CompareTo(mine) == 0)
         {
             return answered;
         }
@@ -97,7 +117,7 @@ public sealed class UpdaterGateway : IUpdaterHost
 
     public BuildIdentity Installed => BuildIdentity.Current;
 
-    public ServiceState State() => ServiceControl.Query(UpdatePaths.ServiceName);
+    public ServiceState State() => _state();
 
     public async Task<UpdateStatus> CheckAsync(CancellationToken cancellationToken)
     {

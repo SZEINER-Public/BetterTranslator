@@ -2,6 +2,7 @@ using System.IO;
 using BetterTranslator.App.Services;
 using BetterTranslator.Updates.Install;
 using BetterTranslator.Updates.Payload;
+using BetterTranslator.Updates.Service;
 using FluentAssertions;
 using Xunit;
 
@@ -32,7 +33,7 @@ public sealed class UpdateStagingLocationTests
 
         Stage(mine.Paths, "9.9.9");
 
-        var gateway = new UpdaterGateway(shared.Paths, mine.Paths);
+        var gateway = new UpdaterGateway(shared.Paths, mine.Paths, () => ServiceState.NotInstalled);
 
         var ready = await gateway.ReadyAsync(CancellationToken.None);
 
@@ -50,7 +51,7 @@ public sealed class UpdateStagingLocationTests
         Stage(shared.Paths, "9.9.9");
         Stage(mine.Paths, "8.8.8");
 
-        var gateway = new UpdaterGateway(shared.Paths, mine.Paths);
+        var gateway = new UpdaterGateway(shared.Paths, mine.Paths, () => ServiceState.NotInstalled);
 
         var ready = await gateway.ReadyAsync(CancellationToken.None);
 
@@ -66,7 +67,7 @@ public sealed class UpdateStagingLocationTests
         using var shared = new TemporaryUpdateRoot();
         using var mine = new TemporaryUpdateRoot();
 
-        var gateway = new UpdaterGateway(shared.Paths, mine.Paths);
+        var gateway = new UpdaterGateway(shared.Paths, mine.Paths, () => ServiceState.NotInstalled);
 
         (await gateway.ReadyAsync(CancellationToken.None)).Should().BeNull();
     }

@@ -1,3 +1,7 @@
+using System.IO;
+using System.Net.Http;
+using BetterTranslator.Updates;
+using BetterTranslator.Updates.Install;
 using BetterTranslator.Core.Services;
 using BetterTranslator.Updates.Releases;
 using FluentAssertions;
@@ -159,5 +163,106 @@ public sealed class UpdateComparisonTests
         SemanticVersion.Parse("1.0.0").Should().BeGreaterThan(SemanticVersion.Parse("1.0.0-rc.1"));
         SemanticVersion.Parse("1.0.0-rc.2").Should().BeGreaterThan(SemanticVersion.Parse("1.0.0-rc.1"));
         SemanticVersion.Parse("1.0.0-rc.1").Should().Be(SemanticVersion.Parse("1.0.0-rc.1"));
+    }
+}
+
+/// <summary>
+/// A release can be tagged at a commit no published binary was built from. The
+/// version and the commit then disagree for ever, and an updater that trusts
+/// them alone offers the same release, installs it, and offers it again. The
+/// published checksum is what settles it.
+/// </summary>
+public sealed class UpdateConvergenceTests
+{
+    private static readonly byte[] Payload = [7, 7, 7, 7];
+
+    private static string PayloadSha =>
+        Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Payload)).ToLowerInvariant();
+
+    private static ReleaseInfo Release(string tag, string commit, string digest, long size) =>
+        new(tag, commit, DateTimeOffset.UnixEpoch, [
+            new ReleaseAsset(UpdatePaths.PayloadAssetName, size, "https://github.com/x/y/releases/download/z/BetterTranslator.exe", digest),
+        ]);
+
+    [Fact]
+    public async Task A_release_whose_bytes_are_already_installed_is_not_offered_again()
+    {
+        using var root = new TemporaryUpdateRoot();
+
+        // The build recorded as installed carries exactly the published bytes,
+        // while the tag names a commit the build never came from.
+        string installed = Path.Combine(root.Root, UpdatePaths.PayloadAssetName);
+        await File.WriteAllBytesAsync(installed, Payload);
+        new InstalledAppStore(root.Paths).Write(installed, "1.0.4", "fdc0818");
+
+        var release = Release("v1.0.4", "349d968aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", PayloadSha, Payload.Length);
+        var client = new RecordedReleaseClient(ReleaseLookup.Found(release));
+
+        using var http = new HttpClient(new RecordingHandler(_ => RecordingHandler.Text(string.Empty)));
+
+        var workflow = new UpdateWorkflow(
+            client,
+            http,
+            root.Paths,
+            null,
+            new BuildIdentity("1.0.4", "fdc0818", "stable", DateTimeOffset.UnixEpoch));
+
+        var status = await workflow.CheckAsync(CancellationToken.None);
+
+        status.Outcome.Should().Be(
+            UpdateOutcome.UpToDate,
+            "the bytes on disk are the bytes the release publishes, whatever the commits say");
+        status.Detail.Should().Contain("already installed");
+    }
+
+    [Fact]
+    public async Task A_release_whose_bytes_differ_at_the_same_version_is_still_offered()
+    {
+        using var root = new TemporaryUpdateRoot();
+
+        string installed = Path.Combine(root.Root, UpdatePaths.PayloadAssetName);
+        await File.WriteAllBytesAsync(installed, [1, 2, 3, 4]);
+        new InstalledAppStore(root.Paths).Write(installed, "1.0.4", "fdc0818");
+
+        var release = Release("v1.0.4", "349d968aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", PayloadSha, Payload.Length);
+        var client = new RecordedReleaseClient(ReleaseLookup.Found(release));
+
+        using var http = new HttpClient(new RecordingHandler(_ => RecordingHandler.Text(string.Empty)));
+
+        var workflow = new UpdateWorkflow(
+            client,
+            http,
+            root.Paths,
+            null,
+            new BuildIdentity("1.0.4", "fdc0818", "stable", DateTimeOffset.UnixEpoch));
+
+        var status = await workflow.CheckAsync(CancellationToken.None);
+
+        status.Outcome.Should().Be(
+            UpdateOutcome.UpdateAvailable,
+            "a genuinely different build at the same version is still worth taking");
+    }
+
+    [Fact]
+    public async Task A_newer_version_is_offered_without_reading_the_installed_file()
+    {
+        using var root = new TemporaryUpdateRoot();
+
+        var release = Release("v1.0.5", "349d968aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", PayloadSha, Payload.Length);
+        var client = new RecordedReleaseClient(ReleaseLookup.Found(release));
+
+        using var http = new HttpClient(new RecordingHandler(_ => RecordingHandler.Text(string.Empty)));
+
+        var workflow = new UpdateWorkflow(
+            client,
+            http,
+            root.Paths,
+            null,
+            new BuildIdentity("1.0.4", "fdc0818", "stable", DateTimeOffset.UnixEpoch));
+
+        var status = await workflow.CheckAsync(CancellationToken.None);
+
+        status.Outcome.Should().Be(UpdateOutcome.UpdateAvailable);
+        status.LatestVersion.Should().Be("1.0.5");
     }
 }
