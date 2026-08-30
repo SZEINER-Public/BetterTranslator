@@ -90,14 +90,14 @@ public sealed class ComponentInstallQueueTests : IDisposable
         await File.WriteAllBytesAsync(paths.PathFor(component), Gguf(4096));
 
         using var client = server.CreateClient();
-        var queue = new ComponentInstallQueue(new DownloadManager(client, paths, resolver), resolver);
+        var queue = new ComponentInstallQueue(new DownloadManager(client, paths, resolver), resolver, paths);
 
         queue.Resolve(component).Reason.Should().Be(PresenceReason.InstalledHere);
 
         var result = await queue.EnqueueAsync(component, null, CancellationToken.None);
 
         result.State.Should().Be(DownloadState.Installed);
-        queue.IsPending(component.Id).Should().BeFalse("nothing was ever queued for it");
+        queue.IsPending(component).Should().BeFalse("nothing was ever queued for it");
         served.Should().Be(0, "the bytes are already at the destination");
     }
 
@@ -120,7 +120,7 @@ public sealed class ComponentInstallQueueTests : IDisposable
         await File.WriteAllBytesAsync(paths.PathFor(component), Gguf(1024));
 
         using var client = server.CreateClient();
-        var queue = new ComponentInstallQueue(new DownloadManager(client, paths, resolver), resolver);
+        var queue = new ComponentInstallQueue(new DownloadManager(client, paths, resolver), resolver, paths);
 
         queue.Resolve(component).Reason.Should().Be(PresenceReason.WrongLength);
 
@@ -172,7 +172,7 @@ public sealed class ComponentInstallQueueTests : IDisposable
 
         var (paths, resolver) = Store();
         using var client = server.CreateClient();
-        var queue = new ComponentInstallQueue(new DownloadManager(client, paths, resolver), resolver);
+        var queue = new ComponentInstallQueue(new DownloadManager(client, paths, resolver), resolver, paths);
         var component = Component(new Uri(server.BaseAddress, "/model"));
 
         var both = await Task.WhenAll(
@@ -181,7 +181,7 @@ public sealed class ComponentInstallQueueTests : IDisposable
 
         both.Should().AllSatisfy(r => r.State.Should().Be(DownloadState.Installed));
         served.Should().Be(1, "the second enqueue joins the transfer already running");
-        queue.IsPending(component.Id).Should().BeFalse("the entry is released once the transfer ends");
+        queue.IsPending(component).Should().BeFalse("the entry is released once the transfer ends");
     }
 
     [Fact]

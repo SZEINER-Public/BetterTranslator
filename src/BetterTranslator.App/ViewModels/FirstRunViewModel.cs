@@ -42,7 +42,13 @@ public sealed partial class FirstRunViewModel : ObservableObject
     private readonly ComponentInstallQueue _queue;
     private CancellationTokenSource? _installing;
 
-    public FirstRunViewModel(InstallPaths paths, HttpClient httpClient)
+    /// <summary>
+    /// The queue is the session's, not this panel's. Built here only where no
+    /// session queue is supplied: two panels each holding their own single
+    /// flight registry are two registries, and one component was installed four
+    /// times behind exactly that.
+    /// </summary>
+    public FirstRunViewModel(InstallPaths paths, HttpClient httpClient, ComponentInstallQueue? queue = null)
     {
         _paths = paths;
 
@@ -53,7 +59,7 @@ public sealed partial class FirstRunViewModel : ObservableObject
 
         // Everything goes through the queue: what a row displays and what the
         // transfer decides are the same answer, asked once.
-        _queue = new ComponentInstallQueue(new DownloadManager(httpClient, paths, resolver), resolver);
+        _queue = queue ?? new ComponentInstallQueue(new DownloadManager(httpClient, paths, resolver), resolver, paths);
 
         // Runtime rows come from the hardware probe, so a Radeon is never offered
         // a CUDA build it could not load.
@@ -217,6 +223,7 @@ public sealed partial class FirstRunViewModel : ObservableObject
     private void UseDefaultFolder()
     {
         _paths.UseDefault();
+        BackendCatalog.SearchAlso(_paths.ModelsFolder);
         RaisePathFigures();
         RefreshPresence();
     }
@@ -236,6 +243,14 @@ public sealed partial class FirstRunViewModel : ObservableObject
         }
 
         _paths.UseFolder(dialog.FolderName);
+
+        // Told to the loader at once, not only after an install lands. A
+        // runtime flavour written into a folder the search list never heard of
+        // is a flavour every "is it installed" surface reports as missing, and
+        // the Get button that follows is how one component was fetched four
+        // times in a row.
+        BackendCatalog.SearchAlso(_paths.ModelsFolder);
+
         RaisePathFigures();
         RefreshPresence();
     }

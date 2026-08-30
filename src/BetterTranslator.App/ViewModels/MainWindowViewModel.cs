@@ -53,6 +53,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
     /// </summary>
     private FirstRunViewModel? _installer;
 
+    private ComponentInstallQueue? _sessionInstalls;
+
     public MainWindowViewModel()
     {
         // Phase 6 moves this to the host's service container; until then the
@@ -672,13 +674,36 @@ public sealed partial class MainWindowViewModel : ObservableObject
             return _installer;
         }
 
-        var installer = new FirstRunViewModel(_installPaths, _httpClient);
+        var installer = new FirstRunViewModel(_installPaths, _httpClient, SessionInstallQueue);
         installer.Finished += OnFirstRunFinished;
         installer.Dismissed += OnInstallerDismissed;
         installer.BatchInstalled += OnBatchInstalled;
 
         _installer = installer;
         return installer;
+    }
+
+    /// <summary>
+    /// One install queue for the life of the process.
+    ///
+    /// The panel is built and released as it is opened and dismissed, so a
+    /// queue owned by the panel gave every opening its own single flight
+    /// registry. Two registries do not know about each other, and the only
+    /// thing standing between them and two transfers of one component was a
+    /// lock file in the temp folder whose failure path returns a lock holding
+    /// nothing.
+    /// </summary>
+    internal ComponentInstallQueue SessionInstallQueue =>
+        _sessionInstalls ??= BuildSessionInstallQueue();
+
+    private ComponentInstallQueue BuildSessionInstallQueue()
+    {
+        var resolver = new ModelResolver(_installPaths, new ModelLibrary());
+
+        return new ComponentInstallQueue(
+            new DownloadManager(_httpClient, _installPaths, resolver),
+            resolver,
+            _installPaths);
     }
 
     /// <summary>
