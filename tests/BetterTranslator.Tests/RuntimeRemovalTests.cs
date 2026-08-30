@@ -134,7 +134,8 @@ public sealed class RuntimeRemovalTests : IAsyncLifetime
         var model = ComponentCatalog.BuiltIn.First(c => c.Kind == ComponentKind.Model);
         var path = _paths.PathFor(model);
 
-        await File.WriteAllBytesAsync(path, [1, 2, 3]);
+        SparseArtifact.Write(path, model.SizeBytes, [0x47, 0x47, 0x55, 0x46, 3, 0, 0, 0]);
+        await Task.CompletedTask;
 
         await _settings.DeleteModelCommand.ExecuteAsync(
             new InstalledModelRow(model.Id, model.Name, "Model", "2.3 GB", CanDelete: true));

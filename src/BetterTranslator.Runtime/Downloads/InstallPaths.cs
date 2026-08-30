@@ -39,13 +39,16 @@ public sealed class InstallPaths
     /// Installed means usable, so every companion counts. A CUDA runtime whose
     /// cuBLAS libraries are missing is on disk and cannot load, and reporting it
     /// installed is what let that ship as "CUDA is slow".
+    ///
+    /// Decided by <see cref="ComponentInstallState"/> rather than here, so every
+    /// surface asks one implementation of the question.
     /// </summary>
     public bool IsInstalled(ModelComponent component) =>
-        File.Exists(PathFor(component)) && component.Companions.All(c => File.Exists(PathFor(c)));
+        ComponentInstallState.IsInstalledIn(ModelsFolder, component);
 
     /// <summary>Which companions are still missing, for a message that names them.</summary>
     public IReadOnlyList<CompanionArtifact> MissingCompanions(ModelComponent component) =>
-        [.. component.Companions.Where(c => !File.Exists(PathFor(c)))];
+        ComponentInstallState.MissingIn(ModelsFolder, component);
 
     /// <summary>Real size on disk, or 0 when the component is not installed.</summary>
     public long InstalledBytes(ModelComponent component)
@@ -60,7 +63,7 @@ public sealed class InstallPaths
         return total;
     }
 
-    private static long Length(string path) => File.Exists(path) ? new FileInfo(path).Length : 0;
+    private static long Length(string path) => Math.Max(ComponentInstallState.BytesOf(path), 0);
 
     public void EnsureCreated() => Directory.CreateDirectory(ModelsFolder);
 

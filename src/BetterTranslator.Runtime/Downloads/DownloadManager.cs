@@ -55,7 +55,7 @@ public sealed class DownloadManager(HttpClient httpClient, InstallPaths paths, M
 
         foreach (var companion in component.Companions)
         {
-            if (File.Exists(paths.PathFor(companion)))
+            if (ComponentInstallState.ArtifactMatches(paths.PathFor(companion), companion.SizeBytes))
             {
                 continue;
             }

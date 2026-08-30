@@ -937,8 +937,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     }
 
     private static bool Complete(string folder, ModelComponent component) =>
-        File.Exists(Path.Combine(folder, component.FileName))
-        && component.Companions.All(c => File.Exists(Path.Combine(folder, c.FileName)));
+        ComponentInstallState.IsInstalledIn(folder, component);
 
     private static long Length(string path)
     {

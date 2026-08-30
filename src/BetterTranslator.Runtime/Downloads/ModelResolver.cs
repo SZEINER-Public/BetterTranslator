@@ -127,17 +127,21 @@ public sealed class ModelResolver(InstallPaths paths, ModelLibrary library)
             // lives somewhere else answers no however well it works.
             if (File.Exists(beside))
             {
-                return Match(
+                var found = Match(
                     beside,
                     component.SizeBytes,
                     paths.IsDefault ? PresenceReason.InstalledHere : PresenceReason.InstalledElsewhere);
+
+                return found.Reason == PresenceReason.InstalledHere
+                    ? WithDependencies(component, found)
+                    : found;
             }
         }
 
         var partial = destination + ".part";
         if (File.Exists(partial))
         {
-            var length = Length(partial);
+            var length = ComponentInstallState.BytesOf(partial);
 
             // A .part that has somehow reached or passed the full length is not
             // a resume point; it is a file whose promotion was interrupted, and
@@ -169,13 +173,21 @@ public sealed class ModelResolver(InstallPaths paths, ModelLibrary library)
 
     /// <summary>
     /// Downgrades a found component to <see cref="PresenceReason.MissingDependencies"/>
-    /// when something it needs beside it is absent. Beside it, not merely
-    /// somewhere: the loader resolves a DLL's imports from that DLL's own
-    /// folder, so a copy elsewhere does not help.
+    /// when something it needs beside it is absent or is the wrong length.
+    /// Beside it, not merely somewhere: the loader resolves a DLL's imports from
+    /// that DLL's own folder, so the folder searched is the one the artifact was
+    /// actually found in.
     /// </summary>
-    private Presence WithDependencies(ModelComponent component, Presence found)
+    private static Presence WithDependencies(ModelComponent component, Presence found)
     {
-        var missing = paths.MissingCompanions(component);
+        var folder = Path.GetDirectoryName(found.Path);
+
+        if (string.IsNullOrEmpty(folder))
+        {
+            return found;
+        }
+
+        var missing = ComponentInstallState.MissingIn(folder, component);
 
         return missing.Count == 0
             ? found
@@ -194,25 +206,13 @@ public sealed class ModelResolver(InstallPaths paths, ModelLibrary library)
     /// </summary>
     private static Presence Match(string path, long expected, PresenceReason found)
     {
-        var length = Length(path);
+        var length = Math.Max(ComponentInstallState.BytesOf(path), 0);
 
-        if (expected > 0 && length != expected)
+        if (!ComponentInstallState.ArtifactMatches(path, expected))
         {
             return new Presence { Reason = PresenceReason.WrongLength, Path = path, BytesOnDisk = length };
         }
 
         return new Presence { Reason = found, Path = path, BytesOnDisk = length };
-    }
-
-    private static long Length(string path)
-    {
-        try
-        {
-            return new FileInfo(path).Length;
-        }
-        catch (IOException)
-        {
-            return 0;
-        }
     }
 }

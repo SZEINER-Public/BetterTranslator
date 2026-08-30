@@ -39,10 +39,15 @@ public sealed class TranslationSettingsTests : IDisposable
 
     private TranslationSettingsViewModel Create() => new(_paths, () => _downloadManagerOpened++);
 
+    /// <summary>
+    /// A stub of the declared length, not a three-byte placeholder. Installed
+    /// state is decided on the length now, so a short file is a partial
+    /// download and rightly does not count as installed.
+    /// </summary>
     private void Install(string id)
     {
         var component = ComponentCatalog.BuiltIn.Single(c => c.Id == id);
-        File.WriteAllBytes(_paths.PathFor(component), [1, 2, 3]);
+        SparseArtifact.Write(_paths.PathFor(component), component.SizeBytes, [0x47, 0x47, 0x55, 0x46, 3, 0, 0, 0]);
     }
 
     [Fact]

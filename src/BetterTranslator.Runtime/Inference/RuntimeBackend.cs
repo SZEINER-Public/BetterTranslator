@@ -158,8 +158,9 @@ public sealed class BackendCatalog(string? runtimeFolder = null)
     /// symptom was that translation was slow.
     /// </summary>
     public bool IsInstalled(RuntimeBackend backend) =>
-        Folders.Any(f => File.Exists(Path.Combine(f, FileNameFor(backend)))
-                      && DependenciesFor(backend).All(d => File.Exists(Path.Combine(f, d))));
+        Folders.Any(f => Downloads.ComponentInstallState.ArtifactMatches(Path.Combine(f, FileNameFor(backend)), 0)
+                      && DependenciesFor(backend).All(
+                          d => Downloads.ComponentInstallState.ArtifactMatches(Path.Combine(f, d), 0)));
 
     /// <summary>
     /// Resolves what will actually be loaded. A stored choice can go stale --

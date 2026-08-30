@@ -81,16 +81,23 @@ public sealed partial class InstallItemViewModel(ModelComponent component) : Obs
         OnPropertyChanged(nameof(PresenceNote));
         OnPropertyChanged(nameof(HasPresenceNote));
         OnPropertyChanged(nameof(CanDeselect));
-
-        // Ticked only when it is at the destination. A copy in another folder
-        // leaves the box off: choosing a new folder is asking for the file to be
-        // there, and the mark beside it says a copy already exists elsewhere.
-        //
-        // Never for a flavour this machine cannot run. No such row is
-        // PreSelected today, so this guards a rule rather than a case -- but the
-        // rule must not depend on that staying true.
-        IsSelected = !IsBlocked && (IsInstalledHere || (Component.PreSelected && !IsElsewhere));
     }
+
+    /// <summary>
+    /// Ticked only when it is at the destination. A copy in another folder
+    /// leaves the box off: choosing a new folder is asking for the file to be
+    /// there, and the mark beside it says a copy already exists elsewhere.
+    ///
+    /// Never for a flavour this machine cannot run. No such row is PreSelected
+    /// today, so this guards a rule rather than a case -- but the rule must not
+    /// depend on that staying true.
+    ///
+    /// Asked for rather than fired from the presence setter, because presence is
+    /// re-read at the moment the queue reads it and a tick the reader chose must
+    /// survive that.
+    /// </summary>
+    public void SelectByDefault() =>
+        IsSelected = !IsBlocked && (IsInstalledHere || (Component.PreSelected && !IsElsewhere));
 
     /// <summary>The runtime is tagged required and cannot be unticked.</summary>
     public bool IsRequired => Component.IsRequired;

@@ -39,8 +39,7 @@ public sealed partial class FirstRunViewModel : ObservableObject
 {
     private readonly ComponentCatalog _catalog = new();
     private readonly InstallPaths _paths;
-    private readonly DownloadManager _downloads;
-    private readonly ModelResolver _resolver;
+    private readonly ComponentInstallQueue _queue;
     private CancellationTokenSource? _installing;
 
     public FirstRunViewModel(InstallPaths paths, HttpClient httpClient)
@@ -51,14 +50,15 @@ public sealed partial class FirstRunViewModel : ObservableObject
         // on the machine. Without it this screen offers to fetch gigabytes that
         // are sitting in another tool's model folder.
         var resolver = new ModelResolver(paths, new BetterTranslator.Runtime.Inference.ModelLibrary());
-        _downloads = new DownloadManager(httpClient, paths, resolver);
+
+        // Everything goes through the queue: what a row displays and what the
+        // transfer decides are the same answer, asked once.
+        _queue = new ComponentInstallQueue(new DownloadManager(httpClient, paths, resolver), resolver);
 
         // Runtime rows come from the hardware probe, so a Radeon is never offered
         // a CUDA build it could not load.
         var hardware = BackendCatalog.Probe();
         HardwareLabel = hardware.VendorLabel;
-
-        _resolver = resolver;
 
         foreach (var component in ComponentCatalog.RuntimesFor(hardware).Concat(_catalog.All))
         {
@@ -96,7 +96,8 @@ public sealed partial class FirstRunViewModel : ObservableObject
     {
         foreach (var item in Items)
         {
-            item.Presence = _resolver.Resolve(item.Component);
+            item.Presence = _queue.Resolve(item.Component);
+            item.SelectByDefault();
         }
 
         RaiseSelectionFigures();
@@ -254,7 +255,7 @@ public sealed partial class FirstRunViewModel : ObservableObject
         CustomModelLink = string.Empty;
 
         var added = _catalog.Custom[^1];
-        var item = new InstallItemViewModel(added) { IsSelected = true };
+        var item = new InstallItemViewModel(added) { Presence = _queue.Resolve(added), IsSelected = true };
         item.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(InstallItemViewModel.IsSelected))
@@ -296,11 +297,27 @@ public sealed partial class FirstRunViewModel : ObservableObject
         _paths.EnsureCreated();
         _installing = new CancellationTokenSource();
 
-        var queue = Selected.ToList();
-        foreach (var item in queue)
+        // Installed state is settled here, once, from the queue's own answer,
+        // and the row is repainted with it before anything is enqueued. That is
+        // the whole defect: the tick said installed, the queue asked a second
+        // time somewhere else, and a row displayed as present was fetched again.
+        var queue = new List<InstallItemViewModel>();
+
+        foreach (var item in Selected.ToList())
         {
+            item.Presence = _queue.Resolve(item.Component);
+
+            if (item.IsInstalledHere)
+            {
+                item.State = DownloadState.Installed;
+                continue;
+            }
+
             item.State = DownloadState.Waiting;
+            queue.Add(item);
         }
+
+        RaiseSelectionFigures();
 
         foreach (var item in queue)
         {
@@ -310,8 +327,8 @@ public sealed partial class FirstRunViewModel : ObservableObject
                 FooterStatus = BuildFooter(item);
             });
 
-            var result = await _downloads
-                .DownloadAsync(item.Component, progress, _installing.Token)
+            var result = await _queue
+                .EnqueueAsync(item.Component, progress, _installing.Token)
                 .ConfigureAwait(true);
 
             item.Apply(result);
