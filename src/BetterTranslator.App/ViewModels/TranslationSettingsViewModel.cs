@@ -11,13 +11,15 @@ namespace BetterTranslator.App.ViewModels;
 /// whose model is missing does not switch: it opens the download manager, and
 /// the item says which model is missing.
 /// </summary>
-public sealed partial class EffortOptionViewModel(TranslationEffort effort, ModelComponent model) : ObservableObject
+public sealed partial class EffortOptionViewModel(EffortTier tier, ModelComponent model) : ObservableObject
 {
-    public TranslationEffort Effort { get; } = effort;
+    public EffortTier Tier { get; } = tier;
+
+    public TranslationEffort Effort => Tier.Effort;
 
     public ModelComponent Model { get; } = model;
 
-    public string Label => Effort == TranslationEffort.Fast ? "Fast" : "Thinking";
+    public string Label => Tier.Label;
 
     /// <summary>The model note under the label, as the effort menu shows it.</summary>
     public string Note => Model.Name;
@@ -46,7 +48,7 @@ public sealed partial class EffortOptionViewModel(TranslationEffort effort, Mode
     /// </summary>
     public string? RadioNote => IsInstalled
         ? null
-        : $"Not installed. Download it to use {(Effort == TranslationEffort.Thinking ? "Thinking" : "Fast")}.";
+        : $"Not installed. Download it to use {Tier.Label}.";
 
     partial void OnIsInstalledChanged(bool value)
     {
@@ -58,7 +60,7 @@ public sealed partial class EffortOptionViewModel(TranslationEffort effort, Mode
 }
 
 /// <summary>
-/// S8. Simple carries the effort menu; Advanced carries the model radios,
+/// S8. The composer carries the effort menu; Advanced carries the model radios,
 /// temperature and user prompt. Advanced adds no mode chips to the composer and
 /// no context field.
 /// </summary>
@@ -74,45 +76,48 @@ public sealed partial class TranslationSettingsViewModel : ObservableObject
         _paths = paths;
         _openDownloadManager = openDownloadManager;
 
-        var fast = ComponentCatalog.BuiltIn.Single(c => c.Id == "eurollm");
-        var thinking = ComponentCatalog.BuiltIn.Single(c => c.Id == "translategemma");
-
         Efforts =
         [
-            new EffortOptionViewModel(TranslationEffort.Fast, fast),
-            new EffortOptionViewModel(TranslationEffort.Thinking, thinking),
+            .. EffortTiers.All.Select(tier => new EffortOptionViewModel(
+                tier,
+                ComponentCatalog.BuiltIn.Single(c => c.Id == tier.ModelId))),
         ];
 
         RefreshInstalled();
-        SelectedEffort = Efforts[0];
     }
 
     public IReadOnlyList<EffortOptionViewModel> Efforts { get; }
 
     [ObservableProperty]
-    public partial EffortOptionViewModel SelectedEffort { get; set; }
+    public partial EffortOptionViewModel? SelectedEffort { get; set; }
 
     /// <summary>Which effort is in force, as the settings row stores it.</summary>
-    public TranslationEffort Effort => SelectedEffort.Effort;
+    public TranslationEffort Effort => SelectedEffort?.Effort ?? EffortTiers.Default;
+
+    public string EffortLabel => SelectedEffort?.Label ?? EffortTiers.NothingInstalledLabel;
+
+    public bool HasSelectedEffort => SelectedEffort is not null;
+
+    [ObservableProperty]
+    public partial string? SelectionNotice { get; set; }
 
     /// <summary>
-    /// The model this effort translates with. This is what makes Fast and
+    /// The model this effort translates with. This is what makes Simple and
     /// Thinking mean something: they are not two labels over one model, they
     /// select which GGUF gets loaded.
     /// </summary>
-    public ModelComponent Model => SelectedEffort.Model;
+    public ModelComponent Model =>
+        (SelectedEffort ?? Efforts.Single(option => option.Effort == EffortTiers.Default)).Model;
 
     /// <summary>
-    /// Restores the stored choice at launch. An effort whose model has since
-    /// been deleted does not get restored -- it would load nothing and every
-    /// send would report no model -- so the first installed one is taken.
+    /// Restores the stored choice at launch. The resolver decides whether it
+    /// still stands: an effort whose model has since been deleted would load
+    /// nothing and every send would report no model.
     /// </summary>
     public void Restore(TranslationEffort effort)
     {
+        _chosen = effort;
         RefreshInstalled();
-
-        var wanted = Efforts.FirstOrDefault(e => e.Effort == effort && e.IsInstalled);
-        SelectedEffort = wanted ?? Efforts.FirstOrDefault(e => e.IsInstalled) ?? Efforts[0];
     }
 
     /// <summary>
@@ -147,21 +152,36 @@ public sealed partial class TranslationSettingsViewModel : ObservableObject
 
     private bool _restoring;
 
+    private bool _resolving;
+
+    private TranslationEffort? _chosen;
+
     /// <summary>Raised when the effort changes, so the shell can store it.</summary>
     public event Action<TranslationEffort>? EffortChanged;
 
-    partial void OnSelectedEffortChanged(EffortOptionViewModel value)
+    public event Action<TranslationEffort>? SelectionResolved;
+
+    partial void OnSelectedEffortChanged(EffortOptionViewModel? value)
     {
         MarkChosen();
         OnPropertyChanged(nameof(Effort));
         OnPropertyChanged(nameof(Model));
+        OnPropertyChanged(nameof(EffortLabel));
+        OnPropertyChanged(nameof(HasSelectedEffort));
 
         // Whether the slider does anything is a fact about the model, so it moves
         // when the model does.
         OnPropertyChanged(nameof(TemperatureIsAdjustable));
         OnPropertyChanged(nameof(TemperatureNote));
 
-        EffortChanged?.Invoke(value.Effort);
+        if (_resolving)
+        {
+            SelectionResolved?.Invoke(Effort);
+            return;
+        }
+
+        _chosen = value?.Effort;
+        EffortChanged?.Invoke(Effort);
     }
 
     /// <summary>One option carries the mark, so the cards cannot both look on.</summary>
@@ -237,6 +257,38 @@ public sealed partial class TranslationSettingsViewModel : ObservableObject
         {
             effort.IsInstalled = _paths.IsInstalled(effort.Model);
         }
+
+        ResolveSelection();
+    }
+
+    private void ResolveSelection()
+    {
+        var selection = EffortTiers.Resolve(
+            Efforts.Where(option => option.IsInstalled).Select(option => option.Tier.ModelId),
+            _chosen);
+
+        SelectionNotice = selection.Notice;
+
+        var wanted = selection.Selected is null
+            ? null
+            : Efforts.Single(option => option.Effort == selection.Selected.Effort);
+
+        if (ReferenceEquals(wanted, SelectedEffort))
+        {
+            MarkChosen();
+            return;
+        }
+
+        _resolving = true;
+
+        try
+        {
+            SelectedEffort = wanted;
+        }
+        finally
+        {
+            _resolving = false;
+        }
     }
 
     [RelayCommand]
@@ -257,6 +309,7 @@ public sealed partial class TranslationSettingsViewModel : ObservableObject
             return;
         }
 
+        _chosen = option.Effort;
         SelectedEffort = option;
     }
 
@@ -274,7 +327,9 @@ public sealed partial class TranslationSettingsViewModel : ObservableObject
         Temperature = DefaultTemperature;
         UserPrompt = string.Empty;
 
-        var firstAvailable = Efforts.FirstOrDefault(e => e.IsInstalled) ?? Efforts[0];
-        SelectedEffort = firstAvailable;
+        _chosen = null;
+        ResolveSelection();
+
+        EffortChanged?.Invoke(Effort);
     }
 }

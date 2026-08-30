@@ -67,7 +67,7 @@ public sealed class SamplerAdvisoryTests
     }
 
     [Theory]
-    [InlineData(TranslationEffort.Fast, true)]
+    [InlineData(TranslationEffort.Simple, true)]
     [InlineData(TranslationEffort.Thinking, false)]
     public void The_slider_is_live_only_for_a_model_that_reads_it(TranslationEffort effort, bool adjustable)
     {

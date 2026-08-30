@@ -36,7 +36,7 @@ public sealed class VerificationWiringTests : IDisposable
         Text = "The build failed.",
         ModelPath = modelPath,
         Direction = TranslationDirection.Between("en", "English", "cs", "Czech"),
-        Effort = TranslationEffort.Fast,
+        Effort = TranslationEffort.Simple,
         Temperature = 0.7f,
     };
 

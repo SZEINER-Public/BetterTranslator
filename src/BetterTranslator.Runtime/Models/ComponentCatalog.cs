@@ -27,7 +27,7 @@ public sealed class ComponentCatalog
             Id = "eurollm",
             Name = "EuroLLM",
             Kind = ComponentKind.Model,
-            Summary = "Quick, wide European coverage - pairs with Fast",
+            Summary = "Wide European coverage. Backs the Simple tier.",
             SizeBytes = 5582838208,
             Version = "9B-Q4_K_M",
             ArtifactFileName = "EuroLLM-9B-Instruct-Q4_K_M.gguf",
@@ -39,7 +39,7 @@ public sealed class ComponentCatalog
             Id = "translategemma",
             Name = "TranslateGemma",
             Kind = ComponentKind.Model,
-            Summary = "Translation-tuned, slower - pairs with Thinking",
+            Summary = "Translation-tuned. Backs the Thinking tier.",
 
             // The share link supplied on 2026-08-02 points at the hyphen build,
             // which is a different artifact from the dot build this row carried

@@ -125,7 +125,7 @@ public sealed class LoopHarness : IDisposable
                         Text = text,
                         ModelPath = ModelPath,
                         Direction = EnglishToCzech,
-                        Effort = TranslationEffort.Fast,
+                        Effort = TranslationEffort.Simple,
                         IsStandalone = false,
                         UseDomainVocabulary = true,
                         UseProjectVocabulary = false,

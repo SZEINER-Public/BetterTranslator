@@ -61,7 +61,7 @@ public sealed record TranslationJob
 
     public Language To => new(Direction.Target.Code.Value, Direction.Target.Name);
 
-    public TranslationEffort Effort { get; init; } = TranslationEffort.Fast;
+    public TranslationEffort Effort { get; init; } = TranslationEffort.Simple;
 
     public float Temperature { get; init; } = 0.2f;
 
@@ -139,7 +139,7 @@ public sealed record TranslationJob
 
     /// <summary>
     /// Sampling for this job. Temperature is the user's; the token budget is the
-    /// effort's, and it is the only thing Fast and Thinking change about
+    /// effort's, and it is the only thing Simple and Thinking change about
     /// sampling -- the rest is left at the runtime's own defaults so a future
     /// change there is not silently overridden here.
     /// </summary>
@@ -160,7 +160,7 @@ public sealed record TranslationJob
         var p = RuntimeDefaults();
 
         p.Temperature = Temperature;
-        p.MaxTokens = Effort == TranslationEffort.Thinking ? ThinkingTokens : FastTokens;
+        p.MaxTokens = Effort == TranslationEffort.Thinking ? ThinkingTokens : SimpleTokens;
 
         if (Verification.SamplerConfigGuard.AppliesTo(ModelPath))
         {
@@ -222,7 +222,7 @@ public sealed record TranslationJob
     /// Enough for a sentence or a short paragraph, which is what the composer
     /// gets used for. The runtime's own default is 512.
     /// </summary>
-    private const int FastTokens = 512;
+    private const int SimpleTokens = 512;
 
     /// <summary>
     /// Room for a long passage. Held well under the 4096-token context so the

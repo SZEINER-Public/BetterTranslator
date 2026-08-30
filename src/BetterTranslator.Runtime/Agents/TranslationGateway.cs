@@ -228,9 +228,8 @@ public sealed class TranslationGateway : IDisposable
         }
 
         _settings.SelectedModelPath = match.Path;
-        _settings.Effort = string.Equals(LanguageRegistry.ModelFlag(match.FileName), "translategemma", StringComparison.Ordinal)
-            ? TranslationEffort.Thinking
-            : TranslationEffort.Fast;
+        _settings.Effort = EffortTiers.ForModelId(LanguageRegistry.ModelFlag(match.FileName))?.Effort
+            ?? _settings.Effort;
 
         await _settingsStore.SaveAsync(_settings, cancellationToken).ConfigureAwait(false);
 
@@ -885,7 +884,7 @@ public sealed class TranslationGateway : IDisposable
         var found = library.Scan([.. ModelLibrary.DefaultFolders(_installPaths.ModelsFolder)]);
 
         var component = ComponentCatalog.BuiltIn.FirstOrDefault(c =>
-            c.Id == (_settings.Effort == TranslationEffort.Fast ? "eurollm" : "translategemma"));
+            c.Id == EffortTiers.For(_settings.Effort).ModelId);
 
         var wanted = component is null ? null : library.Match(found, component.FileName);
 

@@ -82,7 +82,7 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
     /// <summary>
     /// The whole registry as the model in force sees it: every language, each
     /// carrying whether that model supports it. Filled by the shell, so it
-    /// repartitions when Fast is chosen and again for Thinking rather than being
+    /// repartitions when Simple is chosen and again for Thinking rather than being
     /// a list maintained in the view.
     /// </summary>
     public ObservableCollection<TargetLanguage> Languages { get; } = [.. TargetLanguage.All];

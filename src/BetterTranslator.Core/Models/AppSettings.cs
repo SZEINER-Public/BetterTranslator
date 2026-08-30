@@ -34,7 +34,7 @@ public sealed class AppSettings
     /// Full path to the GGUF to translate with. Empty until one is chosen or
     /// one is found on disk, and re-resolved when the file has gone.
     ///
-    /// The effort outranks this. Fast and Thinking are two names for two models
+    /// The effort outranks this. Simple and Thinking are two names for two models
     /// and sit on the composer where they are read every send, so letting a
     /// buried picker quietly win would make that visible control do nothing.
     /// This is what runs when the chosen effort's own model is not installed.
@@ -42,11 +42,11 @@ public sealed class AppSettings
     public string SelectedModelPath { get; set; } = string.Empty;
 
     /// <summary>
-    /// Fast or Thinking. Kept across sessions because it selects the model that
+    /// Simple or Thinking. Kept across sessions because it selects the model that
     /// gets loaded, and reloading one costs seconds and gigabytes -- landing on
     /// the wrong one at launch is not a cheap mistake.
     /// </summary>
-    public TranslationEffort Effort { get; set; } = TranslationEffort.Fast;
+    public TranslationEffort Effort { get; set; } = EffortTiers.Default;
 
     /// <summary>
     /// Apply the software-domain vocabulary to every send. On by default: the

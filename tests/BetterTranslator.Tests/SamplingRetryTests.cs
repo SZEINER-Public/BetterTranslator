@@ -71,7 +71,7 @@ public sealed class SamplingRetryTests
     [Fact]
     public void EffortStillDecidesTheBudgetAndNothingElse()
     {
-        var fast = (Job with { Effort = TranslationEffort.Fast }).Sampling();
+        var fast = (Job with { Effort = TranslationEffort.Simple }).Sampling();
         var thinking = (Job with { Effort = TranslationEffort.Thinking }).Sampling();
 
         thinking.MaxTokens.Should().BeGreaterThan(fast.MaxTokens);

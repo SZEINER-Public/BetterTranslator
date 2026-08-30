@@ -61,10 +61,7 @@ public sealed class SettingsStore(Database database)
                     ? backendParsed
                     : settings.RuntimeBackend,
             SelectedModelPath = stored.GetValueOrDefault(SelectedModelPathKey, settings.SelectedModelPath),
-            Effort = stored.TryGetValue(EffortKey, out var effort)
-                && Enum.TryParse<TranslationEffort>(effort, out var effortParsed)
-                    ? effortParsed
-                    : settings.Effort,
+            Effort = EffortTiers.Parse(stored.GetValueOrDefault(EffortKey)) ?? settings.Effort,
             Temperature = Double(stored, TemperatureKey, settings.Temperature),
             Instruction = stored.GetValueOrDefault(InstructionKey, settings.Instruction),
             RestartAfterInstall = Bool(stored, RestartAfterInstallKey, settings.RestartAfterInstall),

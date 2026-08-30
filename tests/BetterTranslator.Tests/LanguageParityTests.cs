@@ -308,7 +308,7 @@ public sealed class LanguageParityTests(ITestOutputHelper output)
 
         prompts.HasTrainedShape("translategemma-4b-it.Q4_K_M").Should().BeTrue();
 
-        // EuroLLM is the Fast model and publishes no trained prompt, so it is
+        // EuroLLM backs the Simple tier and publishes no trained prompt, so it is
         // asked in a way it was never tuned for. Pinned because it is the fact
         // the runtime's fixed prompt collides with.
         prompts.HasTrainedShape("EuroLLM-9B-Instruct-Q4_K_M").Should().BeFalse();

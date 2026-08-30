@@ -277,7 +277,7 @@ public sealed class TranslationContextTests : IAsyncLifetime
 }
 
 /// <summary>
-/// Fast and Thinking are two models and two budgets, not one model under two
+/// Simple and Thinking are two models and two budgets, not one model under two
 /// labels, and a job says for itself whether anything besides the text is going
 /// to the runtime.
 /// </summary>
@@ -294,7 +294,7 @@ public sealed class TranslationJobTests
     [Fact]
     public void Thinking_is_given_more_room_than_Fast()
     {
-        var fast = Job(TranslationEffort.Fast).Sampling();
+        var fast = Job(TranslationEffort.Simple).Sampling();
         var thinking = Job(TranslationEffort.Thinking).Sampling();
 
         thinking.MaxTokens.Should().BeGreaterThan(fast.MaxTokens);
@@ -307,7 +307,7 @@ public sealed class TranslationJobTests
     [Fact]
     public void The_users_temperature_reaches_the_runtime()
     {
-        var job = Job(TranslationEffort.Fast) with { Temperature = 0.75f };
+        var job = Job(TranslationEffort.Simple) with { Temperature = 0.75f };
 
         job.Sampling().Temperature.Should().Be(0.75f);
     }
@@ -315,19 +315,19 @@ public sealed class TranslationJobTests
     [Fact]
     public void A_plain_job_is_not_grounded()
     {
-        Job(TranslationEffort.Fast).IsGrounded.Should().BeFalse();
+        Job(TranslationEffort.Simple).IsGrounded.Should().BeFalse();
 
         // Whitespace is not context. An empty user-prompt field would otherwise
         // move every translation onto the grounded path for nothing.
-        (Job(TranslationEffort.Fast) with { Memory = "   ", Instruction = "" })
+        (Job(TranslationEffort.Simple) with { Memory = "   ", Instruction = "" })
             .IsGrounded.Should().BeFalse();
     }
 
     [Fact]
     public void Memory_or_a_standing_instruction_grounds_it()
     {
-        (Job(TranslationEffort.Fast) with { Memory = "glossary" }).IsGrounded.Should().BeTrue();
-        (Job(TranslationEffort.Fast) with { Instruction = "keep product names" }).IsGrounded.Should().BeTrue();
+        (Job(TranslationEffort.Simple) with { Memory = "glossary" }).IsGrounded.Should().BeTrue();
+        (Job(TranslationEffort.Simple) with { Instruction = "keep product names" }).IsGrounded.Should().BeTrue();
     }
 }
 

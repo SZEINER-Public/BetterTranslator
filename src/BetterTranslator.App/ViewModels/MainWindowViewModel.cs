@@ -203,7 +203,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         // Switching effort switches the model, so the path is re-resolved here
 
-        // rather than at the next send: picking Thinking and getting Fast's
+        // rather than at the next send: picking Thinking and getting Simple's
         // model would be indistinguishable from the setting doing nothing.
         Translation.EffortChanged += effort =>
         {
@@ -211,6 +211,13 @@ public sealed partial class MainWindowViewModel : ObservableObject
             _selectedModelPath = ResolveModelPath();
             ApplyModelLanguages();
             Store(settings => settings.Effort = effort);
+        };
+
+        Translation.SelectionResolved += effort =>
+        {
+            _settings.Effort = effort;
+            _selectedModelPath = ResolveModelPath();
+            ApplyModelLanguages();
         };
 
         // Advanced is stored now, so what an agent sends is what the reader set.

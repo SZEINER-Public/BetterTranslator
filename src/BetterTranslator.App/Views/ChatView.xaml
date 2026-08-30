@@ -711,11 +711,21 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Text="{Binding DataContext.Translation.SelectionNotice, RelativeSource={RelativeSource AncestorType=Window}}"
+                       Style="{StaticResource TextMeta}"
+                       Foreground="{StaticResource BrushWarnText}"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Left"
+                       Margin="2,0,2,8"
+                       Visibility="{Binding DataContext.Translation.SelectionNotice, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource NotEmptyToVisibility}}" />
 
             <!-- While a readable file is over the chat the composer takes the
                  accent, which is where the drop will land. -->
-            <Border Grid.Row="0"
+            <Border Grid.Row="1"
                     BorderThickness="{StaticResource BorderThickness}"
                     CornerRadius="{StaticResource RadiusComposer}"
                     Padding="16,12,12,10">
@@ -1243,10 +1253,10 @@
                                 ToolTip="Choose how much thinking to spend"
                                 AutomationProperties.Name="Choose how much thinking to spend">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <controls:IconView Definition="{StaticResource IconBoltFast}"
+                                <controls:IconView Definition="{StaticResource IconThinkingBubble}"
                                                    Foreground="{StaticResource BrushTextSecondary}"
                                                    VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding DataContext.Translation.SelectedEffort.Label, RelativeSource={RelativeSource AncestorType=Window}}"
+                                <TextBlock Text="{Binding DataContext.Translation.EffortLabel, RelativeSource={RelativeSource AncestorType=Window}}"
                                            Style="{StaticResource TextSecondary}"
                                            Margin="6,0,0,0"
                                            VerticalAlignment="Center" />
@@ -1348,7 +1358,7 @@
                 Fluent is documented as not for use in line with text, and an
                 emoji arrow would be a second icon family.
             -->
-            <WrapPanel Grid.Row="1"
+            <WrapPanel Grid.Row="2"
                        HorizontalAlignment="Center"
                        Margin="0,8,0,0">
                 <!-- The keys stay one wrap item: they read as a pair and a

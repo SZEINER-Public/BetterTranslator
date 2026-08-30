@@ -102,7 +102,7 @@ public sealed class TranslationSettingsTests : IDisposable
         var thinking = vm.Efforts.Single(e => e.Effort == TranslationEffort.Thinking);
         vm.ChooseEffortCommand.Execute(thinking);
 
-        vm.SelectedEffort.Effort.Should().Be(TranslationEffort.Thinking);
+        vm.SelectedEffort!.Effort.Should().Be(TranslationEffort.Thinking);
         _downloadManagerOpened.Should().Be(0);
         thinking.InstallHint.Should().BeNull();
         thinking.RadioNote.Should().BeNull();
@@ -126,11 +126,11 @@ public sealed class TranslationSettingsTests : IDisposable
     }
 
     [Fact]
-    public void FastIsEuroLlmAndThinkingIsTranslateGemma()
+    public void SimpleIsEuroLlmAndThinkingIsTranslateGemma()
     {
         var vm = Create();
 
-        vm.Efforts.Single(e => e.Effort == TranslationEffort.Fast).Model.Name.Should().Be("EuroLLM");
+        vm.Efforts.Single(e => e.Effort == TranslationEffort.Simple).Model.Name.Should().Be("EuroLLM");
         vm.Efforts.Single(e => e.Effort == TranslationEffort.Thinking).Model.Name.Should().Be("TranslateGemma");
     }
 
@@ -148,7 +148,7 @@ public sealed class TranslationSettingsTests : IDisposable
 
         vm.Temperature.Should().Be(0.2);
         vm.UserPrompt.Should().BeEmpty();
-        vm.SelectedEffort.IsInstalled.Should().BeTrue("reset does not land on a model that is not there");
+        vm.SelectedEffort!.IsInstalled.Should().BeTrue("reset does not land on a model that is not there");
     }
 
     [Fact]
@@ -158,7 +158,7 @@ public sealed class TranslationSettingsTests : IDisposable
         // when the chosen one writes its own sampler and ignores the slider.
         var vm = Create();
 
-        vm.SelectedEffort = vm.Efforts.Single(option => option.Effort == TranslationEffort.Fast);
+        vm.SelectedEffort = vm.Efforts.Single(option => option.Effort == TranslationEffort.Simple);
 
         vm.TemperatureNote.Should().Be("Low keeps wording close to the source.");
 

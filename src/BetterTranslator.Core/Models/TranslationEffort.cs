@@ -11,7 +11,7 @@ namespace BetterTranslator.Core.Models;
 public enum TranslationEffort
 {
     /// <summary>EuroLLM. Short budget, for the common one-line translation.</summary>
-    Fast,
+    Simple,
 
     /// <summary>TranslateGemma. Room to work through a longer passage.</summary>
     Thinking,
