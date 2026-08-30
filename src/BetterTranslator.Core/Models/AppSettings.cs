@@ -76,6 +76,14 @@ public sealed class AppSettings
 
     public Verification.VerificationSettings Verification { get; set; } = new();
 
+    /// <summary>
+    /// Close and open again once an install finishes, so the runtime flavour or
+    /// the model that was just written is the one that loads. On by default:
+    /// a component installed into a running process is not the component the
+    /// process is using.
+    /// </summary>
+    public bool RestartAfterInstall { get; set; } = true;
+
     public bool McpEnabled { get; set; }
 
     public string McpHost { get; set; } = "127.0.0.1";

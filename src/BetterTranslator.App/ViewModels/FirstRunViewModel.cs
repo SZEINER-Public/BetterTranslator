@@ -319,6 +319,8 @@ public sealed partial class FirstRunViewModel : ObservableObject
 
         RaiseSelectionFigures();
 
+        var installed = new List<string>();
+
         foreach (var item in queue)
         {
             var progress = new Progress<DownloadProgress>(report =>
@@ -338,14 +340,33 @@ public sealed partial class FirstRunViewModel : ObservableObject
                 Stage = FirstRunStage.ChooseWhatToInstall;
                 return;
             }
+
+            if (result.State == DownloadState.Installed)
+            {
+                installed.Add(item.Name);
+            }
         }
 
         FooterStatus = string.Empty;
         Stage = FirstRunStage.ChooseWhereToStart;
+
+        // One batch, one signal, and only when something was actually written.
+        // A run that fetched nothing has changed nothing for the process to
+        // pick up, so it must not spend the restart the guard allows.
+        if (installed.Count > 0)
+        {
+            BatchInstalled?.Invoke(new InstallBatch(Guid.NewGuid().ToString("N")[..8], installed));
+        }
     }
 
     /// <summary>Raised once the user has chosen where to start.</summary>
     public event Action<StartChoice>? Finished;
+
+    /// <summary>
+    /// Raised once per install run that actually wrote something, carrying the
+    /// id the restart guard spends and the names to put in the notice.
+    /// </summary>
+    public event Action<InstallBatch>? BatchInstalled;
 
     [RelayCommand]
     private void Start(string choice) =>

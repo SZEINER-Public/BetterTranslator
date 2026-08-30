@@ -556,6 +556,9 @@ public sealed partial class SettingsViewModel : ObservableObject
     public partial bool ReindexFilesWhenTheyChange { get; set; } = true;
 
     [ObservableProperty]
+    public partial bool RestartAfterInstall { get; set; } = true;
+
+    [ObservableProperty]
     public partial bool ScopeIsWholeProject { get; set; } = true;
 
     /// <summary>Whole percent. Anything less certain shows dotted and under Unsure.</summary>
@@ -618,6 +621,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         LearnFromMyEdits = settings.LearnFromMyEdits;
         UnderlineMemoryWords = settings.UnderlineMemoryWords;
         ReindexFilesWhenTheyChange = settings.ReindexFilesWhenTheyChange;
+        RestartAfterInstall = settings.RestartAfterInstall;
         ScopeIsWholeProject = settings.DefaultScopeForNewChats == ChatScope.WholeProject;
         UnsureThreshold = settings.UnsureThresholdPercent;
         SelectedBackend = settings.RuntimeBackend;
@@ -1205,6 +1209,8 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     partial void OnReindexFilesWhenTheyChangeChanged(bool value) => Persist();
 
+    partial void OnRestartAfterInstallChanged(bool value) => Persist();
+
     partial void OnScopeIsWholeProjectChanged(bool value) => Persist();
 
     /// <summary>
@@ -1223,6 +1229,7 @@ public sealed partial class SettingsViewModel : ObservableObject
             settings.LearnFromMyEdits = LearnFromMyEdits;
             settings.UnderlineMemoryWords = UnderlineMemoryWords;
             settings.ReindexFilesWhenTheyChange = ReindexFilesWhenTheyChange;
+            settings.RestartAfterInstall = RestartAfterInstall;
             settings.DefaultScopeForNewChats = ScopeIsWholeProject ? ChatScope.WholeProject : ChatScope.ThisChat;
             settings.UnsureThresholdPercent = (int)UnsureThreshold;
             settings.RuntimeBackend = SelectedBackend;

@@ -957,6 +957,76 @@
             <views:SettingsView DataContext="{Binding Settings}" />
         </Grid>
 
+        <!-- The restart notice. Says what is about to happen before it happens,
+             counts down in the open, and offers Not now. No backdrop dismissal:
+             a click anywhere must not be the thing that decides whether the
+             application closes itself. -->
+        <Grid Background="{StaticResource BrushOverlay}"
+              Visibility="{Binding HasRestartNotice, Converter={StaticResource BoolToVisibility}}">
+            <Border Style="{StaticResource DialogSurface}"
+                    DataContext="{Binding RestartNotice}"
+                    MinWidth="{StaticResource EmptyStateMaxWidthDialog}">
+                <StackPanel Margin="20,18,20,0">
+                    <TextBlock Text="{Binding Title}" Style="{StaticResource TextTitle}" />
+
+                    <TextBlock Text="{Binding Body}"
+                               Style="{StaticResource TextProse}"
+                               Foreground="{StaticResource BrushTextSecondary}"
+                               TextWrapping="Wrap"
+                               Margin="0,8,0,0" />
+
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0,10,0,0"
+                                Visibility="{Binding IsCountingDown, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="Restarting in" Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextMuted}" />
+                        <TextBlock Text="{Binding CountdownLabel}"
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   Margin="4,0,0,0" />
+                    </StackPanel>
+
+                    <Border Background="{StaticResource BrushSurfaceSunken}"
+                            BorderBrush="{StaticResource BrushBorderFaint}"
+                            BorderThickness="0,1,0,0"
+                            CornerRadius="0,0,11,11"
+                            Margin="-20,18,-20,0"
+                            Padding="20,14,20,14">
+                        <Grid>
+                            <Button Style="{StaticResource LinkButton}"
+                                    Content="Never restart on its own"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding TurnOffCommand}"
+                                    AutomationProperties.Name="Never restart on its own" />
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Style="{StaticResource SecondaryButton}"
+                                        Content="Not now"
+                                        Command="{Binding PostponeCommand}"
+                                        IsEnabled="{Binding CanPostpone}"
+                                        AutomationProperties.Name="Not now" />
+
+                                <Button Style="{StaticResource PrimaryButton}"
+                                        Content="Restart now"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding RestartNowCommand}"
+                                        Visibility="{Binding IsHeld, Converter={StaticResource InverseBoolToVisibility}}"
+                                        AutomationProperties.Name="Restart now" />
+
+                                <Button Style="{StaticResource PrimaryButton}"
+                                        Content="Stop translating and restart"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding CancelWorkAndRestartCommand}"
+                                        Visibility="{Binding IsHeld, Converter={StaticResource BoolToVisibility}}"
+                                        AutomationProperties.Name="Stop translating and restart" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Grid>
+
         <!-- S11 Add to this project. Escape, the close button and the backdrop
              all close it without changing state. -->
         <Grid Background="{StaticResource BrushOverlay}"

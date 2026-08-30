@@ -33,6 +33,7 @@ public sealed class SettingsStore(Database database)
     private const string VerifyNgramFloor = "verification_ngram_logprob_floor";
     private const string VerifyMinFrequency = "verification_min_frequency";
     private const string VerifyChunkRun = "verification_untranslated_chunk_min_run";
+    private const string RestartAfterInstallKey = "restart_after_install";
     private const string McpEnabledKey = "mcp_enabled";
     private const string McpHostKey = "mcp_host";
     private const string McpPortKey = "mcp_port";
@@ -66,6 +67,7 @@ public sealed class SettingsStore(Database database)
                     : settings.Effort,
             Temperature = Double(stored, TemperatureKey, settings.Temperature),
             Instruction = stored.GetValueOrDefault(InstructionKey, settings.Instruction),
+            RestartAfterInstall = Bool(stored, RestartAfterInstallKey, settings.RestartAfterInstall),
             McpEnabled = Bool(stored, McpEnabledKey, settings.McpEnabled),
             McpHost = stored.GetValueOrDefault(McpHostKey, settings.McpHost),
             McpPort = Int(stored, McpPortKey, settings.McpPort),
@@ -114,6 +116,7 @@ public sealed class SettingsStore(Database database)
             [VerifyNgramFloor] = settings.Verification.NgramLogProbFloor.ToString(CultureInfo.InvariantCulture),
             [VerifyMinFrequency] = settings.Verification.MinFrequency.ToString(CultureInfo.InvariantCulture),
             [VerifyChunkRun] = settings.Verification.UntranslatedChunkMinRun.ToString(CultureInfo.InvariantCulture),
+            [RestartAfterInstallKey] = settings.RestartAfterInstall ? "1" : "0",
             [McpEnabledKey] = settings.McpEnabled ? "1" : "0",
             [McpHostKey] = settings.McpHost,
             [McpPortKey] = settings.McpPort.ToString(CultureInfo.InvariantCulture),

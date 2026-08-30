@@ -27,6 +27,9 @@ namespace BetterTranslator.App.ViewModels;
 public sealed partial class MainWindowViewModel : ObservableObject
 {
     private readonly DispatcherTimer _sizeReadoutTimer;
+    private readonly DispatcherTimer _restartCountdown;
+    private readonly Core.Services.Restart.RestartGuard _restartGuard = new();
+    private readonly RestartLog _restartLog;
     private readonly Database _database;
     private readonly InstallPaths _installPaths;
     private readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromMinutes(30) };
@@ -64,6 +67,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         _database = new Database(paths);
         _installPaths = new InstallPaths(paths);
         _settingsStore = new SettingsStore(_database);
+        _restartLog = new RestartLog(Path.Combine(paths.Root, "logs"));
 
         var indexStore = new IndexStore(_database);
         Memory = new MemoryViewModel(indexStore, new IndexingService(indexStore, new DocumentReaders()));
@@ -232,6 +236,9 @@ public sealed partial class MainWindowViewModel : ObservableObject
             _sizeReadoutTimer.Stop();
             IsSizeReadoutVisible = false;
         };
+
+        _restartCountdown = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _restartCountdown.Tick += (_, _) => RestartNotice?.Tick();
     }
 
     public ObservableCollection<SegmentItem> WorkspaceModes { get; }
@@ -613,6 +620,18 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
+        // Written every launch, not only when a restart is asked for. The
+        // shipped executable hosts the runtime from an unpacked payload, so
+        // which of the two paths a relaunch would take is the first thing
+        // anybody reading this log needs to know.
+        var relaunch = Core.Services.Restart.ProcessRelaunch.Resolve();
+
+        _restartLog.Write(
+            $"Launched. Process path {Environment.ProcessPath}, payload directory {AppContext.BaseDirectory}, "
+            + $"managed entry {Environment.GetCommandLineArgs().FirstOrDefault()}. Resolved {relaunch.Detail}. "
+            + $"Relaunch command line would be {relaunch.CommandLine}. "
+            + $"Relaunched by an earlier install: {Environment.GetEnvironmentVariable(RestartLauncher.RelaunchedMarker) == "1"}.");
+
         await _database.MigrateAsync(cancellationToken).ConfigureAwait(true);
         await StartRuntimeAsync(cancellationToken).ConfigureAwait(true);
         await Workspace.LoadAsync(cancellationToken).ConfigureAwait(true);
@@ -656,9 +675,124 @@ public sealed partial class MainWindowViewModel : ObservableObject
         var installer = new FirstRunViewModel(_installPaths, _httpClient);
         installer.Finished += OnFirstRunFinished;
         installer.Dismissed += OnInstallerDismissed;
+        installer.BatchInstalled += OnBatchInstalled;
 
         _installer = installer;
         return installer;
+    }
+
+    /// <summary>
+    /// Releases the single instance mutex. Set by the application, which owns
+    /// it: the shell cannot reach into App to let go of a handle, and a
+    /// relaunch that leaves it held gives the new process a second instance it
+    /// will refuse to be.
+    /// </summary>
+    public Func<CancellationToken, Task>? ReleaseSingleInstance { get; set; }
+
+    /// <summary>
+    /// How the process ends once the new one is up. Injected so a test can
+    /// watch a restart run to completion without taking the test host down
+    /// with it.
+    /// </summary>
+    public Action<int> ExitProcess { get; set; } =
+        code => Application.Current?.Dispatcher.BeginInvoke(() => Application.Current.Shutdown(code));
+
+    /// <summary>Non-null while the restart notice is up.</summary>
+    [ObservableProperty]
+    public partial RestartNoticeViewModel? RestartNotice { get; set; }
+
+    public bool HasRestartNotice => RestartNotice is not null;
+
+    partial void OnRestartNoticeChanged(RestartNoticeViewModel? value)
+    {
+        OnPropertyChanged(nameof(HasRestartNotice));
+
+        if (value is null)
+        {
+            _restartCountdown.Stop();
+        }
+        else
+        {
+            _restartCountdown.Start();
+        }
+    }
+
+    /// <summary>
+    /// The order matters and it is the whole of constraint three. The runtime
+    /// child goes first because it is ours to take down. The listener goes
+    /// next, so the port is free before anything else races for it. The mutex
+    /// goes last: while it is held nothing else can claim to be the running
+    /// instance, and letting go of it early would let a second copy start into
+    /// a half released process.
+    /// </summary>
+    internal Core.Services.Restart.RestartService BuildRestartService() => new(
+        [
+            new NamedRestartResource(
+                "the model runtime and its child process",
+                token => _translator.UnloadAsync(token)),
+            new NamedRestartResource(
+                "the MCP loopback listener and its port",
+                token => AgentServer.StopAsync(token)),
+            new NamedRestartResource(
+                "the log file handles",
+                _ =>
+                {
+                    _restartLog.Write("Log handles flushed before the relaunch.");
+                    return Task.CompletedTask;
+                }),
+            new NamedRestartResource(
+                "the single instance mutex",
+                token => ReleaseSingleInstance?.Invoke(token) ?? Task.CompletedTask),
+        ],
+        new ShellActiveWork(_translator, AgentServer),
+        _restartGuard,
+        Core.Services.Restart.ProcessRelaunch.Resolve,
+        RestartLauncher.Start,
+        code => ExitProcess(code),
+        _restartLog.Write,
+        () => _settings.RestartAfterInstall);
+
+    private void OnBatchInstalled(InstallBatch batch)
+    {
+        var service = BuildRestartService();
+
+        var request = new Core.Services.Restart.RestartRequest
+        {
+            BatchId = batch.Id,
+            Reason = batch.Summary,
+        };
+
+        var looked = service.Inspect(request);
+
+        _restartLog.Write($"Install batch {batch.Id} finished: {batch.Summary} Restart check: {looked.Detail}");
+
+        if (looked.Outcome is Core.Services.Restart.RestartOutcome.RefusedBySetting
+            or Core.Services.Restart.RestartOutcome.RefusedByGuard)
+        {
+            return;
+        }
+
+        RestartNotice = new RestartNoticeViewModel(
+            request,
+            batch.Summary,
+            looked.ActiveWork,
+            cancelWork => service.RestartAsync(
+                request with { CancelActiveWork = cancelWork },
+                CancellationToken.None),
+            () => RestartNotice = null,
+            RememberRestartSetting);
+    }
+
+    private void RememberRestartSetting(bool on)
+    {
+        _settings.RestartAfterInstall = on;
+
+        if (Settings is { } open)
+        {
+            open.RestartAfterInstall = on;
+        }
+
+        _storing = _settingsStore.SaveAsync(_settings, CancellationToken.None);
     }
 
     /// <summary>

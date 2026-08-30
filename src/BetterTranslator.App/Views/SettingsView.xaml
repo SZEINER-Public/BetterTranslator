@@ -551,7 +551,22 @@
                                    Foreground="{StaticResource BrushTextSecondary}"
                                    TextWrapping="Wrap" />
 
-                        <ItemsControl ItemsSource="{Binding Catalogue}" Margin="0,12,0,0" MaxWidth="470" HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <controls:ToggleSwitch IsOn="{Binding RestartAfterInstall, Mode=TwoWay}"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,2,12,0"
+                                                   AutomationProperties.Name="Restart after an install finishes" />
+                            <StackPanel MaxWidth="440">
+                                <TextBlock Text="Restart after an install finishes" Style="{StaticResource TextCardTitle}" />
+                                <TextBlock Text="A runtime or a model written while the app is open is not the one the app is using. This closes the window and opens it again so the new files load. You are told before it happens and can put it off."
+                                           Style="{StaticResource TextMeta}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,3,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <ItemsControl ItemsSource="{Binding Catalogue}" Margin="0,16,0,0" MaxWidth="470" HorizontalAlignment="Left">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Style="{StaticResource SourceCard}">

@@ -60,6 +60,30 @@ public sealed class McpServerHost : IAsyncDisposable
 
     public string? Address { get; private set; }
 
+    /// <summary>
+    /// Jobs an agent started that have not finished. Read before a restart:
+    /// translate_file and translate_batch run for minutes, and a relaunch that
+    /// took one down without asking would throw away work nobody agreed to
+    /// lose.
+    /// </summary>
+    public IReadOnlyList<string> RunningJobs() =>
+        _open is null
+            ? []
+            : [.. _open.Jobs.All().Where(j => !j.IsFinished).Select(j => $"{j.Id} ({j.Kind})")];
+
+    public void CancelRunningJobs()
+    {
+        if (_open is null)
+        {
+            return;
+        }
+
+        foreach (var job in _open.Jobs.All().Where(j => !j.IsFinished))
+        {
+            _open.Jobs.Cancel(job.Id);
+        }
+    }
+
     public static string RegistrationCommand(string host, int port, string token)
     {
         var command = $"claude mcp add --transport http bettertranslator http://{host}:{port}/mcp";

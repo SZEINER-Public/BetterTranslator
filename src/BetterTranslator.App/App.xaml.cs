@@ -61,6 +61,23 @@ public partial class App : Application
         _ = Task.Run(PrepareNotifications);
 
         MainWindow = new MainWindow();
+
+        // The mutex belongs to the application, so the application is what
+        // hands the shell a way to let go of it. A relaunch that left it held
+        // would meet a new process refusing to be a second instance.
+        if (MainWindow.DataContext is MainWindowViewModel shell)
+        {
+            shell.ReleaseSingleInstance = _ =>
+            {
+                _instance?.Dispose();
+                _instance = null;
+                _activator?.Dispose();
+                _activator = null;
+
+                return Task.CompletedTask;
+            };
+        }
+
         MainWindow.Show();
     }
 
