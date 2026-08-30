@@ -736,75 +736,98 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <!-- Attachment chips, project memory always first -->
-                    <ItemsControl Grid.Row="0"
-                                  ItemsSource="{Binding Attachments}"
+                    <!-- How many are attached, said outside the scroller so the
+                         count is readable without scrolling to find out. It is
+                         also the only thing that says anything at all once the
+                         strip is showing three rows of a hundred. -->
+                    <TextBlock Grid.Row="0"
+                               Text="{Binding AttachmentSummary}"
+                               Style="{StaticResource TextMicro}"
+                               Foreground="{StaticResource BrushTextMuted}"
+                               Margin="0,0,0,6"
+                               Visibility="{Binding HasAttachments, Converter={StaticResource BoolToVisibility}}" />
+
+                    <!-- Attachment chips, project memory always first.
+
+                         Capped and scrolling inside the cap. Uncapped this row
+                         grew a chip row at a time until the input and the send
+                         button were arranged below the bottom of the window,
+                         which is what "the prompt field disappears" was. The
+                         history yields its space first, and once it has none
+                         left the composer must stop growing rather than walk off
+                         the screen. -->
+                    <ScrollViewer Grid.Row="1"
+                                  Style="{StaticResource ComposerAttachmentsScroll}"
                                   Margin="0,0,0,10"
                                   Visibility="{Binding HasAttachments, Converter={StaticResource BoolToVisibility}}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <!-- Chips differ in width, so wrap rather than a uniform grid. -->
-                                <WrapPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Height="{StaticResource ChipHeight}"
-                                        CornerRadius="{StaticResource ChipRadius}"
-                                        Background="{StaticResource BrushSurface}"
-                                        BorderBrush="{StaticResource BrushBorder}"
-                                        BorderThickness="{StaticResource BorderThickness}"
-                                        Padding="9,0,4,0"
-                                        Margin="0,0,6,6">
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <!-- A file chip opens the preview; the
-                                             memory chip has nothing to preview. -->
-                                        <controls:ChromeButton Icon="{StaticResource IconEyePreview}"
-                                                               Width="{StaticResource Space14}"
-                                                               Height="{StaticResource Space14}"
-                                                               Margin="0,0,5,0"
-                                                               ToolTip="Preview this file"
-                                                               AutomationProperties.Name="Preview this file"
-                                                               Visibility="{Binding IsMemory, Converter={StaticResource InverseBoolToVisibility}}"
-                                                               Command="{Binding DataContext.PreviewFileCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                               CommandParameter="{Binding}" />
-                                        <controls:IconView Definition="{StaticResource IconFileGeneric}"
-                                                           Foreground="{StaticResource BrushTextTertiary}"
-                                                           VerticalAlignment="Center"
-                                                           Visibility="{Binding IsMemory, Converter={StaticResource InverseBoolToVisibility}}" />
-                                        <controls:IconView Definition="{StaticResource IconMemoryGraphSmall}"
-                                                           Foreground="{StaticResource BrushTextTertiary}"
-                                                           VerticalAlignment="Center"
-                                                           Visibility="{Binding IsMemory, Converter={StaticResource BoolToVisibility}}" />
-                                        <TextBlock Text="{Binding Label}"
-                                                   Style="{StaticResource TextSecondary}"
-                                                   VerticalAlignment="Center"
-                                                   MaxWidth="150"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   Margin="6,0,0,0" />
-                                        <TextBlock Text="{Binding SizeLabel}"
-                                                   Style="{StaticResource TextMicro}"
-                                                   Foreground="{StaticResource BrushTextMuted}"
-                                                   VerticalAlignment="Center"
-                                                   Margin="6,0,0,0"
-                                                   Visibility="{Binding HasSize, Converter={StaticResource BoolToVisibility}}" />
-                                        <controls:ChromeButton Icon="{StaticResource IconCloseSmall}"
-                                                               Width="{StaticResource Space14}"
-                                                               Height="{StaticResource Space14}"
-                                                               Margin="4,0,0,0"
-                                                               ToolTip="Remove this attachment"
-                                                               AutomationProperties.Name="Remove this attachment"
-                                                               Command="{Binding DataContext.RemoveAttachmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                               CommandParameter="{Binding}" />
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                        <ItemsControl x:Name="AttachmentStrip"
+                                      ItemsSource="{Binding Attachments}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <!-- Chips differ in width, so wrap rather than a uniform grid. -->
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Height="{StaticResource ChipHeight}"
+                                            CornerRadius="{StaticResource ChipRadius}"
+                                            Background="{StaticResource BrushSurface}"
+                                            BorderBrush="{StaticResource BrushBorder}"
+                                            BorderThickness="{StaticResource BorderThickness}"
+                                            Padding="9,0,4,0"
+                                            Margin="0,0,6,6">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <!-- A file chip opens the preview; the
+                                                 memory chip has nothing to preview. -->
+                                            <controls:ChromeButton Icon="{StaticResource IconEyePreview}"
+                                                                   Width="{StaticResource Space14}"
+                                                                   Height="{StaticResource Space14}"
+                                                                   Margin="0,0,5,0"
+                                                                   ToolTip="Preview this file"
+                                                                   AutomationProperties.Name="Preview this file"
+                                                                   Visibility="{Binding IsMemory, Converter={StaticResource InverseBoolToVisibility}}"
+                                                                   Command="{Binding DataContext.PreviewFileCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                   CommandParameter="{Binding}" />
+                                            <controls:IconView Definition="{StaticResource IconFileGeneric}"
+                                                               Foreground="{StaticResource BrushTextTertiary}"
+                                                               VerticalAlignment="Center"
+                                                               Visibility="{Binding IsMemory, Converter={StaticResource InverseBoolToVisibility}}" />
+                                            <controls:IconView Definition="{StaticResource IconMemoryGraphSmall}"
+                                                               Foreground="{StaticResource BrushTextTertiary}"
+                                                               VerticalAlignment="Center"
+                                                               Visibility="{Binding IsMemory, Converter={StaticResource BoolToVisibility}}" />
+                                            <TextBlock Text="{Binding Label}"
+                                                       Style="{StaticResource TextSecondary}"
+                                                       VerticalAlignment="Center"
+                                                       MaxWidth="150"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Margin="6,0,0,0" />
+                                            <TextBlock Text="{Binding SizeLabel}"
+                                                       Style="{StaticResource TextMicro}"
+                                                       Foreground="{StaticResource BrushTextMuted}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="6,0,0,0"
+                                                       Visibility="{Binding HasSize, Converter={StaticResource BoolToVisibility}}" />
+                                            <controls:ChromeButton Icon="{StaticResource IconCloseSmall}"
+                                                                   Width="{StaticResource Space14}"
+                                                                   Height="{StaticResource Space14}"
+                                                                   Margin="4,0,0,0"
+                                                                   ToolTip="Remove this attachment"
+                                                                   AutomationProperties.Name="Remove this attachment"
+                                                                   Command="{Binding DataContext.RemoveAttachmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                   CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
 
-                    <Grid Grid.Row="1">
+                    <Grid Grid.Row="2">
                         <TextBox x:Name="ComposerInput"
                                  Background="Transparent"
                                  BorderThickness="0"
@@ -836,7 +859,7 @@
 
                     <!-- S7 toolbar: plus, language pill, spacer, send. This row
                          never wraps; the pill collapses instead. -->
-                    <Grid Grid.Row="2" Margin="0,10,0,0">
+                    <Grid Grid.Row="3" Margin="0,10,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />

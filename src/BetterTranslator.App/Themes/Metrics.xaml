@@ -249,6 +249,17 @@
     <sys:Double x:Key="ComposerMinHeight">42</sys:Double>
     <sys:Double x:Key="ComposerMaxHeight">140</sys:Double>
 
+    <!-- The chip strip is capped and scrolls inside the cap. Uncapped it grew a
+         row per pair of files, pushed the input and the send button below the
+         window edge, and there was no way back to either: the strip is the top
+         row of the composer, so everything under it went first.
+
+         106, which is three chip rows of 32 plus ten of a fourth. The tenth is
+         the point: a cap landing exactly on a row boundary reads as a list that
+         happens to end, and the sliver says there is more under it before the
+         bar is looked for. -->
+    <sys:Double x:Key="ComposerAttachmentsMaxHeight">106</sys:Double>
+
     <!-- The send button is a disc, so its radius is half its size. Both are
          here rather than one being written into the template, because a size
          changed without its radius stops being round. -->

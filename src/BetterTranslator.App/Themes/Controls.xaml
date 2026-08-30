@@ -1552,6 +1552,29 @@
     </Style>
 
 
+    <!--
+        The attachment strip, capped to a peek and scrolling inside it.
+
+        The same shape FilePreviewScroll uses and for the same reason: a surface
+        that clips with nothing to take hold of is a surface a reader cannot get
+        past. The bar runs in a track of its own so it reads as a bar rather than
+        as a thumb left behind over the chips, and the wheel is handed outward at
+        the ends so the gesture reaches the history instead of dying here.
+    -->
+    <Style x:Key="ComposerAttachmentsScroll" TargetType="ScrollViewer">
+        <Style.Resources>
+            <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
+                <Setter Property="Background" Value="{StaticResource BrushBorderFaint}" />
+                <Setter Property="Margin" Value="6,0,0,0" />
+            </Style>
+        </Style.Resources>
+        <Setter Property="MaxHeight" Value="{StaticResource ComposerAttachmentsMaxHeight}" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="controls:WheelChaining.Chains" Value="True" />
+    </Style>
+
     <Style TargetType="{x:Type controls:BilingualRow}">
         <Setter Property="Template">
             <Setter.Value>

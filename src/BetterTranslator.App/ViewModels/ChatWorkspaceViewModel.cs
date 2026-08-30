@@ -51,6 +51,7 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
         Attachments.CollectionChanged += (_, _) =>
         {
             OnPropertyChanged(nameof(HasAttachments));
+            OnPropertyChanged(nameof(AttachmentSummary));
             OnPropertyChanged(nameof(UsesMemory));
             OnPropertyChanged(nameof(CanSend));
         };
@@ -281,6 +282,17 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
 
     public bool HasAttachments => Attachments.Count > 0;
 
+    /// <summary>
+    /// How many chips there are, said above the strip.
+    ///
+    /// The strip is capped and scrolls inside the cap, so past three rows the
+    /// number is no longer countable by looking. This line sits outside the
+    /// scroller and answers it without one.
+    /// </summary>
+    public string AttachmentSummary => Attachments.Count == 1
+        ? "1 attached"
+        : $"{Attachments.Count} attached";
+
     /// <summary>Rows in the Pinned section, filtered by the search text.</summary>
     public ICollectionView PinnedView { get; }
 
@@ -489,6 +501,7 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
         }
 
         OnPropertyChanged(nameof(HasAttachments));
+        OnPropertyChanged(nameof(AttachmentSummary));
     }
 
     /// <summary>The plus menu's Memory item. Project memory is always first.</summary>
@@ -504,6 +517,7 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
 
         Attachments.Insert(0, AttachmentViewModel.Memory());
         OnPropertyChanged(nameof(HasAttachments));
+        OnPropertyChanged(nameof(AttachmentSummary));
         OnPropertyChanged(nameof(UsesMemory));
     }
 
@@ -518,6 +532,7 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
         }
 
         OnPropertyChanged(nameof(HasAttachments));
+        OnPropertyChanged(nameof(AttachmentSummary));
         OnPropertyChanged(nameof(UsesMemory));
     }
 
