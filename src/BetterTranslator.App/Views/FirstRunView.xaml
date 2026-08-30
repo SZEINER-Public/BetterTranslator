@@ -66,6 +66,15 @@
                                VerticalAlignment="Center" />
                 </StackPanel>
 
+                <TextBlock Text="{Binding FolderWarning}"
+                           Style="{StaticResource TextMeta}"
+                           Foreground="{StaticResource BrushDangerText}"
+                           TextWrapping="Wrap"
+                           MaxWidth="520"
+                           HorizontalAlignment="Left"
+                           Margin="20,6,20,0"
+                           Visibility="{Binding FolderWarning, Converter={StaticResource NotEmptyToVisibility}}" />
+
                 <TextBlock Text="What to install"
                            Style="{StaticResource TextSubheading}"
                            Margin="20,18,20,8" />

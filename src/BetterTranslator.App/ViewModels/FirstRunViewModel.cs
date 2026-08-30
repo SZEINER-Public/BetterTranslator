@@ -166,6 +166,8 @@ public sealed partial class FirstRunViewModel : ObservableObject
 
     public string PathLabel => _paths.IsDefault ? "Default path" : "Chosen folder";
 
+    public string? FolderWarning => _paths.LocationWarning;
+
     private IEnumerable<InstallItemViewModel> Selected => Items.Where(i => i.IsSelected);
 
     /// <summary>What the probe found, named above the runtime rows.</summary>
@@ -429,5 +431,6 @@ public sealed partial class FirstRunViewModel : ObservableObject
         OnPropertyChanged(nameof(IsUsingDefaultFolder));
         OnPropertyChanged(nameof(ChosenPath));
         OnPropertyChanged(nameof(PathLabel));
+        OnPropertyChanged(nameof(FolderWarning));
     }
 }

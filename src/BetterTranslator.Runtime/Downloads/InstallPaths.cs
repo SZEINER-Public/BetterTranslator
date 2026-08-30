@@ -11,9 +11,24 @@ namespace BetterTranslator.Runtime.Downloads;
 public sealed class InstallPaths
 {
     private readonly AppPaths _appPaths;
+    private readonly InstallLocationStore _store;
     private string? _override;
 
-    public InstallPaths(AppPaths appPaths) => _appPaths = appPaths;
+    public InstallPaths(AppPaths appPaths)
+        : this(appPaths, new InstallLocationStore(appPaths.InstallLocationFile, InstallLocationStore.BesideRunningAssembly))
+    {
+    }
+
+    public InstallPaths(AppPaths appPaths, InstallLocationStore store)
+    {
+        _appPaths = appPaths;
+        _store = store;
+
+        var stored = store.Load();
+
+        _override = stored.Folder;
+        LocationWarning = stored.Warning;
+    }
 
     /// <summary>The folder components are installed into.</summary>
     public string ModelsFolder => _override ?? _appPaths.ModelsFolder;
@@ -23,13 +38,25 @@ public sealed class InstallPaths
 
     public bool IsDefault => _override is null;
 
+    public string StoreFile => _store.FilePath;
+
+    public string? LocationWarning { get; private set; }
+
     /// <summary>
     /// Points installs at a folder the user chose. Cancelling the dialog must
     /// not call this: the choice then stays on Default folder.
     /// </summary>
-    public void UseFolder(string folder) => _override = folder;
+    public void UseFolder(string folder)
+    {
+        _override = folder;
+        LocationWarning = _store.Save(folder);
+    }
 
-    public void UseDefault() => _override = null;
+    public void UseDefault()
+    {
+        _override = null;
+        LocationWarning = _store.Save(null);
+    }
 
     public string PathFor(ModelComponent component) => Path.Combine(ModelsFolder, component.FileName);
 

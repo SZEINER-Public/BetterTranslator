@@ -18,7 +18,7 @@ public sealed class AppPaths
         "BetterTranslator");
 
     public AppPaths()
-        : this(ResolveRoot())
+        : this(ResolveRoot(), DefaultRoot)
     {
     }
 
@@ -51,9 +51,22 @@ public sealed class AppPaths
     }
 
     /// <summary>Overridable root, so tests do not touch the real profile.</summary>
-    public AppPaths(string root) => Root = root;
+    public AppPaths(string root)
+        : this(root, root)
+    {
+    }
+
+    private AppPaths(string root, string profileRoot)
+    {
+        Root = root;
+        ProfileRoot = profileRoot;
+    }
 
     public string Root { get; }
+
+    public string ProfileRoot { get; }
+
+    public string InstallLocationFile => Path.Combine(ProfileRoot, InstallLocationStore.FileName);
 
     public string DatabaseFile => Path.Combine(Root, "betterTranslator.db");
 
