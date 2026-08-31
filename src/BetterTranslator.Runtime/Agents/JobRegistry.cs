@@ -140,6 +140,14 @@ public sealed class TrackedJob
 
     public event Action? PauseChanged;
 
+    /// <summary>
+    /// Raised whenever the job reaches a new state, so a surface showing its
+    /// controls is told when it stops rather than having to poll. A run that
+    /// finished while nothing asked left a Stop button on screen for the rest
+    /// of the session.
+    /// </summary>
+    public event Action? StateChanged;
+
     public void Pause()
     {
         lock (_gate)
@@ -237,6 +245,8 @@ public sealed class TrackedJob
                 _state = JobState.Running;
             }
         }
+
+        StateChanged?.Invoke();
     }
 
     internal void Finish()
@@ -250,6 +260,8 @@ public sealed class TrackedJob
                     : JobState.Done;
             }
         }
+
+        StateChanged?.Invoke();
     }
 
     internal void Fail(string message)
@@ -259,6 +271,8 @@ public sealed class TrackedJob
             _state = JobState.Failed;
             _error = message;
         }
+
+        StateChanged?.Invoke();
     }
 
     internal void Cancelled()
@@ -267,6 +281,8 @@ public sealed class TrackedJob
         {
             _state = JobState.Cancelled;
         }
+
+        StateChanged?.Invoke();
     }
 
     public void Cancel()
@@ -286,6 +302,8 @@ public sealed class TrackedJob
 
         release?.TrySetResult();
         _cancellation.Cancel();
+
+        StateChanged?.Invoke();
     }
 
     public void Running() => Begin();
@@ -301,6 +319,8 @@ public sealed class TrackedJob
                 _state = JobState.Done;
             }
         }
+
+        StateChanged?.Invoke();
     }
 
     public void Failed(string message) => Fail(message);

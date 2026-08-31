@@ -110,6 +110,43 @@ public sealed class StopAndPauseTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task AFinishedTranslationOffersNoStopAndIsToldTheRunEnded()
+    {
+        string? id = null;
+        var announced = 0;
+
+        _onUnit = (text, _) =>
+        {
+            if (text == "One line.")
+            {
+                id = Latest.JobId;
+
+                Latest.PropertyChanged += (_, e) =>
+                {
+                    if (e.PropertyName == nameof(EntryViewModel.CanStop))
+                    {
+                        announced++;
+                    }
+                };
+            }
+
+            return Task.CompletedTask;
+        };
+
+        await SendAsync(ThreeLines);
+
+        var entry = Latest;
+
+        entry.Phase.Should().Be(TranslationPhase.Complete);
+        entry.IsRunning.Should().BeFalse("the run is over");
+        entry.CanStop.Should().BeFalse("a finished translation has nothing left to stop");
+        entry.CanPause.Should().BeFalse();
+
+        announced.Should().BeGreaterThan(0, "the row is told the run ended rather than left to poll for it");
+        JobRegistry.Shared.Status(id!).Should().BeNull();
+    }
+
+    [Fact]
     public async Task AStoppedEntryIsStoredAsStoppedRatherThanDone()
     {
         _onUnit = async (text, token) =>
@@ -343,5 +380,7 @@ public sealed class StopAndPauseTests : IAsyncLifetime
         entry.HasResultText.Should().BeFalse("nothing came back, so nothing is shown as a translation");
         entry.HasFailed.Should().BeTrue();
         entry.Note.Should().Be("Stopped before anything came back.");
+        entry.IsRunning.Should().BeFalse();
+        entry.CanStop.Should().BeFalse("a row that is no longer running has nothing left to stop");
     }
 }

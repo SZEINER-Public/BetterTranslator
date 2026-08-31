@@ -138,10 +138,10 @@ public sealed record TranslationJob
     public bool IsSameLanguage => Direction.IsSameLanguage;
 
     /// <summary>
-    /// Sampling for this job. Temperature is the user's; the token budget is the
-    /// effort's, and it is the only thing Simple and Thinking change about
-    /// sampling -- the rest is left at the runtime's own defaults so a future
-    /// change there is not silently overridden here.
+    /// Sampling for this job. Temperature is the user's; the token budget is
+    /// <see cref="TokenBudget"/>, and it is the only thing Simple and Thinking
+    /// change about sampling -- the rest is left at the runtime's own defaults
+    /// so a future change there is not silently overridden here.
     /// </summary>
     /// <param name="attempt">
     /// Which try this is, from zero. Only the seed changes with it, and that is
@@ -160,7 +160,7 @@ public sealed record TranslationJob
         var p = RuntimeDefaults();
 
         p.Temperature = Temperature;
-        p.MaxTokens = Effort == TranslationEffort.Thinking ? ThinkingTokens : SimpleTokens;
+        p.MaxTokens = TokenBudget;
 
         if (Verification.SamplerConfigGuard.AppliesTo(ModelPath))
         {
@@ -222,6 +222,18 @@ public sealed record TranslationJob
     /// Enough for a sentence or a short paragraph, which is what the composer
     /// gets used for. The runtime's own default is 512.
     /// </summary>
+    /// <summary>
+    /// How much the runtime is allowed to generate for this one request.
+    ///
+    /// Thinking's larger budget is for a document passage, which is the only
+    /// thing that can legitimately come back long. A composer unit is already
+    /// cut to a line or a sentence before it gets here, so the larger ceiling
+    /// buys it nothing and costs it every token a model spends past the answer
+    /// before it stops.
+    /// </summary>
+    private int TokenBudget =>
+        Effort == TranslationEffort.Thinking && !IsStandalone ? ThinkingTokens : SimpleTokens;
+
     private const int SimpleTokens = 512;
 
     /// <summary>

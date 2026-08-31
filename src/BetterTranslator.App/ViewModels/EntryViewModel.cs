@@ -1017,10 +1017,16 @@ public sealed partial class EntryViewModel : ObservableObject
         if (Job is { } previous)
         {
             previous.PauseChanged -= OnPauseChanged;
+            previous.StateChanged -= RaiseRunControlsSafely;
         }
 
         Job = job;
         job.PauseChanged += OnPauseChanged;
+
+        // The run can reach its end without the phase moving again, and every
+        // control that offers to stop it reads whether it is still going. Left
+        // unheard, a finished run kept its Stop.
+        job.StateChanged += RaiseRunControlsSafely;
 
         if (Phase == TranslationPhase.Idle && !job.Snapshot().IsFinished)
         {
@@ -1034,6 +1040,25 @@ public sealed partial class EntryViewModel : ObservableObject
     {
         IsPaused = Job?.IsPaused ?? false;
         RaiseRunControls();
+    }
+
+    /// <summary>
+    /// A job reports its state from whatever thread reached it, and an agent
+    /// cancelling one through job_cancel is not on the window's. Marshalled the
+    /// way the runtime panel marshals its own notifications; outside a running
+    /// application there is no dispatcher and the direct call is correct.
+    /// </summary>
+    private void RaiseRunControlsSafely()
+    {
+        var dispatcher = Application.Current?.Dispatcher;
+
+        if (dispatcher is null || dispatcher.CheckAccess())
+        {
+            RaiseRunControls();
+            return;
+        }
+
+        dispatcher.BeginInvoke(RaiseRunControls);
     }
 
     private void RaiseRunControls()

@@ -1638,13 +1638,19 @@
                                                    Margin="0,3,0,0"
                                                    Visibility="{Binding HasNote, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibility}}" />
 
-                                        <Button Content="{TemplateBinding RetryText}"
-                                                Style="{StaticResource SecondaryButton}"
-                                                HorizontalAlignment="Left"
-                                                Margin="0,8,0,0"
-                                                AutomationProperties.Name="{TemplateBinding RetryText}"
-                                                Command="{Binding RetryCommand, RelativeSource={RelativeSource TemplatedParent}}"
-                                                CommandParameter="{Binding RetryParameter, RelativeSource={RelativeSource TemplatedParent}}" />
+                                        <!-- The same glyph the translation carries beside
+                                             Copy, because it is the same action: send this
+                                             source again. Held at full opacity rather than
+                                             revealed on hover, since a failed row has
+                                             nothing else to act on. -->
+                                        <controls:ChromeButton Style="{StaticResource EntryCopyButton}"
+                                                               Icon="{StaticResource IconRefresh}"
+                                                               Opacity="1"
+                                                               Margin="-5,8,0,0"
+                                                               ToolTip="{TemplateBinding RetryText}"
+                                                               AutomationProperties.Name="{TemplateBinding RetryText}"
+                                                               Command="{Binding RetryCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                                               CommandParameter="{Binding RetryParameter, RelativeSource={RelativeSource TemplatedParent}}" />
                                     </StackPanel>
                                 </Grid>
                             </StackPanel>

@@ -305,6 +305,30 @@ public sealed class TranslationJobTests
     }
 
     [Fact]
+    public void A_composer_unit_gets_the_short_budget_whatever_the_effort_says()
+    {
+        // The chat cuts a message into lines and sentences before anything is
+        // sent, so a composer unit is never the long passage Thinking's budget
+        // exists for. Giving it that ceiling only pays for the tokens a model
+        // spends past the answer before it stops.
+        var chat = (Job(TranslationEffort.Thinking) with { IsStandalone = true }).Sampling();
+        var document = Job(TranslationEffort.Thinking).Sampling();
+
+        chat.MaxTokens.Should().Be(Job(TranslationEffort.Simple).Sampling().MaxTokens);
+        chat.MaxTokens.Should().BeLessThan(document.MaxTokens);
+    }
+
+    [Fact]
+    public void A_document_passage_keeps_the_room_Thinking_promises()
+    {
+        var document = (Job(TranslationEffort.Thinking) with { IsStandalone = false }).Sampling();
+
+        document.MaxTokens.Should().BeGreaterThan(
+            (Job(TranslationEffort.Simple) with { IsStandalone = false }).Sampling().MaxTokens,
+            "the file path is the one that can legitimately come back long");
+    }
+
+    [Fact]
     public void The_users_temperature_reaches_the_runtime()
     {
         var job = Job(TranslationEffort.Simple) with { Temperature = 0.75f };
