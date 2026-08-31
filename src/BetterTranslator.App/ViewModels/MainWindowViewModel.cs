@@ -208,10 +208,16 @@ public sealed partial class MainWindowViewModel : ObservableObject
         Translation.EffortChanged += effort =>
         {
             _settings.Effort = effort;
+            _settings.ModelChosenExplicitly = false;
             _selectedModelPath = ResolveModelPath();
             ApplyModelLanguages();
             Workspace.OfferRegeneration(Translation.Model.Name);
-            Store(settings => settings.Effort = effort);
+
+            Store(settings =>
+            {
+                settings.Effort = effort;
+                settings.ModelChosenExplicitly = false;
+            });
         };
 
         Translation.SelectionResolved += effort =>
@@ -542,19 +548,22 @@ public sealed partial class MainWindowViewModel : ObservableObject
         var library = new ModelLibrary();
         var found = library.Scan([.. ModelLibrary.DefaultFolders(_installPaths.ModelsFolder)]);
 
-        var wanted = library.Match(found, Translation.Model.FileName);
-
-        if (wanted is not null)
+        if (found.Count == 0)
         {
-            return wanted.Path;
+            return _selectedModelPath;
         }
 
-        if (!string.IsNullOrWhiteSpace(_settings.SelectedModelPath) && File.Exists(_settings.SelectedModelPath))
-        {
-            return _settings.SelectedModelPath;
-        }
+        var choice = ModelSelection.Resolve(
+            library,
+            found,
+            _settings.SelectedModelFile,
+            _settings.SelectedModelPath,
+            _settings.ModelChosenExplicitly,
+            Translation.Model.FileName);
 
-        return library.Default(found)?.Path ?? string.Empty;
+        Runtime.SelectionNote = choice.Reason;
+
+        return choice.Path;
     }
 
     [ObservableProperty]

@@ -168,9 +168,9 @@
     <sys:Double x:Key="TableCellMinWidth">96</sys:Double>
     <sys:Double x:Key="TableCellMaxWidth">280</sys:Double>
     <sys:Double x:Key="EntryCollapsedHeight">360</sys:Double>
-    <sys:Double x:Key="SeparatorHitWidth">5</sys:Double>
-    <sys:Double x:Key="SeparatorGrabWidth">7</sys:Double>
-    <Thickness x:Key="SeparatorGrabOffset">-3,0,0,0</Thickness>
+    <sys:Double x:Key="SeparatorHitWidth">8</sys:Double>
+    <sys:Double x:Key="SeparatorGrabWidth">8</sys:Double>
+    <Thickness x:Key="SeparatorGrabOffset">0</Thickness>
     <sys:Double x:Key="SeparatorGripHeight">18</sys:Double>
     <sys:Double x:Key="SeparatorGripRadius">0.5</sys:Double>
     <Thickness x:Key="SeparatorGripGap">2,0,0,0</Thickness>

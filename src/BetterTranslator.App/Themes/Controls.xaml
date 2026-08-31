@@ -472,12 +472,13 @@
                 <ControlTemplate TargetType="{x:Type controls:ResizeSeparator}">
                     <Grid x:Name="Root"
                           Background="{TemplateBinding Background}"
+                          ClipToBounds="True"
                           SnapsToDevicePixels="True"
                           UseLayoutRounding="True">
                         <Grid x:Name="Grab"
                               Width="{StaticResource SeparatorGrabWidth}"
                               Margin="{StaticResource SeparatorGrabOffset}"
-                              HorizontalAlignment="Left"
+                              HorizontalAlignment="Center"
                               Background="Transparent">
                             <StackPanel x:Name="Grip"
                                         Orientation="Horizontal"
@@ -504,7 +505,7 @@
 
                         <Rectangle x:Name="Rule"
                                    Width="{StaticResource BorderWidth}"
-                                   HorizontalAlignment="Left"
+                                   HorizontalAlignment="Center"
                                    Fill="{StaticResource BrushBorderSoft}"
                                    SnapsToDevicePixels="True" />
                     </Grid>

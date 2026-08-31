@@ -228,6 +228,8 @@ public sealed class TranslationGateway : IDisposable
         }
 
         _settings.SelectedModelPath = match.Path;
+        _settings.SelectedModelFile = ModelSelection.FileNameOf(match.Path);
+        _settings.ModelChosenExplicitly = true;
         _settings.Effort = EffortTiers.ForModelId(LanguageRegistry.ModelFlag(match.FileName))?.Effort
             ?? _settings.Effort;
 
@@ -886,19 +888,13 @@ public sealed class TranslationGateway : IDisposable
         var component = ComponentCatalog.BuiltIn.FirstOrDefault(c =>
             c.Id == EffortTiers.For(_settings.Effort).ModelId);
 
-        var wanted = component is null ? null : library.Match(found, component.FileName);
-
-        if (wanted is not null)
-        {
-            return wanted.Path;
-        }
-
-        if (!string.IsNullOrWhiteSpace(_settings.SelectedModelPath) && File.Exists(_settings.SelectedModelPath))
-        {
-            return _settings.SelectedModelPath;
-        }
-
-        return library.Default(found)?.Path ?? string.Empty;
+        return ModelSelection.Resolve(
+            library,
+            found,
+            _settings.SelectedModelFile,
+            _settings.SelectedModelPath,
+            _settings.ModelChosenExplicitly,
+            component?.FileName ?? string.Empty).Path;
     }
 
     public void Dispose() => _engine.Dispose();

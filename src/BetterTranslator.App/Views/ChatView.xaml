@@ -416,23 +416,41 @@
                                                 </ScrollViewer>
                                             </controls:ExpandArea>
 
-                                            <Grid Visibility="{Binding HasResultText, Converter={StaticResource BoolToVisibility}}">
-                                                <controls:ChromeButton Style="{StaticResource EntryCopyButton}"
-                                                                       Icon="{StaticResource IconCopy}"
-                                                                       Command="{Binding CopyResultCommand}"
-                                                                       ToolTip="Copy the translation"
-                                                                       AutomationProperties.Name="Copy the translation"
-                                                                       Visibility="{Binding ResultCopied, Converter={StaticResource InverseBoolToVisibility}}" />
+                                            <!-- Copy and regenerate sit together under the
+                                                 translation, because both are things you do
+                                                 to the answer you are looking at. Regenerate
+                                                 is the row menu's item brought out to where
+                                                 it is reached without opening a menu. -->
+                                            <StackPanel Orientation="Horizontal"
+                                                        HorizontalAlignment="Left"
+                                                        Visibility="{Binding HasResultText, Converter={StaticResource BoolToVisibility}}">
+                                                <Grid>
+                                                    <controls:ChromeButton Style="{StaticResource EntryCopyButton}"
+                                                                           Icon="{StaticResource IconCopy}"
+                                                                           Command="{Binding CopyResultCommand}"
+                                                                           ToolTip="Copy the translation"
+                                                                           AutomationProperties.Name="Copy the translation"
+                                                                           Visibility="{Binding ResultCopied, Converter={StaticResource InverseBoolToVisibility}}" />
+
+                                                    <controls:ChromeButton Style="{StaticResource EntryCopyButton}"
+                                                                           Icon="{StaticResource IconCheckDone}"
+                                                                           Foreground="{StaticResource BrushSuccessDeep}"
+                                                                           Opacity="1"
+                                                                           Command="{Binding CopyResultCommand}"
+                                                                           ToolTip="Copied"
+                                                                           AutomationProperties.Name="Copied"
+                                                                           Visibility="{Binding ResultCopied, Converter={StaticResource BoolToVisibility}}" />
+                                                </Grid>
 
                                                 <controls:ChromeButton Style="{StaticResource EntryCopyButton}"
-                                                                       Icon="{StaticResource IconCheckDone}"
-                                                                       Foreground="{StaticResource BrushSuccessDeep}"
-                                                                       Opacity="1"
-                                                                       Command="{Binding CopyResultCommand}"
-                                                                       ToolTip="Copied"
-                                                                       AutomationProperties.Name="Copied"
-                                                                       Visibility="{Binding ResultCopied, Converter={StaticResource BoolToVisibility}}" />
-                                            </Grid>
+                                                                       Icon="{StaticResource IconRefresh}"
+                                                                       Margin="4,2,0,0"
+                                                                       Command="{Binding DataContext.RegenerateEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                       CommandParameter="{Binding}"
+                                                                       ToolTip="Translate this again with the model selected now"
+                                                                       AutomationProperties.Name="Regenerate this translation"
+                                                                       Visibility="{Binding CanRegenerate, Converter={StaticResource BoolToVisibility}}" />
+                                            </StackPanel>
                                         </StackPanel>
                                     </controls:BilingualRow.TargetContent>
                                 </controls:BilingualRow>

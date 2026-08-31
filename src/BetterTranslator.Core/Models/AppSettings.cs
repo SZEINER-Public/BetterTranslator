@@ -41,6 +41,10 @@ public sealed class AppSettings
     /// </summary>
     public string SelectedModelPath { get; set; } = string.Empty;
 
+    public string SelectedModelFile { get; set; } = string.Empty;
+
+    public bool ModelChosenExplicitly { get; set; }
+
     /// <summary>
     /// Simple or Thinking. Kept across sessions because it selects the model that
     /// gets loaded, and reloading one costs seconds and gigabytes -- landing on

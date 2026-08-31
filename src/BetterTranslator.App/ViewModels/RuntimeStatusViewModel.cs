@@ -63,6 +63,13 @@ public sealed partial class RuntimeStatusViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsPanelOpen { get; set; }
 
+    [ObservableProperty]
+    public partial string? SelectionNote { get; set; }
+
+    public bool HasSelectionNote => !string.IsNullOrWhiteSpace(SelectionNote);
+
+    partial void OnSelectionNoteChanged(string? value) => OnPropertyChanged(nameof(HasSelectionNote));
+
     [RelayCommand]
     private void TogglePanel() => IsPanelOpen = !IsPanelOpen;
 

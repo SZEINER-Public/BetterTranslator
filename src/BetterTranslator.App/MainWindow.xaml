@@ -250,6 +250,19 @@
                                                    Foreground="{StaticResource BrushWarnText}"
                                                    TextWrapping="Wrap" />
                                     </Border>
+
+                                    <Border Background="{StaticResource BrushWarnSurface}"
+                                            BorderBrush="{StaticResource BrushWarnBorder}"
+                                            BorderThickness="{StaticResource BorderThickness}"
+                                            CornerRadius="{StaticResource RadiusRow}"
+                                            Margin="0,10,0,0"
+                                            Padding="9,7,9,7"
+                                            Visibility="{Binding Runtime.HasSelectionNote, Converter={StaticResource BoolToVisibility}}">
+                                        <TextBlock Text="{Binding Runtime.SelectionNote}"
+                                                   Style="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushWarnText}"
+                                                   TextWrapping="Wrap" />
+                                    </Border>
                                 </StackPanel>
                             </Border>
                         </Popup>

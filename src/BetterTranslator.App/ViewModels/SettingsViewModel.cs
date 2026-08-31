@@ -1242,6 +1242,8 @@ public sealed partial class SettingsViewModel : ObservableObject
             if (_modelChosenHere && SelectedModel is not null)
             {
                 settings.SelectedModelPath = SelectedModel.Model.Path;
+                settings.SelectedModelFile = Runtime.Inference.ModelSelection.FileNameOf(SelectedModel.Model.Path);
+                settings.ModelChosenExplicitly = true;
 
                 // Spent. The choice is now in the row like anyone else's, and
                 // re-asserting it on some later unrelated toggle would undo

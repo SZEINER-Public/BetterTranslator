@@ -18,6 +18,8 @@ public sealed class SettingsStore(Database database)
     private const string TargetLanguage = "target_language";
     private const string RuntimeBackendKey = "runtime_backend";
     private const string SelectedModelPathKey = "selected_model_path";
+    private const string SelectedModelFileKey = "selected_model_file";
+    private const string ModelChosenExplicitlyKey = "selected_model_explicit";
     private const string EffortKey = "translation_effort";
     private const string DomainVocabularyKey = "use_domain_vocabulary";
     private const string TemperatureKey = "translation_temperature";
@@ -61,6 +63,11 @@ public sealed class SettingsStore(Database database)
                     ? backendParsed
                     : settings.RuntimeBackend,
             SelectedModelPath = stored.GetValueOrDefault(SelectedModelPathKey, settings.SelectedModelPath),
+            SelectedModelFile = ChosenFile(stored, settings.SelectedModelFile),
+            ModelChosenExplicitly = Bool(
+                stored,
+                ModelChosenExplicitlyKey,
+                stored.GetValueOrDefault(SelectedModelPathKey, string.Empty).Length > 0),
             Effort = EffortTiers.Parse(stored.GetValueOrDefault(EffortKey)) ?? settings.Effort,
             Temperature = Double(stored, TemperatureKey, settings.Temperature),
             Instruction = stored.GetValueOrDefault(InstructionKey, settings.Instruction),
@@ -99,6 +106,8 @@ public sealed class SettingsStore(Database database)
             [TargetLanguage] = settings.TargetLanguage,
             [RuntimeBackendKey] = settings.RuntimeBackend.ToString(),
             [SelectedModelPathKey] = settings.SelectedModelPath,
+            [SelectedModelFileKey] = settings.SelectedModelFile,
+            [ModelChosenExplicitlyKey] = settings.ModelChosenExplicitly ? "1" : "0",
             [EffortKey] = settings.Effort.ToString(),
             [TemperatureKey] = settings.Temperature.ToString(CultureInfo.InvariantCulture),
             [InstructionKey] = settings.Instruction,
@@ -157,6 +166,18 @@ public sealed class SettingsStore(Database database)
         }
 
         return values;
+    }
+
+    private static string ChosenFile(Dictionary<string, string> values, string fallback)
+    {
+        if (values.TryGetValue(SelectedModelFileKey, out var stored) && stored.Length > 0)
+        {
+            return stored;
+        }
+
+        var path = values.GetValueOrDefault(SelectedModelPathKey, string.Empty);
+
+        return path.Length > 0 ? System.IO.Path.GetFileName(path) : fallback;
     }
 
     private static bool Bool(Dictionary<string, string> values, string key, bool fallback) =>
