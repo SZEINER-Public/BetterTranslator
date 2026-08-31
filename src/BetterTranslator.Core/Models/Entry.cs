@@ -22,6 +22,8 @@ public enum EntryState
     /// source and offers Retry rather than raising a toast.
     /// </summary>
     Failed,
+
+    Stopped,
 }
 
 public sealed class Entry

@@ -34,7 +34,8 @@ public sealed record ContentTranslationResult(
     string? Text,
     ContentShape Shape,
     string? Note = null,
-    string? Refusal = null);
+    string? Refusal = null,
+    bool Stopped = false);
 
 /// <summary>
 /// How a piece of text is cut up and put back together, for every surface that
@@ -87,10 +88,25 @@ public static class ContentTranslation
             .ConfigureAwait(false));
     }
 
+    public static bool IsChunked(string? source)
+    {
+        if (string.IsNullOrWhiteSpace(source))
+        {
+            return false;
+        }
+
+        if (JsonSyntax.HasTranslatableValues(source) || MarkdownSyntax.HasTranslatableProse(source))
+        {
+            return true;
+        }
+
+        return source.ReplaceLineEndings("\n").Split('\n').Count(line => line.Trim().Length > 0) > 1;
+    }
+
     private static ContentTranslationResult Json(JsonTranslationResult document) =>
         document.Translated == 0
-            ? new ContentTranslationResult(null, ContentShape.Json)
-            : new ContentTranslationResult(document.Text, ContentShape.Json, KeptValues(document));
+            ? new ContentTranslationResult(null, ContentShape.Json, Stopped: document.Stopped)
+            : new ContentTranslationResult(document.Text, ContentShape.Json, KeptValues(document), Stopped: document.Stopped);
 
     private static ContentTranslationResult Markdown(string source, MarkdownTranslationResult document)
     {
@@ -100,17 +116,18 @@ public static class ContentTranslation
                 null,
                 ContentShape.Markdown,
                 Refusal: "the document would not have come back intact - "
-                    + string.Join("; ", document.StructureIssues));
+                    + string.Join("; ", document.StructureIssues),
+                Stopped: document.Stopped);
         }
 
         // Nothing usable came back for any block. Returning the source would put
         // untranslated text under the target-language heading.
         if (string.Equals(document.Text, source, StringComparison.Ordinal))
         {
-            return new ContentTranslationResult(null, ContentShape.Markdown);
+            return new ContentTranslationResult(null, ContentShape.Markdown, Stopped: document.Stopped);
         }
 
-        return new ContentTranslationResult(document.Text, ContentShape.Markdown, Recovery(document));
+        return new ContentTranslationResult(document.Text, ContentShape.Markdown, Recovery(document), Stopped: document.Stopped);
     }
 
     private static ContentTranslationResult Prose(MessageTranslationResult message)
@@ -120,7 +137,7 @@ public static class ContentTranslation
         // every block took the recovery path.
         if (message.Translated + message.Recovered == 0)
         {
-            return new ContentTranslationResult(null, ContentShape.Prose);
+            return new ContentTranslationResult(null, ContentShape.Prose, Stopped: message.Stopped);
         }
 
         var note = message.Kept switch
@@ -130,7 +147,7 @@ public static class ContentTranslation
             _ => $"{message.Kept} lines kept their source",
         };
 
-        return new ContentTranslationResult(message.Text, ContentShape.Prose, note);
+        return new ContentTranslationResult(message.Text, ContentShape.Prose, note, Stopped: message.Stopped);
     }
 
     /// <summary>

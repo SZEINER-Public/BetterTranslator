@@ -60,13 +60,23 @@ public static class MarkdownTranslation
 
         var answers = new List<(MarkdownUnit Unit, string? Answer, bool Holds, bool Echoed)>();
 
+        var stopped = false;
+
         foreach (var unit in units)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            string? answer = null;
 
-            var answer = unit.Guards.Count <= MaxSentinels
-                ? await translate(unit.Text, cancellationToken)
-                : null;
+            if (unit.Guards.Count <= MaxSentinels)
+            {
+                bool halted;
+                (answer, halted) = await Documents.Stoppable.UnitAsync(translate, unit.Text, cancellationToken);
+
+                if (halted)
+                {
+                    stopped = true;
+                    break;
+                }
+            }
 
             answers.Add((
                 unit,
@@ -85,8 +95,6 @@ public static class MarkdownTranslation
 
         foreach (var (unit, answer, holds, echoed) in answers)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             if (holds && !(echoed && working))
             {
                 edits.Add((
@@ -138,8 +146,8 @@ public static class MarkdownTranslation
         }
 
         return issues.Count == 0
-            ? new MarkdownTranslationResult(text, translated, recovered, kept, issues, unverified)
-            : new MarkdownTranslationResult(markdown, 0, 0, units.Count, issues, unverified);
+            ? new MarkdownTranslationResult(text, translated, recovered, kept, issues, unverified, stopped)
+            : new MarkdownTranslationResult(markdown, 0, 0, units.Count, issues, unverified, stopped);
     }
 
     private static async Task<int> RunsAsync(
@@ -153,8 +161,6 @@ public static class MarkdownTranslation
 
         foreach (var run in unit.Runs)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             // The span's edges are the space between it and the markup either
             // side. They are never sent and never replaced, so an answer cannot
             // weld the words onto that markup by returning them trimmed.
@@ -169,7 +175,12 @@ public static class MarkdownTranslation
                 continue;
             }
 
-            var answer = await translate(source, cancellationToken);
+            var (answer, halted) = await Documents.Stoppable.UnitAsync(translate, source, cancellationToken);
+
+            if (halted)
+            {
+                break;
+            }
 
             if (UnitFidelity.Echoed(source, answer))
             {

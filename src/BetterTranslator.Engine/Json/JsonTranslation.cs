@@ -64,10 +64,15 @@ public static partial class JsonTranslation
         var literalNonAscii = JsonSegmenter.PrefersLiteralNonAscii(json);
         var answers = new Dictionary<int, string>();
 
+        var stopped = false;
+
         foreach (var batch in Batches(wanted))
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            await RunAsync(batch, translate, answers, cancellationToken);
+            if (await RunAsync(batch, translate, answers, cancellationToken).ConfigureAwait(false))
+            {
+                stopped = true;
+                break;
+            }
         }
 
         var kept = wanted.Where(s => !answers.ContainsKey(s.Start)).ToList();
@@ -82,7 +87,8 @@ public static partial class JsonTranslation
             text,
             answers.Count,
             kept.Count,
-            [.. kept.Select(s => s.KeyPath)]);
+            [.. kept.Select(s => s.KeyPath)],
+            stopped);
     }
 
     /// <summary>
@@ -128,7 +134,7 @@ public static partial class JsonTranslation
     /// valid JSON and one entry stays in the source language, which is a state
     /// the reader can see and act on.
     /// </summary>
-    private static async Task RunAsync(
+    private static async Task<bool> RunAsync(
         List<JsonScalar> batch,
         Func<string, CancellationToken, Task<string?>> translate,
         Dictionary<int, string> answers,
@@ -137,26 +143,38 @@ public static partial class JsonTranslation
         if (batch.Count > 1)
         {
             var request = Build(batch, out var markers, out var guards);
-            var answer = await translate(request, cancellationToken);
+            var (answer, halted) = await Documents.Stoppable.UnitAsync(translate, request, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (halted)
+            {
+                return true;
+            }
 
             if (TrySplit(answer, markers, guards, batch, answers))
             {
-                return;
+                return false;
             }
         }
 
         foreach (var scalar in batch)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             var (protectedText, guards) = JsonValueGuard.Protect(scalar.Text);
-            var answer = await translate(protectedText, cancellationToken);
+            var (answer, halted) = await Documents.Stoppable.UnitAsync(translate, protectedText, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (halted)
+            {
+                return true;
+            }
 
             if (JsonValueGuard.Holds(answer, guards))
             {
                 answers[scalar.Start] = JsonValueGuard.Restore(answer!.Trim(), guards);
             }
         }
+
+        return false;
     }
 
     /// <summary>

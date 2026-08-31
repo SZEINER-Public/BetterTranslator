@@ -54,7 +54,8 @@ public sealed record MarkdownTranslationResult(
     int Recovered,
     int Kept,
     IReadOnlyList<string> StructureIssues,
-    int Unverified = 0)
+    int Unverified = 0,
+    bool Stopped = false)
 {
     public bool StructureHeld => StructureIssues.Count == 0;
 }

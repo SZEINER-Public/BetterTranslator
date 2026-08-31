@@ -61,4 +61,5 @@ public sealed record JsonTranslationResult(
     string Text,
     int Translated,
     int Kept,
-    IReadOnlyList<string> KeptPaths);
+    IReadOnlyList<string> KeptPaths,
+    bool Stopped = false);

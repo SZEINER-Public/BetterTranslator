@@ -348,7 +348,8 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
         SelectedRow is null ? string.Empty : RelativeTime.Header(SelectedRow.Chat.UpdatedAt, _clock.Now);
 
     public bool CanSend =>
-        DirectionVerdict.CanSend
+        !IsGenerating
+        && DirectionVerdict.CanSend
         && (!string.IsNullOrWhiteSpace(Draft) || Attachments.Any(a => a.FilePath is not null));
 
     public EntryViewModel? ExpandedEntry => Entries.FirstOrDefault(e => e.IsExpanded);
@@ -1552,7 +1553,15 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
         }
 
         var replacing = view.IsRegenerating && view.HasResultText;
-        var (sequence, token) = view.BeginRun();
+
+        var job = Runtime.Agents.JobRegistry.Shared.Track("chat", 0);
+        _liveJobs[entry.Id] = job;
+        view.AttachJob(job);
+        job.Running();
+
+        var (sequence, token) = view.BeginRun(job.Token);
+        RaiseGenerationState();
+
         string? note = null;
 
         try
@@ -1568,6 +1577,8 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
                 entry.Source,
                 async (text, unitToken) =>
                 {
+                    await job.WaitWhilePausedAsync(unitToken).ConfigureAwait(true);
+
                     var unit = await Translate(
                         new TranslationAsk(text, direction, MemoryFor(text, view), UsesMemory),
                         unitToken)
@@ -1613,10 +1624,11 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
             RaiseChatMetrics();
 
             view.Verification = outcome.Verification;
+            view.WasStopped = content.Stopped;
 
             if (outcome.HasText)
             {
-                view.Complete(outcome.Text!, note);
+                view.Complete(outcome.Text!, content.Stopped ? view.StoppedLabel : note);
             }
             else
             {
@@ -1624,7 +1636,7 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
                 // nothing. Saying which gate declined it is the difference
                 // between "the app is broken" and "the glossary wanted a
                 // different word".
-                view.Fail(note ?? LastVerdict?.Invoke());
+                view.Fail(content.Stopped ? StoppedWithNothing : note ?? LastVerdict?.Invoke());
             }
 
             // Written from the outcome rather than from the view: the view holds
@@ -1633,7 +1645,9 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
             if (!replacing || outcome.HasText)
             {
                 entry.Result = outcome.Text ?? string.Empty;
-                entry.State = outcome.HasText ? EntryState.Done : EntryState.Failed;
+                entry.State = outcome.HasText
+                    ? content.Stopped ? EntryState.Stopped : EntryState.Done
+                    : EntryState.Failed;
 
                 await _store.UpdateEntryResultAsync(entry, CancellationToken.None).ConfigureAwait(true);
             }
@@ -1643,7 +1657,86 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
             // Superseded or stopped. Whatever replaced it owns the region now,
             // and has already cleared it.
         }
+        finally
+        {
+            if (_liveJobs.TryGetValue(entry.Id, out var finished) && ReferenceEquals(finished, job))
+            {
+                _liveJobs.Remove(entry.Id);
+            }
+
+            if (job.Token.IsCancellationRequested)
+            {
+                job.Stopped();
+            }
+            else
+            {
+                job.Completed();
+            }
+
+            Runtime.Agents.JobRegistry.Shared.Forget(job.Id);
+            RaiseGenerationState();
+        }
     }
+
+    private const string StoppedWithNothing = "Stopped before anything came back.";
+
+    private readonly Dictionary<Guid, Runtime.Agents.TrackedJob> _liveJobs = [];
+
+    public bool IsGenerating => _liveJobs.Count > 0;
+
+    public IReadOnlyList<string> LiveJobIds => [.. _liveJobs.Values.Select(job => job.Id)];
+
+    private void RaiseGenerationState()
+    {
+        OnPropertyChanged(nameof(IsGenerating));
+        OnPropertyChanged(nameof(CanSend));
+        StopGenerationCommand.NotifyCanExecuteChanged();
+    }
+
+    private void Reattach(EntryViewModel view)
+    {
+        if (_liveJobs.TryGetValue(view.Entry.Id, out var job))
+        {
+            view.AttachJob(job);
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(IsGenerating))]
+    private void StopGeneration()
+    {
+        foreach (var entry in Entries.Where(entry => entry.IsRunning).ToList())
+        {
+            StopEntry(entry);
+        }
+
+        foreach (var job in _liveJobs.Values.ToList())
+        {
+            job.Cancel();
+        }
+    }
+
+    [RelayCommand]
+    private void StopEntry(EntryViewModel view)
+    {
+        if (view is null)
+        {
+            return;
+        }
+
+        if (view.IsRegenerating)
+        {
+            view.CancelRegeneration();
+            return;
+        }
+
+        view.Stop();
+    }
+
+    [RelayCommand]
+    private void PauseEntry(EntryViewModel view) => view?.Pause();
+
+    [RelayCommand]
+    private void ResumeEntry(EntryViewModel view) => view?.Resume();
 
 
     /// <summary>
@@ -1963,6 +2056,8 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
             // lands on.
             entry.UnsureThreshold = UnsureThreshold;
             entry.ShowsFidelity = ShowMetrics;
+
+            Reattach(entry);
 
             Entries.Add(entry);
         }

@@ -26,6 +26,8 @@ public sealed record JobSnapshot(
 
 public sealed class JobRegistry
 {
+    public static JobRegistry Shared { get; } = new();
+
     private readonly ConcurrentDictionary<string, TrackedJob> _jobs = new(StringComparer.Ordinal);
     private readonly SemaphoreSlim _worker = new(1, 1);
 
@@ -33,17 +35,17 @@ public sealed class JobRegistry
 
     public string Start(string kind, int total, Func<TrackedJob, CancellationToken, Task> work)
     {
-        var id = "job_" + Interlocked.Increment(ref _next).ToString("D4");
-        var job = new TrackedJob(id, kind, total);
-
-        _jobs[id] = job;
+        var job = Track(kind, total);
 
         _ = Task.Run(async () =>
         {
-            await _worker.WaitAsync(job.Token).ConfigureAwait(false);
+            var held = false;
 
             try
             {
+                await _worker.WaitAsync(job.Token).ConfigureAwait(false);
+                held = true;
+
                 job.Begin();
                 await work(job, job.Token).ConfigureAwait(false);
                 job.Finish();
@@ -58,12 +60,29 @@ public sealed class JobRegistry
             }
             finally
             {
-                _worker.Release();
+                if (held)
+                {
+                    _worker.Release();
+                }
             }
         });
 
-        return id;
+        return job.Id;
     }
+
+    public TrackedJob Track(string kind, int total)
+    {
+        var id = "job_" + Interlocked.Increment(ref _next).ToString("D4");
+        var job = new TrackedJob(id, kind, total);
+
+        _jobs[id] = job;
+
+        return job;
+    }
+
+    public TrackedJob? Find(string id) => _jobs.TryGetValue(id, out var job) ? job : null;
+
+    public void Forget(string id) => _jobs.TryRemove(id, out _);
 
     public JobSnapshot? Status(string id) => _jobs.TryGetValue(id, out var job) ? job.Snapshot() : null;
 
@@ -91,6 +110,7 @@ public sealed class TrackedJob
     private int _done;
     private string? _detail;
     private string? _error;
+    private TaskCompletionSource? _paused;
 
     internal TrackedJob(string id, string kind, int total)
     {
@@ -106,6 +126,73 @@ public sealed class TrackedJob
     public int Total { get; private set; }
 
     public CancellationToken Token => _cancellation.Token;
+
+    public bool IsPaused
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _paused is not null;
+            }
+        }
+    }
+
+    public event Action? PauseChanged;
+
+    public void Pause()
+    {
+        lock (_gate)
+        {
+            if (_paused is not null || _state is JobState.Done or JobState.Failed or JobState.Cancelled)
+            {
+                return;
+            }
+
+            _paused = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        }
+
+        PauseChanged?.Invoke();
+    }
+
+    public void Resume()
+    {
+        TaskCompletionSource? release;
+
+        lock (_gate)
+        {
+            release = _paused;
+            _paused = null;
+        }
+
+        if (release is null)
+        {
+            return;
+        }
+
+        release.TrySetResult();
+        PauseChanged?.Invoke();
+    }
+
+    public async Task WaitWhilePausedAsync(CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            Task waiting;
+
+            lock (_gate)
+            {
+                if (_paused is null)
+                {
+                    return;
+                }
+
+                waiting = _paused.Task;
+            }
+
+            await waiting.WaitAsync(cancellationToken).ConfigureAwait(false);
+        }
+    }
 
     public void Report(int done, string? detail)
     {
@@ -182,16 +269,39 @@ public sealed class TrackedJob
         }
     }
 
-    internal void Cancel()
+    public void Cancel()
     {
+        TaskCompletionSource? release;
+
         lock (_gate)
         {
             if (_state is JobState.Done or JobState.Failed)
             {
                 return;
             }
+
+            release = _paused;
+            _paused = null;
         }
 
+        release?.TrySetResult();
         _cancellation.Cancel();
     }
+
+    public void Running() => Begin();
+
+    public void Stopped() => Cancelled();
+
+    public void Completed()
+    {
+        lock (_gate)
+        {
+            if (_state is JobState.Queued or JobState.Running)
+            {
+                _state = JobState.Done;
+            }
+        }
+    }
+
+    public void Failed(string message) => Fail(message);
 }

@@ -66,7 +66,7 @@ public sealed class TranslationGateway : IDisposable
             new AppPaths().DictionariesFolder);
         _chats = new ChatWriter(new ChatStore(database));
 
-        Jobs = new JobRegistry();
+        Jobs = JobRegistry.Shared;
     }
 
     /// <summary>

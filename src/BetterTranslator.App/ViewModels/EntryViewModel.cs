@@ -58,9 +58,17 @@ public sealed partial class EntryViewModel : ObservableObject
         Phase = entry.State switch
         {
             EntryState.Done when translated => TranslationPhase.Complete,
+            EntryState.Stopped when translated => TranslationPhase.Complete,
             EntryState.Failed => TranslationPhase.Failed,
             _ => TranslationPhase.Idle,
         };
+
+        WasStopped = entry.State == EntryState.Stopped && translated;
+
+        if (WasStopped)
+        {
+            Note = StoppedLabel;
+        }
 
         // Decided once, from the source, and never from the result: the two are
         // the same document in two languages, so a translation that came back
@@ -804,11 +812,13 @@ public sealed partial class EntryViewModel : ObservableObject
 
     partial void OnPhaseChanged(TranslationPhase value)
     {
+        RaiseRunControls();
+
         // The stored state is the durable half of the phase. Idle and Pending
         // are both "nothing has translated it", which is what the column means.
         Entry.State = value switch
         {
-            TranslationPhase.Complete => EntryState.Done,
+            TranslationPhase.Complete => WasStopped ? EntryState.Stopped : EntryState.Done,
             TranslationPhase.Failed => EntryState.Failed,
             _ => EntryState.Pending,
         };
@@ -978,15 +988,84 @@ public sealed partial class EntryViewModel : ObservableObject
     /// The token the work runs under, and the sequence the caller quotes back in
     /// <see cref="Owns"/> before it writes anything.
     /// </returns>
+    public Runtime.Agents.TrackedJob? Job { get; private set; }
+
+    public string? JobId => Job?.Id;
+
+    [ObservableProperty]
+    public partial bool IsPaused { get; set; }
+
+    [ObservableProperty]
+    public partial bool WasStopped { get; set; }
+
+    public bool IsRunning =>
+        Phase is TranslationPhase.Pending or TranslationPhase.Streaming
+        || (Job is { } live && !live.Snapshot().IsFinished && !live.Token.IsCancellationRequested);
+
+    public bool CanPause => IsRunning && !IsPaused && IsChunked;
+
+    public bool CanResume => IsRunning && IsPaused;
+
+    public bool CanStop => IsRunning;
+
+    public bool IsChunked => Engine.Documents.ContentTranslation.IsChunked(Source);
+
+    public string StoppedLabel => "Stopped. This is what had been translated when you stopped it.";
+
+    public void AttachJob(Runtime.Agents.TrackedJob job)
+    {
+        if (Job is { } previous)
+        {
+            previous.PauseChanged -= OnPauseChanged;
+        }
+
+        Job = job;
+        job.PauseChanged += OnPauseChanged;
+
+        if (Phase == TranslationPhase.Idle && !job.Snapshot().IsFinished)
+        {
+            Phase = TranslationPhase.Pending;
+        }
+
+        OnPauseChanged();
+    }
+
+    private void OnPauseChanged()
+    {
+        IsPaused = Job?.IsPaused ?? false;
+        RaiseRunControls();
+    }
+
+    private void RaiseRunControls()
+    {
+        OnPropertyChanged(nameof(IsRunning));
+        OnPropertyChanged(nameof(CanPause));
+        OnPropertyChanged(nameof(CanResume));
+        OnPropertyChanged(nameof(CanStop));
+    }
+
+    partial void OnIsPausedChanged(bool value) => RaiseRunControls();
+
+    public void Pause() => Job?.Pause();
+
+    public void Resume() => Job?.Resume();
+
+    public void Stop() => Job?.Cancel();
+
     public (int Sequence, CancellationToken Token) BeginRun()
+        => BeginRun(CancellationToken.None);
+
+    public (int Sequence, CancellationToken Token) BeginRun(CancellationToken jobToken)
     {
         // Cancelled but not disposed. The runtime links its own source to this
         // token and unregisters in its finally, so the cancelled one is garbage
         // the moment its run lets go -- and disposing it out from under a call
         // that is still unwinding is a race for nothing.
         _run?.Cancel();
-        _run = new CancellationTokenSource();
+        _run = CancellationTokenSource.CreateLinkedTokenSource(jobToken);
         _sequence++;
+
+        WasStopped = false;
 
         // Matches are left alone: they belong to the source, not to the run, and
         // Aligned renders none of them while there is no result to sit in.
@@ -1014,6 +1093,7 @@ public sealed partial class EntryViewModel : ObservableObject
     /// </summary>
     public void CancelRun()
     {
+        Job?.Cancel();
         _run?.Cancel();
         _sequence++;
     }

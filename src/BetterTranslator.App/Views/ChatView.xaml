@@ -491,12 +491,12 @@
                                                           Command="{Binding RegenerateEntryCommand}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                           Visibility="{Binding PlacementTarget.DataContext.CanRegenerate, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVisibility}}" />
-                                                <MenuItem Header="Stop regenerating"
+                                                <MenuItem Header="Stop"
                                                           Style="{DynamicResource AppMenuItem}"
                                                           Icon="{StaticResource IconCloseSmall}"
-                                                          Command="{Binding CancelRegenerationCommand}"
+                                                          Command="{Binding StopEntryCommand}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                                          Visibility="{Binding PlacementTarget.DataContext.IsRegenerating, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVisibility}}" />
+                                                          Visibility="{Binding PlacementTarget.DataContext.CanStop, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVisibility}}" />
                                                 <Separator Style="{DynamicResource AppMenuSeparator}" />
                                                 <MenuItem Header="Delete"
                                                           Style="{DynamicResource AppMenuItem}"
@@ -540,14 +540,34 @@
                                         </Border>
 
                                         <Button Style="{StaticResource LinkButton}"
+                                                Content="Pause"
+                                                Margin="10,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Command="{Binding DataContext.PauseEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Pause at the end of the piece being translated now"
+                                                AutomationProperties.Name="Pause this translation"
+                                                Visibility="{Binding CanPause, Converter={StaticResource BoolToVisibility}}" />
+
+                                        <Button Style="{StaticResource LinkButton}"
+                                                Content="Resume"
+                                                Margin="10,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Command="{Binding DataContext.ResumeEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Carry on from the first piece that is not translated yet"
+                                                AutomationProperties.Name="Resume this translation"
+                                                Visibility="{Binding CanResume, Converter={StaticResource BoolToVisibility}}" />
+
+                                        <Button Style="{StaticResource LinkButton}"
                                                 Content="Stop"
                                                 Margin="10,0,0,0"
                                                 VerticalAlignment="Center"
-                                                Command="{Binding DataContext.CancelRegenerationCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                Command="{Binding DataContext.StopEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                 CommandParameter="{Binding}"
-                                                ToolTip="Stop this regeneration and keep the translation you have"
-                                                AutomationProperties.Name="Stop this regeneration"
-                                                Visibility="{Binding IsRegenerating, Converter={StaticResource BoolToVisibility}}" />
+                                                ToolTip="Stop here and keep what has come back"
+                                                AutomationProperties.Name="Stop this translation"
+                                                Visibility="{Binding CanStop, Converter={StaticResource BoolToVisibility}}" />
 
                                         <!-- Carries the same Tag as the menu's owner,
                                              because opening from here makes this the
@@ -1407,7 +1427,16 @@
                                                Command="{Binding SendCommand}"
                                                IsEnabled="{Binding CanSend}"
                                                ToolTip="Translate"
-                                               AutomationProperties.Name="Translate" />
+                                               AutomationProperties.Name="Translate"
+                                               Visibility="{Binding IsGenerating, Converter={StaticResource InverseBoolToVisibility}}" />
+
+                        <controls:ChromeButton Grid.Column="3"
+                                               Style="{StaticResource SendButton}"
+                                               Icon="{StaticResource IconCloseCrossSearch}"
+                                               Command="{Binding StopGenerationCommand}"
+                                               ToolTip="Stop translating. What has come back so far is kept."
+                                               AutomationProperties.Name="Stop translating"
+                                               Visibility="{Binding IsGenerating, Converter={StaticResource BoolToVisibility}}" />
                     </Grid>
                 </Grid>
             </Border>

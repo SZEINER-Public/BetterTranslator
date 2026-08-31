@@ -45,7 +45,8 @@ public sealed record MessageTranslationResult(
     int Translated,
     int Recovered,
     int Kept,
-    IReadOnlyList<MessageUnit> Units)
+    IReadOnlyList<MessageUnit> Units,
+    bool Stopped = false)
 {
     public IEnumerable<MessageUnit> Failures => Units.Where(u => !u.FromModel);
 }
@@ -85,17 +86,23 @@ public static class MessageTranslation
         int translated = 0, recovered = 0, kept = 0;
 
         var offset = 0;
+        var stopped = false;
 
         foreach (var line in lines)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             var trimmed = Trim(line, offset);
 
             if (trimmed.Length > 0 && TranslationCandidate.IsWorthSending(line, minLetters: 1))
             {
                 var source = text.Substring(trimmed.Start, trimmed.Length);
-                var answer = await translate(source, cancellationToken);
+                var (answer, halted) = await Stoppable.UnitAsync(translate, source, cancellationToken);
+
+                if (halted)
+                {
+                    stopped = true;
+                    break;
+                }
+
                 var cause = Unusable(answer, source);
 
                 if (cause is null)
@@ -117,7 +124,7 @@ public static class MessageTranslation
                         false,
                         Explain(cause.Value, refusal)));
 
-                    await SentencesAsync(text, trimmed, translate, edits, units, refusal, cancellationToken);
+                    stopped = await SentencesAsync(text, trimmed, translate, edits, units, refusal, cancellationToken);
 
                     if (edits.Count > before)
                     {
@@ -127,6 +134,11 @@ public static class MessageTranslation
                     {
                         kept++;
                     }
+
+                    if (stopped)
+                    {
+                        break;
+                    }
                 }
             }
 
@@ -134,10 +146,10 @@ public static class MessageTranslation
             offset += line.Length + 1;
         }
 
-        return new MessageTranslationResult(Splice(text, edits), translated, recovered, kept, units);
+        return new MessageTranslationResult(Splice(text, edits), translated, recovered, kept, units, stopped);
     }
 
-    private static async Task SentencesAsync(
+    private static async Task<bool> SentencesAsync(
         string text,
         (int Start, int Length) line,
         Func<string, CancellationToken, Task<string?>> translate,
@@ -153,13 +165,11 @@ public static class MessageTranslation
         // not already have. Asking again would be the same question.
         if (sentences.Count < 2)
         {
-            return;
+            return false;
         }
 
         foreach (var (start, length) in sentences)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             var sentence = source.Substring(start, length);
 
             if (!TranslationCandidate.IsWorthSending(sentence, minLetters: 1))
@@ -167,7 +177,13 @@ public static class MessageTranslation
                 continue;
             }
 
-            var answer = await translate(sentence, cancellationToken);
+            var (answer, halted) = await Stoppable.UnitAsync(translate, sentence, cancellationToken);
+
+            if (halted)
+            {
+                return true;
+            }
+
             var cause = Unusable(answer, sentence);
 
             if (cause is null)
@@ -186,6 +202,8 @@ public static class MessageTranslation
                     Explain(cause.Value, refusal)));
             }
         }
+
+        return false;
     }
 
     /// <summary>
