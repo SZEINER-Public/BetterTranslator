@@ -80,7 +80,7 @@ internal static class Native
     static Native()
     {
         NativeLibrary.SetDllImportResolver(typeof(Native).Assembly, (name, asm, path) =>
-            name == Lib ? NativeLibrary.Load(ResolveFlavor(), asm, path) : IntPtr.Zero);
+            name == Lib ? ResolveFlavor() : IntPtr.Zero);
     }
 
     // Set from the stored setting before the first native call. Windows will not
@@ -107,7 +107,11 @@ internal static class Native
     /// </summary>
     internal static string? Substitution { get; private set; }
 
-    private static string ResolveFlavor()
+    internal static Inference.FlavorFinding? Finding { get; private set; }
+
+    internal static string? ResolvedPath { get; private set; }
+
+    private static IntPtr ResolveFlavor()
     {
         var dirs = Inference.BackendCatalog.SearchPaths.Count > 0
             ? Inference.BackendCatalog.SearchPaths
@@ -123,6 +127,7 @@ internal static class Native
         // flavour was refused is the one worth reporting, and it is not
         // necessarily the last failure seen.
         var refusals = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        Inference.FlavorFinding? worst = null;
 
         foreach (var flavor in order)
         {
@@ -135,33 +140,29 @@ internal static class Native
                     continue;
                 }
 
-                // Load rather than TryLoad, for the message. TryLoad collapses
-                // "not there" and "there but its dependencies are not" into the
-                // same false, and those are the two cases that must not read
-                // alike.
-                try
-                {
-                    var handle = NativeLibrary.Load(candidate);
-                    NativeLibrary.Free(handle);
+                var (finding, handle) = Inference.RuntimeSupport.Open(candidate, flavor, dir);
 
+                if (finding.State == Inference.FlavorState.Ready)
+                {
                     LoadedFlavor = flavor;
+                    ResolvedPath = candidate;
+                    Finding = finding;
                     Substitution = Explain(PreferredFlavor, flavor, refusals);
 
-                    return candidate;
+                    return handle;
                 }
-                catch (Exception ex) when (ex is DllNotFoundException or BadImageFormatException)
-                {
-                    refusals[flavor] = ex.Message;
-                }
+
+                refusals[flavor] = Inference.RuntimeSupport.Describe(finding, dirs);
+                worst ??= finding;
             }
         }
 
-        var detail = refusals.Count > 0
-            ? " Found but could not load: " + string.Join("; ", refusals.Select(r => $"{r.Key}.dll -- {r.Value}"))
-            : string.Empty;
+        Finding = worst ?? new Inference.FlavorFinding(
+            Inference.FlavorState.NothingFound, null, null, null, null, 0);
 
-        throw new DllNotFoundException(
-            $"No BetterRuntime flavor found in {string.Join(" or ", dirs)}. Expected BetterRuntimeCPU.dll or a GPU flavor.{detail}");
+        ResolvedPath = Finding.Path;
+
+        throw new DllNotFoundException(Inference.RuntimeSupport.Describe(Finding, dirs));
     }
 
     /// <summary>

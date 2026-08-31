@@ -181,3 +181,5 @@ Desktop.ini
 $RECYCLE.BIN/
 *.lnk
 .DS_Store
+
+native/runtime-support/

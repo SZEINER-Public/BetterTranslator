@@ -18,6 +18,29 @@
     <Resource Include="Assets\app-icon.ico" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(RuntimeSupportDir)' != ''">
+    <None Include="$(RuntimeSupportDir)\msvcp140.dll"
+          Condition="Exists('$(RuntimeSupportDir)\msvcp140.dll')"
+          Link="runtime-support\msvcp140.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false" />
+    <None Include="$(RuntimeSupportDir)\vcruntime140.dll"
+          Condition="Exists('$(RuntimeSupportDir)\vcruntime140.dll')"
+          Link="runtime-support\vcruntime140.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false" />
+    <None Include="$(RuntimeSupportDir)\vcruntime140_1.dll"
+          Condition="Exists('$(RuntimeSupportDir)\vcruntime140_1.dll')"
+          Link="runtime-support\vcruntime140_1.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false" />
+    <None Include="$(RuntimeSupportDir)\vcomp140.dll"
+          Condition="Exists('$(RuntimeSupportDir)\vcomp140.dll')"
+          Link="runtime-support\vcomp140.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="ModelContextProtocol" Version="2.1.0" />

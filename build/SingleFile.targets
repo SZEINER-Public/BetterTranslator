@@ -76,7 +76,11 @@
 
     <Exec Command="dotnet publish &quot;$(UpdaterProject)&quot; -c $(SingleFileConfiguration) -r $(SingleFileRuntimeIdentifier) --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishDir=bin/$(SingleFileConfiguration)/net10.0-windows/$(SingleFileRuntimeIdentifier)/publish/ --nologo -nodeReuse:false" />
 
-    <Exec Command="dotnet publish &quot;$(AppProject)&quot; -c $(SingleFileConfiguration) -r $(SingleFileRuntimeIdentifier) --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:PublishReadyToRun=false -p:PublishDir=&quot;$(SingleFilePayloadDir)\\&quot; --nologo -nodeReuse:false" />
+    <PropertyGroup>
+      <SingleFileRuntimeSupport Condition="'$(RuntimeSupportDir)' != ''"> -p:RuntimeSupportDir="$(RuntimeSupportDir)"</SingleFileRuntimeSupport>
+    </PropertyGroup>
+
+    <Exec Command="dotnet publish &quot;$(AppProject)&quot; -c $(SingleFileConfiguration) -r $(SingleFileRuntimeIdentifier) --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -p:PublishReadyToRun=false -p:PublishDir=&quot;$(SingleFilePayloadDir)\\&quot;$(SingleFileRuntimeSupport) --nologo -nodeReuse:false" />
 
     <Error Condition="!Exists('$(SingleFilePayloadDir)\BetterTranslator.dll')"
            Text="The payload publish produced no managed entry assembly at $(SingleFilePayloadDir)\BetterTranslator.dll." />
