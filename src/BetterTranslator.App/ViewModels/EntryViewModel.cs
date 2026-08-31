@@ -917,6 +917,57 @@ public sealed partial class EntryViewModel : ObservableObject
     /// <summary>An answer waiting out the placeholder's minimum hold.</summary>
     private (TranslationPhase Phase, string? Text, string? Note)? _settling;
 
+    private sealed record ReplacedResult(
+        string Result,
+        TranslationPhase Phase,
+        string? Note,
+        int? GeneratedTokens,
+        int? DurationMs,
+        Core.Verification.VerificationResult? Verification);
+
+    private ReplacedResult? _replaced;
+
+    public const string RegenerationCancelledNote =
+        "Regeneration stopped. The translation below is the one you already had.";
+
+    public const string RegenerationFailedNote =
+        "Regeneration produced nothing. The translation below is the one you already had.";
+
+    [ObservableProperty]
+    public partial bool IsRegenerating { get; set; }
+
+    public bool CanRegenerate => !IsRegenerating && Source.Length > 0;
+
+    [ObservableProperty]
+    public partial string? PreviousResult { get; set; }
+
+    public bool HasPreviousResult => PreviousResult is { Length: > 0 };
+
+    partial void OnIsRegeneratingChanged(bool value) => OnPropertyChanged(nameof(CanRegenerate));
+
+    partial void OnPreviousResultChanged(string? value)
+    {
+        OnPropertyChanged(nameof(HasPreviousResult));
+        CopyPreviousResultCommand.NotifyCanExecuteChanged();
+    }
+
+    public void BeginRegeneration()
+    {
+        _replaced ??= new ReplacedResult(Result, Phase, Note, GeneratedTokens, DurationMs, Verification);
+        IsRegenerating = true;
+    }
+
+    public void CancelRegeneration()
+    {
+        if (!IsRegenerating)
+        {
+            return;
+        }
+
+        CancelRun();
+        Settle(TranslationPhase.Idle, text: null, RegenerationCancelledNote);
+    }
+
     /// <summary>
     /// Starts a run. Anything already in flight for this entry is superseded:
     /// cancelled, and its answer discarded if it arrives regardless. The result
@@ -1000,6 +1051,29 @@ public sealed partial class EntryViewModel : ObservableObject
     /// </summary>
     private void Settle(TranslationPhase phase, string? text, string? note)
     {
+        if (_replaced is { } replaced)
+        {
+            _replaced = null;
+            IsRegenerating = false;
+
+            var hadAnswer = replaced.Phase == TranslationPhase.Complete && replaced.Result.Length > 0;
+
+            if (phase == TranslationPhase.Complete)
+            {
+                PreviousResult = hadAnswer ? replaced.Result : PreviousResult;
+            }
+            else if (hadAnswer)
+            {
+                GeneratedTokens = replaced.GeneratedTokens;
+                DurationMs = replaced.DurationMs;
+                Verification = replaced.Verification;
+
+                phase = replaced.Phase;
+                text = replaced.Result;
+                note ??= RegenerationFailedNote;
+            }
+        }
+
         _skeletonTimer?.Stop();
         _settling = null;
 
@@ -1107,6 +1181,9 @@ public sealed partial class EntryViewModel : ObservableObject
 
     [RelayCommand(CanExecute = nameof(CanCopyResult))]
     private void CopyResult() => Copy(Result, source: false);
+
+    [RelayCommand(CanExecute = nameof(HasPreviousResult))]
+    private void CopyPreviousResult() => Copy(PreviousResult ?? string.Empty, source: false);
 
     /// <summary>
     /// The clipboard is held by whatever else is running, so a copy can fail

@@ -210,6 +210,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             _settings.Effort = effort;
             _selectedModelPath = ResolveModelPath();
             ApplyModelLanguages();
+            Workspace.OfferRegeneration(Translation.Model.Name);
             Store(settings => settings.Effort = effort);
         };
 

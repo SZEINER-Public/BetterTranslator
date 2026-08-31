@@ -1341,7 +1341,138 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
     /// late answer from the attempt it replaced cannot land on top of it.
     /// </summary>
     [RelayCommand]
-    private Task RetryEntryAsync(EntryViewModel view) => TranslateEntryAsync(view.Entry, view);
+    private Task RetryEntryAsync(EntryViewModel view) => RegenerateEntryAsync(view);
+
+    private readonly SemaphoreSlim _regenerations = new(1, 1);
+
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private async Task RegenerateEntryAsync(EntryViewModel view)
+    {
+        if (view is null || view.IsRegenerating)
+        {
+            return;
+        }
+
+        await EntriesLoaded.ConfigureAwait(true);
+
+        view.BeginRegeneration();
+
+        await _regenerations.WaitAsync(CancellationToken.None).ConfigureAwait(true);
+
+        try
+        {
+            if (!view.IsRegenerating)
+            {
+                return;
+            }
+
+            if (view.Kind == EntryKind.File)
+            {
+                await RunFileEntryAsync(view.Entry, view).ConfigureAwait(true);
+            }
+            else
+            {
+                await TranslateEntryAsync(view.Entry, view).ConfigureAwait(true);
+            }
+        }
+        finally
+        {
+            _regenerations.Release();
+        }
+    }
+
+    [RelayCommand]
+    private void CancelRegeneration(EntryViewModel view) => view?.CancelRegeneration();
+
+    [ObservableProperty]
+    public partial string? RegenerateOfferModel { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRegeneratingAll { get; set; }
+
+    public bool HasRegenerateOffer => RegenerateOfferModel is { Length: > 0 } && !IsRegeneratingAll;
+
+    public string RegenerateOfferText =>
+        $"{RegenerateOfferModel} is now the model. Translations below were made with the one before it.";
+
+    partial void OnRegenerateOfferModelChanged(string? value) =>
+        OnPropertyChanged(nameof(HasRegenerateOffer));
+
+    partial void OnIsRegeneratingAllChanged(bool value) =>
+        OnPropertyChanged(nameof(HasRegenerateOffer));
+
+    public void OfferRegeneration(string modelName)
+    {
+        if (Entries.Any(entry => entry.HasResultText))
+        {
+            RegenerateOfferModel = modelName;
+        }
+    }
+
+    [RelayCommand]
+    private void DismissRegenerateOffer() => RegenerateOfferModel = null;
+
+    [RelayCommand]
+    private void ConfirmRegenerateAll()
+    {
+        var targets = Entries.Where(entry => entry.HasResultText && !entry.IsRegenerating).ToList();
+
+        if (targets.Count == 0)
+        {
+            RegenerateOfferModel = null;
+            return;
+        }
+
+        var model = RegenerateOfferModel;
+
+        _showDialog(new ConfirmDialogViewModel(
+            targets.Count == 1 ? "Regenerate 1 message?" : $"Regenerate {targets.Count} messages?",
+            model is { Length: > 0 }
+                ? $"Each one is sent again as it was first written, on {model}. They run one at a time, and every current translation stays until its replacement lands."
+                : "Each one is sent again as it was first written. They run one at a time, and every current translation stays until its replacement lands.",
+            "Regenerate",
+            "Cancel",
+            "IconRefresh",
+            "IconCloseCrossSearch",
+            () => RegenerationsCompleted = RegenerateAllAsync(targets),
+            () => _showDialog(null)));
+    }
+
+    [RelayCommand]
+    private void CancelRegenerateAll()
+    {
+        IsRegeneratingAll = false;
+
+        foreach (var entry in Entries.Where(entry => entry.IsRegenerating))
+        {
+            entry.CancelRegeneration();
+        }
+    }
+
+    public Task RegenerationsCompleted { get; private set; } = Task.CompletedTask;
+
+    private async Task RegenerateAllAsync(IReadOnlyList<EntryViewModel> targets)
+    {
+        RegenerateOfferModel = null;
+        IsRegeneratingAll = true;
+
+        try
+        {
+            foreach (var view in targets)
+            {
+                if (!IsRegeneratingAll)
+                {
+                    return;
+                }
+
+                await RegenerateEntryAsync(view).ConfigureAwait(true);
+            }
+        }
+        finally
+        {
+            IsRegeneratingAll = false;
+        }
+    }
 
     /// <summary>
     /// Where an exported file is written. Set by the shell to the save dialog,
@@ -1420,6 +1551,7 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
             return;
         }
 
+        var replacing = view.IsRegenerating && view.HasResultText;
         var (sequence, token) = view.BeginRun();
         string? note = null;
 
@@ -1498,10 +1630,13 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
             // Written from the outcome rather than from the view: the view holds
             // its answer back for as long as the placeholder is still owed, and
             // the store is not waiting on a presentation delay.
-            entry.Result = outcome.Text ?? string.Empty;
-            entry.State = outcome.HasText ? EntryState.Done : EntryState.Failed;
+            if (!replacing || outcome.HasText)
+            {
+                entry.Result = outcome.Text ?? string.Empty;
+                entry.State = outcome.HasText ? EntryState.Done : EntryState.Failed;
 
-            await _store.UpdateEntryResultAsync(entry, CancellationToken.None).ConfigureAwait(true);
+                await _store.UpdateEntryResultAsync(entry, CancellationToken.None).ConfigureAwait(true);
+            }
         }
         catch (OperationCanceledException)
         {

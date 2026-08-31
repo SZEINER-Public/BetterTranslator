@@ -48,6 +48,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <!-- Stamp only, in the same column as the entries. The chat's
@@ -91,7 +92,53 @@
                     </Border>
                 </StackPanel>
 
-                <ItemsControl Grid.Row="1"
+                <Border Grid.Row="1"
+                        Background="{StaticResource BrushAccentTint}"
+                        BorderBrush="{StaticResource BrushBorderFaint}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusCard}"
+                        Padding="12,10,10,10"
+                        Margin="0,16,0,0"
+                        Visibility="{Binding HasRegenerateOffer, Converter={StaticResource BoolToVisibility}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <controls:IconView Grid.Column="0"
+                                           Definition="{StaticResource IconRefresh}"
+                                           Foreground="{StaticResource BrushAccent}"
+                                           VerticalAlignment="Center" />
+
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding RegenerateOfferText}"
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center"
+                                   Margin="8,0,8,0" />
+
+                        <Button Grid.Column="2"
+                                Style="{StaticResource LinkButton}"
+                                Content="Regenerate this conversation"
+                                VerticalAlignment="Center"
+                                Command="{Binding ConfirmRegenerateAllCommand}"
+                                AutomationProperties.Name="Regenerate this conversation" />
+
+                        <controls:ChromeButton Grid.Column="3"
+                                               Icon="{StaticResource IconCloseSmall}"
+                                               Margin="6,0,0,0"
+                                               VerticalAlignment="Center"
+                                               Command="{Binding DismissRegenerateOfferCommand}"
+                                               ToolTip="Dismiss"
+                                               AutomationProperties.Name="Dismiss this offer" />
+                    </Grid>
+                </Border>
+
+                <ItemsControl Grid.Row="2"
                               ItemsSource="{Binding Entries}"
                               Margin="0,20,0,24">
                     <ItemsControl.ItemTemplate>
@@ -432,6 +479,24 @@
                                                           Style="{DynamicResource AppMenuItem}"
                                                           Icon="{StaticResource IconCopy}"
                                                           Command="{Binding PlacementTarget.DataContext.CopyResultCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                                <MenuItem Header="Copy the translation this replaced"
+                                                          Style="{DynamicResource AppMenuItem}"
+                                                          Icon="{StaticResource IconCopy}"
+                                                          Command="{Binding PlacementTarget.DataContext.CopyPreviousResultCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          Visibility="{Binding PlacementTarget.DataContext.HasPreviousResult, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVisibility}}" />
+                                                <Separator Style="{DynamicResource AppMenuSeparator}" />
+                                                <MenuItem Header="Regenerate"
+                                                          Style="{DynamicResource AppMenuItem}"
+                                                          Icon="{StaticResource IconRefresh}"
+                                                          Command="{Binding RegenerateEntryCommand}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          Visibility="{Binding PlacementTarget.DataContext.CanRegenerate, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVisibility}}" />
+                                                <MenuItem Header="Stop regenerating"
+                                                          Style="{DynamicResource AppMenuItem}"
+                                                          Icon="{StaticResource IconCloseSmall}"
+                                                          Command="{Binding CancelRegenerationCommand}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          Visibility="{Binding PlacementTarget.DataContext.IsRegenerating, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVisibility}}" />
                                                 <Separator Style="{DynamicResource AppMenuSeparator}" />
                                                 <MenuItem Header="Delete"
                                                           Style="{DynamicResource AppMenuItem}"
@@ -473,6 +538,16 @@
                                                                        AutomationProperties.Name="Source" />
                                             </StackPanel>
                                         </Border>
+
+                                        <Button Style="{StaticResource LinkButton}"
+                                                Content="Stop"
+                                                Margin="10,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Command="{Binding DataContext.CancelRegenerationCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Stop this regeneration and keep the translation you have"
+                                                AutomationProperties.Name="Stop this regeneration"
+                                                Visibility="{Binding IsRegenerating, Converter={StaticResource BoolToVisibility}}" />
 
                                         <!-- Carries the same Tag as the menu's owner,
                                              because opening from here makes this the
