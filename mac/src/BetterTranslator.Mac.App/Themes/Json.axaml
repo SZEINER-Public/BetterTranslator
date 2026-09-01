@@ -1,0 +1,45 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:json="using:BetterTranslator.Engine.Json">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Colors.axaml" />
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Typography.axaml" />
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Metrics.axaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <DataTemplate x:Key="JsonScalar" DataType="json:JsonScalar">
+        <Grid Margin="0,0,0,3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="JsonKey" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Text="{Binding KeyPath}"
+                       Theme="{StaticResource TextMonoSmall}"
+                       Foreground="{StaticResource BrushTextSubtle}"
+                       TextWrapping="Wrap"
+                       Margin="0,0,14,0"
+                       MaxWidth="{StaticResource ScopePathMaxWidth}" />
+
+            <TextBlock x:Name="Value"
+                       Grid.Column="1"
+                       Text="{Binding Text}"
+                       Theme="{StaticResource TextMonoPath}"
+                       TextWrapping="Wrap"
+                       Classes.notString="{Binding !IsString}">
+                <TextBlock.Styles>
+                    <Style Selector="TextBlock.notString">
+                        <Setter Property="Foreground" Value="{StaticResource BrushTextTertiary}" />
+                    </Style>
+                </TextBlock.Styles>
+            </TextBlock>
+        </Grid>
+    </DataTemplate>
+
+    <ControlTheme x:Key="JsonRows" TargetType="ItemsControl">
+        <Setter Property="Grid.IsSharedSizeScope" Value="True" />
+    </ControlTheme>
+
+</ResourceDictionary>

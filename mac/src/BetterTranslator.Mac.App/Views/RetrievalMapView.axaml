@@ -1,0 +1,276 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:BetterTranslator.Mac.App.Controls"
+             xmlns:conv="using:BetterTranslator.Mac.App.Converters"
+             xmlns:idx="using:BetterTranslator.Indexing"
+             xmlns:views="using:BetterTranslator.Mac.App.Views"
+             xmlns:vm="using:BetterTranslator.App.ViewModels"
+             x:Class="BetterTranslator.Mac.App.Views.RetrievalMapView"
+             x:DataType="vm:RetrievalMapViewModel"
+             Background="{StaticResource BrushSurface}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <Grid Grid.Row="0"
+              ColumnDefinitions="*,Auto"
+              Background="{StaticResource BrushSurface}"
+              IsVisible="{Binding !IsEmpty}">
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="16,12,0,12">
+                <StackPanel Margin="0,0,28,0">
+                    <TextBlock Text="Text indexed"
+                               Theme="{StaticResource TextFine}"
+                               Foreground="{StaticResource BrushTextTertiary}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                        <TextBlock Text="{Binding TextIndexedValue}" Theme="{StaticResource TextHeading}" />
+                        <TextBlock Text="pieces ready to search"
+                                   Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextTertiary}"
+                                   Margin="7,0,0,0"
+                                   VerticalAlignment="Bottom" />
+                    </StackPanel>
+                </StackPanel>
+
+                <Rectangle Width="{StaticResource BorderWidth}"
+                           Fill="{StaticResource BrushBorderSoft}"
+                           Margin="0,0,28,0" />
+
+                <StackPanel Margin="0,0,28,0">
+                    <TextBlock Text="Lookups"
+                               Theme="{StaticResource TextFine}"
+                               Foreground="{StaticResource BrushTextTertiary}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                        <TextBlock Text="{Binding LookupsValue}"
+                                   Theme="{StaticResource TextHeading}"
+                                   Foreground="{StaticResource BrushAccentDeep}" />
+                        <TextBlock Text="in the last minute"
+                                   Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextTertiary}"
+                                   Margin="7,0,0,0"
+                                   VerticalAlignment="Bottom" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,16,0" VerticalAlignment="Center">
+                <controls:SegmentedControl ItemsSource="{Binding FocusSegments}"
+                                           SelectedItem="{Binding SelectedFocus, Mode=TwoWay}"
+                                           AutomationProperties.Name="Focus" />
+
+                <controls:ChromeButton x:Name="ReindexButton"
+                                       Icon="{StaticResource IconRefresh}"
+                                       Margin="8,0,0,0"
+                                       Command="{Binding OpenReindexMenuCommand}"
+                                       ToolTip.Tip="Reindex"
+                                       AutomationProperties.Name="Reindex" />
+
+                <Popup PlacementTarget="{Binding #ReindexButton}"
+                       Placement="BottomEdgeAlignedLeft"
+                       HorizontalOffset="-200"
+                       VerticalOffset="6"
+                       IsLightDismissEnabled="True"
+                       IsOpen="{Binding IsReindexMenuOpen, Mode=TwoWay}">
+                    <Border Background="{StaticResource BrushSurface}"
+                            BorderBrush="{StaticResource BrushBorder}"
+                            BorderThickness="{StaticResource BorderThickness}"
+                            CornerRadius="{StaticResource RadiusCard}"
+                            Padding="{StaticResource Space2Thickness}"
+                            Effect="{StaticResource ShadowPopover}"
+                            MinWidth="268">
+                        <Grid>
+                            <ItemsControl ItemsSource="{Binding ReindexScopes}"
+                                          IsVisible="{Binding !IsPickingSources}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="idx:ReindexScope">
+                                        <Button Theme="{StaticResource MenuRowButton}"
+                                                Height="NaN"
+                                                Padding="9,7,12,8"
+                                                IsEnabled="{Binding IsAvailable}"
+                                                AutomationProperties.Name="{Binding Title}"
+                                                Command="{Binding $parent[ItemsControl].((vm:RetrievalMapViewModel)DataContext).ChooseScopeCommand}"
+                                                CommandParameter="{Binding}">
+                                            <Grid MinWidth="228">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Title}" Theme="{StaticResource TextDefault}" />
+                                                    <TextBlock Text="{Binding Detail}"
+                                                               Theme="{StaticResource TextMeta}"
+                                                               Foreground="{StaticResource BrushTextSecondary}"
+                                                               Margin="0,2,0,0" />
+                                                </StackPanel>
+                                                <controls:IconView Definition="{StaticResource IconChevronRight}"
+                                                                   Foreground="{StaticResource BrushTextMuted}"
+                                                                   HorizontalAlignment="Right"
+                                                                   VerticalAlignment="Center"
+                                                                   IsVisible="{Binding IsPickStage}" />
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <StackPanel IsVisible="{Binding IsPickingSources}">
+                                <Button Theme="{StaticResource MenuRowButton}"
+                                        Command="{Binding BackToScopesCommand}"
+                                        AutomationProperties.Name="Back to the reindex scopes">
+                                    <StackPanel Orientation="Horizontal">
+                                        <controls:IconView Definition="{StaticResource IconChevronLeftSmall}"
+                                                           VerticalAlignment="Center" />
+                                        <TextBlock Text="Pick what to reindex"
+                                                   Theme="{StaticResource TextDefault}"
+                                                   Margin="8,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <ScrollViewer MaxHeight="220"
+                                              VerticalScrollBarVisibility="Auto"
+                                              Margin="0,4,0,0">
+                                    <ItemsControl ItemsSource="{Binding PickableSources}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:PickableSourceViewModel">
+                                                <Grid Margin="9,5,12,5" MinWidth="228">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <CheckBox Theme="{StaticResource AppCheckBox}"
+                                                                  IsChecked="{Binding IsPicked, Mode=TwoWay}"
+                                                                  AutomationProperties.Name="{Binding Name}" />
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   Theme="{StaticResource TextSecondary}"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   MaxWidth="140"
+                                                                   Margin="10,0,0,0"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding ChunkLabel}"
+                                                               Theme="{StaticResource TextMicro}"
+                                                               Foreground="{StaticResource BrushTextMuted}"
+                                                               HorizontalAlignment="Right"
+                                                               VerticalAlignment="Center" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+
+                                <Border Background="{StaticResource BrushSurfaceSunken}"
+                                        BorderBrush="{StaticResource BrushBorderFaint}"
+                                        BorderThickness="0,1,0,0"
+                                        Padding="9,8,9,8"
+                                        Margin="0,4,0,0">
+                                    <Grid>
+                                        <TextBlock Text="{Binding PickedLabel}"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextMuted}"
+                                                   VerticalAlignment="Center" />
+                                        <Button Theme="{StaticResource PrimaryButton}"
+                                                Content="Reindex"
+                                                Height="{StaticResource SegmentHeight}"
+                                                HorizontalAlignment="Right"
+                                                IsEnabled="{Binding CanReindexPicked}"
+                                                Command="{Binding ReindexPickedCommand}"
+                                                AutomationProperties.Name="Reindex the picked sources" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Popup>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+
+            <Border Grid.Column="0"
+                    BorderBrush="{StaticResource BrushBorderSoft}"
+                    BorderThickness="0,1,0,0">
+                <views:MapSurface x:Name="Canvas"
+                                  Focusable="True"
+                                  PaintSurface="OnPaintSurface"
+                                  PointerPressed="OnCanvasPointerPressed"
+                                  PointerReleased="OnCanvasPointerReleased"
+                                  PointerMoved="OnCanvasPointerMoved"
+                                  PointerWheelChanged="OnCanvasPointerWheelChanged"
+                                  KeyDown="OnCanvasKeyDown"
+                                  AutomationProperties.Name="Retrieval map - arrow keys pan, plus and minus zoom, 0 fits"
+                                  IsVisible="{Binding !IsEmpty}" />
+            </Border>
+
+            <Border Grid.Column="1"
+                    Width="296"
+                    Background="{StaticResource BrushSurface}"
+                    BorderBrush="{StaticResource BrushBorderSoft}"
+                    BorderThickness="1,1,0,0"
+                    IsVisible="{Binding !IsEmpty}">
+                <Grid RowDefinitions="Auto,*">
+
+                    <TextBlock Grid.Row="0"
+                               Text="Live activity"
+                               Theme="{StaticResource TextSubheading}"
+                               Margin="14,12,14,10" />
+
+                    <TextBlock Grid.Row="1"
+                               Text="{Binding ActivityEmptyLine}"
+                               Theme="{StaticResource TextMeta}"
+                               Foreground="{StaticResource BrushTextMuted}"
+                               TextWrapping="Wrap"
+                               Margin="14,0,14,0"
+                               VerticalAlignment="Top"
+                               IsVisible="{Binding !HasActivity}" />
+
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Padding="14,0,10,14"
+                                  IsVisible="{Binding HasActivity}">
+                        <ItemsControl ItemsSource="{Binding Activity}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ActivityRowViewModel">
+                                    <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,11">
+
+                                        <Ellipse Grid.Column="0"
+                                                 Width="{StaticResource LogDotSize}"
+                                                 Height="{StaticResource LogDotSize}"
+                                                 Fill="{Binding Dot, Converter={x:Static conv:Converters.BrushShim}}"
+                                                 VerticalAlignment="Top"
+                                                 Margin="0,4,9,0" />
+
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding Line}"
+                                                       Theme="{StaticResource TextSecondary}"
+                                                       TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding Detail}"
+                                                       Theme="{StaticResource TextMonoSmall}"
+                                                       Foreground="{StaticResource BrushTextSubtle}"
+                                                       TextWrapping="Wrap"
+                                                       Margin="0,2,0,0" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <StackPanel Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    MaxWidth="{StaticResource EmptyStateMaxWidthPane}"
+                    IsVisible="{Binding IsEmpty}">
+            <TextBlock Text="Nothing to map yet"
+                       Theme="{StaticResource TextTitle}"
+                       HorizontalAlignment="Center" />
+            <TextBlock Text="Once something is indexed, every source, chunk and memory hit shows up here as it fires."
+                       Theme="{StaticResource TextProse}"
+                       Foreground="{StaticResource BrushTextSecondary}"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Margin="0,6,0,0" />
+            <Button Theme="{StaticResource PrimaryButton}"
+                    Content="Choose what to index"
+                    HorizontalAlignment="Center"
+                    Margin="0,16,0,0"
+                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenAddSourcesCommand}"
+                    AutomationProperties.Name="Choose what to index" />
+        </StackPanel>
+    </Grid>
+</UserControl>

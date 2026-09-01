@@ -1,0 +1,129 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System"
+                    xmlns:conv="using:Avalonia.Data.Converters"
+                    xmlns:controls="using:BetterTranslator.Mac.App.Controls"
+                    xmlns:shared="using:BetterTranslator.App.Controls"
+                    xmlns:md="using:BetterTranslator.Indexing.Markdown">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Colors.axaml" />
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Typography.axaml" />
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Metrics.axaml" />
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Icons.axaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <sys:Int32 x:Key="MdHeadingLevelTitle">1</sys:Int32>
+    <sys:Int32 x:Key="MdHeadingLevelSubheading">3</sys:Int32>
+
+    <DataTemplate x:Key="MdHeading" DataType="md:MdHeading">
+        <TextBlock Theme="{StaticResource TextHeading}"
+                   controls:MarkdownText.Inlines="{Binding Inlines}"
+                   TextWrapping="Wrap"
+                   Margin="0,14,0,6"
+                   Classes.headingTitle="{Binding Level, Converter={x:Static conv:ObjectConverters.Equal}, ConverterParameter={StaticResource MdHeadingLevelTitle}}"
+                   Classes.headingSubheading="{Binding Level, Converter={x:Static conv:ObjectConverters.Equal}, ConverterParameter={StaticResource MdHeadingLevelSubheading}}">
+            <TextBlock.Styles>
+                <Style Selector="TextBlock.headingTitle">
+                    <Setter Property="FontSize" Value="{StaticResource TextTitleSize}" />
+                </Style>
+                <Style Selector="TextBlock.headingSubheading">
+                    <Setter Property="FontSize" Value="{StaticResource TextSubheadingSize}" />
+                </Style>
+            </TextBlock.Styles>
+        </TextBlock>
+    </DataTemplate>
+
+    <DataTemplate x:Key="MdParagraph" DataType="md:MdParagraph">
+        <TextBlock Theme="{StaticResource TextProse}"
+                   controls:MarkdownText.Inlines="{Binding Inlines}"
+                   TextWrapping="Wrap"
+                   Margin="0,0,0,10" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="MdListItem" DataType="md:MdListItem">
+        <Grid Margin="0,0,0,3">
+            <Grid.Styles>
+                <Style Selector="controls|IconView.done">
+                    <Setter Property="Definition" Value="{StaticResource IconCheckDone}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrushSuccessDeep}" />
+                </Style>
+            </Grid.Styles>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="Marker"
+                       Grid.Column="0"
+                       Text="{Binding Marker}"
+                       Theme="{StaticResource TextProse}"
+                       Foreground="{StaticResource BrushTextTertiary}"
+                       Margin="4,0,10,0"
+                       IsVisible="{Binding Done, Converter={x:Static conv:ObjectConverters.IsNull}}" />
+
+            <controls:IconView x:Name="Box"
+                               Grid.Column="0"
+                               Definition="{StaticResource IconCheckCheckbox}"
+                               Foreground="{StaticResource BrushBorderStrong}"
+                               VerticalAlignment="Top"
+                               Margin="4,3,10,0"
+                               IsVisible="{Binding Done, Converter={x:Static conv:ObjectConverters.IsNotNull}}"
+                               Classes.done="{Binding Done, TargetNullValue=False}" />
+
+            <StackPanel Grid.Column="1">
+                <TextBlock Theme="{StaticResource TextProse}"
+                           controls:MarkdownText.Inlines="{Binding Inlines}"
+                           TextWrapping="Wrap" />
+                <ItemsControl ItemsSource="{Binding Children}" Margin="0,3,0,0" />
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="MdBulletList" DataType="md:MdBulletList">
+        <ItemsControl ItemsSource="{Binding Items}" Margin="0,0,0,10" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="MdCodeBlock" DataType="md:MdCodeBlock">
+        <Border Background="{StaticResource BrushSurfaceSunken}"
+                BorderBrush="{StaticResource BrushBorderSoft}"
+                BorderThickness="{StaticResource BorderThickness}"
+                CornerRadius="{StaticResource RadiusDefault}"
+                Padding="12,9,12,9"
+                Margin="0,2,0,12">
+            <TextBlock Text="{Binding Text}"
+                       Theme="{StaticResource TextMonoPath}"
+                       TextWrapping="Wrap" />
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Key="MdTable" DataType="md:MdTable">
+        <Border BorderBrush="{StaticResource BrushBorderSoft}"
+                BorderThickness="{StaticResource BorderThickness}"
+                CornerRadius="{StaticResource RadiusDefault}"
+                Margin="0,2,0,12">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Disabled"
+                          Focusable="False">
+                <Grid controls:MarkdownTable.Source="{Binding}" />
+            </ScrollViewer>
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Key="MdQuote" DataType="md:MdQuote">
+        <Border BorderBrush="{StaticResource BrushBorder}"
+                BorderThickness="2,0,0,0"
+                Padding="12,0,0,0"
+                Margin="0,0,0,10">
+            <ItemsControl ItemsSource="{Binding Blocks}" />
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Key="MdThematicBreak" DataType="md:MdThematicBreak">
+        <Rectangle Height="{StaticResource BorderWidth}"
+                   Fill="{StaticResource BrushBorderSoft}"
+                   Margin="0,10,0,14" />
+    </DataTemplate>
+
+</ResourceDictionary>

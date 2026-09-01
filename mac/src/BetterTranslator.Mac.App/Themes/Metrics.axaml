@@ -1,0 +1,219 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Colors.axaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <sys:Double x:Key="Space1">2</sys:Double>
+    <sys:Double x:Key="Space2">4</sys:Double>
+    <sys:Double x:Key="Space3">5</sys:Double>
+    <sys:Double x:Key="Space4">6</sys:Double>
+    <sys:Double x:Key="Space5">7</sys:Double>
+    <sys:Double x:Key="Space6">8</sys:Double>
+    <sys:Double x:Key="Space7">9</sys:Double>
+    <sys:Double x:Key="Space8">10</sys:Double>
+    <sys:Double x:Key="Space9">11</sys:Double>
+    <sys:Double x:Key="Space10">12</sys:Double>
+    <sys:Double x:Key="Space11">14</sys:Double>
+    <sys:Double x:Key="Space12">16</sys:Double>
+    <sys:Double x:Key="Space13">18</sys:Double>
+    <sys:Double x:Key="Space14">20</sys:Double>
+    <sys:Double x:Key="Space15">24</sys:Double>
+    <sys:Double x:Key="Space16">28</sys:Double>
+
+    <Thickness x:Key="Space1Thickness">2</Thickness>
+    <Thickness x:Key="Space2Thickness">4</Thickness>
+    <Thickness x:Key="Space3Thickness">5</Thickness>
+    <Thickness x:Key="Space4Thickness">6</Thickness>
+    <Thickness x:Key="Space5Thickness">7</Thickness>
+    <Thickness x:Key="Space6Thickness">8</Thickness>
+    <Thickness x:Key="Space7Thickness">9</Thickness>
+    <Thickness x:Key="Space8Thickness">10</Thickness>
+    <Thickness x:Key="Space9Thickness">11</Thickness>
+    <Thickness x:Key="Space10Thickness">12</Thickness>
+    <Thickness x:Key="Space11Thickness">14</Thickness>
+    <Thickness x:Key="Space12Thickness">16</Thickness>
+    <Thickness x:Key="Space13Thickness">18</Thickness>
+    <Thickness x:Key="Space14Thickness">20</Thickness>
+    <Thickness x:Key="Space15Thickness">24</Thickness>
+    <Thickness x:Key="Space16Thickness">28</Thickness>
+
+    <CornerRadius x:Key="RadiusXs">2</CornerRadius>
+    <CornerRadius x:Key="RadiusSm">3</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">4</CornerRadius>
+    <CornerRadius x:Key="RadiusControl">5</CornerRadius>
+    <CornerRadius x:Key="RadiusDefault">6</CornerRadius>
+    <CornerRadius x:Key="RadiusRow">7</CornerRadius>
+    <CornerRadius x:Key="RadiusPanel">8</CornerRadius>
+    <CornerRadius x:Key="RadiusCard">9</CornerRadius>
+    <CornerRadius x:Key="RadiusCardLg">10</CornerRadius>
+    <CornerRadius x:Key="RadiusDialog">11</CornerRadius>
+    <CornerRadius x:Key="RadiusComposer">22</CornerRadius>
+
+    <sys:Double x:Key="BorderWidth">1</sys:Double>
+    <sys:Double x:Key="BorderWidthControl">1.5</sys:Double>
+    <Thickness x:Key="BorderThickness">1</Thickness>
+    <Thickness x:Key="BorderThicknessControl">1.5</Thickness>
+
+    <DropShadowDirectionEffect x:Key="ShadowWindow" Direction="270" BlurRadius="34" ShadowDepth="14" Opacity="0.18" Color="Black" />
+    <DropShadowDirectionEffect x:Key="ShadowPopover" Direction="270" BlurRadius="26" ShadowDepth="10" Opacity="0.16" Color="Black" />
+    <DropShadowDirectionEffect x:Key="ShadowDialog" Direction="270" BlurRadius="54" ShadowDepth="22" Opacity="0.24" Color="Black" />
+    <DropShadowDirectionEffect x:Key="ShadowThumb" Direction="270" BlurRadius="2" ShadowDepth="1" Opacity="0.10" Color="Black" />
+
+    <SplineEasing x:Key="EaseStandard" X1="0.2" Y1="0" X2="0" Y2="1" />
+    <SplineEasing x:Key="EaseBurst" X1="0.3" Y1="0" X2="0.4" Y2="1" />
+
+    <sys:TimeSpan x:Key="Motion120">0:0:0.12</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion130">0:0:0.13</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion140">0:0:0.14</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion150">0:0:0.15</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion160">0:0:0.16</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion170">0:0:0.17</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion180">0:0:0.18</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion200">0:0:0.2</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion220">0:0:0.22</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion240">0:0:0.24</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion300">0:0:0.3</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion320">0:0:0.32</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion400">0:0:0.4</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion900">0:0:0.9</sys:TimeSpan>
+    <sys:TimeSpan x:Key="Motion1200">0:0:1.2</sys:TimeSpan>
+
+    <sys:Double x:Key="SizePillHideDelayMs">400</sys:Double>
+    <sys:Double x:Key="CopyConfirmHoldMs">1600</sys:Double>
+
+    <sys:Double x:Key="SkeletonRevealDelayMs">150</sys:Double>
+    <sys:Double x:Key="SkeletonMinHoldMs">350</sys:Double>
+
+    <sys:Double x:Key="FocusRingWidth">2</sys:Double>
+    <sys:Double x:Key="FocusRingOffset">2</sys:Double>
+
+    <ControlTheme x:Key="FocusRing" TargetType="ContentControl">
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ContentControl">
+                <Rectangle Margin="-2"
+                           RadiusX="{Binding TopLeft, Source={StaticResource RadiusMd}, x:CompileBindings=False}"
+                           RadiusY="{Binding TopLeft, Source={StaticResource RadiusMd}, x:CompileBindings=False}"
+                           Stroke="{StaticResource BrushAccent}"
+                           StrokeThickness="{StaticResource FocusRingWidth}"
+                           UseLayoutRounding="True" />
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <sys:Double x:Key="CaptionHeight">32</sys:Double>
+    <sys:Double x:Key="ToolbarHeight">48</sys:Double>
+    <sys:Double x:Key="WindowDefaultWidth">1536</sys:Double>
+    <sys:Double x:Key="WindowDefaultHeight">1016</sys:Double>
+    <sys:Double x:Key="WindowMinWidth">880</sys:Double>
+    <sys:Double x:Key="WindowMinHeight">620</sys:Double>
+    <sys:Double x:Key="ResizeBorderWidth">6</sys:Double>
+    <Thickness x:Key="ResizeBorderThickness">6</Thickness>
+    <CornerRadius x:Key="WindowChromeCornerRadius">0</CornerRadius>
+    <Thickness x:Key="WindowChromeGlassFrame">0</Thickness>
+    <sys:Double x:Key="CaptionButtonWidth">46</sys:Double>
+    <sys:Double x:Key="TitlebarMarkHeight">11</sys:Double>
+
+    <Thickness x:Key="TitlebarMarkGap">8,0,0,0</Thickness>
+
+    <sys:Double x:Key="SidebarDefaultWidth">246</sys:Double>
+    <sys:Double x:Key="SidebarMinWidth">200</sys:Double>
+    <sys:Double x:Key="SidebarMaxWidth">420</sys:Double>
+    <sys:Double x:Key="ChatColumnWidth">788</sys:Double>
+
+    <sys:Double x:Key="PinnedSectionMaxHeight">260</sys:Double>
+
+    <sys:Double x:Key="TableCellMinWidth">96</sys:Double>
+    <sys:Double x:Key="TableCellMaxWidth">280</sys:Double>
+    <sys:Double x:Key="EntryCollapsedHeight">360</sys:Double>
+    <sys:Double x:Key="SeparatorHitWidth">8</sys:Double>
+    <sys:Double x:Key="SeparatorGrabWidth">8</sys:Double>
+    <Thickness x:Key="SeparatorGrabOffset">0</Thickness>
+    <sys:Double x:Key="SeparatorGripHeight">18</sys:Double>
+    <sys:Double x:Key="SeparatorGripRadius">0.5</sys:Double>
+    <Thickness x:Key="SeparatorGripGap">2,0,0,0</Thickness>
+    <sys:Double x:Key="SeparatorGripRestOpacity">0.55</sys:Double>
+    <sys:Double x:Key="SeparatorGripActiveOpacity">1</sys:Double>
+    <sys:Double x:Key="RightPanelDefaultWidth">300</sys:Double>
+    <sys:Double x:Key="RightPanelMinWidth">240</sys:Double>
+    <sys:Double x:Key="RightPanelMaxWidth">460</sys:Double>
+    <sys:Double x:Key="SizePillHeight">26</sys:Double>
+    <sys:Double x:Key="PreviewDefaultWidth">390</sys:Double>
+    <sys:Double x:Key="PreviewMinWidth">300</sys:Double>
+    <sys:Double x:Key="PreviewMaxWidth">620</sys:Double>
+
+    <sys:Double x:Key="ChromeButtonSize">32</sys:Double>
+    <sys:Double x:Key="ChromeButtonSizeSmall">30</sys:Double>
+    <sys:Double x:Key="ChipButtonSize">24</sys:Double>
+    <sys:Double x:Key="ScopePathMaxWidth">240</sys:Double>
+    <sys:Double x:Key="PrimaryButtonHeight">32</sys:Double>
+    <sys:Double x:Key="SegmentHeight">26</sys:Double>
+    <sys:Double x:Key="SegmentTrackPadding">2</sys:Double>
+    <sys:Double x:Key="SegmentWidthMemory">100</sys:Double>
+    <sys:Double x:Key="SegmentWidthSimple">86</sys:Double>
+    <sys:Double x:Key="SegmentWidthAdvanced">86</sys:Double>
+    <sys:Double x:Key="LanguagePillHeight">28</sys:Double>
+    <CornerRadius x:Key="LanguagePillRadius">14</CornerRadius>
+    <sys:Double x:Key="ChipHeight">26</sys:Double>
+    <CornerRadius x:Key="ChipRadius">13</CornerRadius>
+    <sys:Double x:Key="KeycapSize">20</sys:Double>
+    <sys:Double x:Key="CheckboxSize">17</sys:Double>
+    <sys:Double x:Key="CheckboxSizeSmall">15</sys:Double>
+    <sys:Double x:Key="ToggleTrackWidth">30</sys:Double>
+    <sys:Double x:Key="ToggleTrackHeight">17</sys:Double>
+    <CornerRadius x:Key="ToggleTrackRadius">8.5</CornerRadius>
+    <sys:Double x:Key="ToggleKnobTravel">13</sys:Double>
+    <sys:Double x:Key="TextFieldHeight">30</sys:Double>
+    <sys:Double x:Key="DropMarkTravel">8</sys:Double>
+
+    <sys:Double x:Key="TemperatureStep">0.05</sys:Double>
+
+    <sys:Double x:Key="SkeletonBarHeight">10</sys:Double>
+    <sys:Double x:Key="SkeletonCharsPerLine">68</sys:Double>
+    <sys:Double x:Key="SkeletonMaxLines">8</sys:Double>
+    <sys:Double x:Key="SkeletonLastBarMinFraction">0.35</sys:Double>
+    <sys:Double x:Key="SkeletonLastBarMaxFraction">0.85</sys:Double>
+    <sys:Double x:Key="SkeletonShimmerDepth">0.4</sys:Double>
+
+    <sys:Double x:Key="RevealFromOpacity">0.4</sys:Double>
+
+    <sys:Double x:Key="ComposerMinHeight">42</sys:Double>
+    <sys:Double x:Key="ComposerMaxHeight">140</sys:Double>
+
+    <sys:Double x:Key="ComposerAttachmentsMaxHeight">106</sys:Double>
+
+    <sys:Double x:Key="SendButtonSize">32</sys:Double>
+    <CornerRadius x:Key="SendButtonRadius">16</CornerRadius>
+
+    <sys:Double x:Key="LanguagePickerWidth">296</sys:Double>
+    <sys:Double x:Key="LanguagePickerMaxHeight">280</sys:Double>
+    <sys:Double x:Key="FilePreviewMaxHeight">360</sys:Double>
+
+    <sys:Double x:Key="LanguageTileWidthSm">16</sys:Double>
+    <sys:Double x:Key="LanguageTileHeightSm">11</sys:Double>
+    <sys:Double x:Key="LanguageTileWidth">20</sys:Double>
+    <sys:Double x:Key="LanguageTileHeight">14</sys:Double>
+    <sys:Double x:Key="LanguageTileWidthLg">24</sys:Double>
+    <sys:Double x:Key="LanguageTileHeightLg">16</sys:Double>
+    <sys:Double x:Key="MenuItemHeight">28</sys:Double>
+    <sys:Double x:Key="ListRowHeight">30</sys:Double>
+    <Thickness x:Key="ListRowInsetThickness">6,0,6,0</Thickness>
+    <sys:Double x:Key="ProgressBarHeight">4</sys:Double>
+    <CornerRadius x:Key="ProgressBarRadius">2</CornerRadius>
+    <sys:Double x:Key="CopyButtonSize">26</sys:Double>
+    <sys:Double x:Key="ScrollThumbWidth">8</sys:Double>
+    <sys:Double x:Key="LogDotSize">8</sys:Double>
+    <sys:Double x:Key="AddOwnWordButtonSize">27</sys:Double>
+    <sys:Double x:Key="EmptyStateMaxWidthDialog">392</sys:Double>
+    <sys:Double x:Key="EmptyStateMaxWidthPane">568</sys:Double>
+    <sys:Double x:Key="DialogWidthAddSources">568</sys:Double>
+    <sys:Double x:Key="SettingsWindowWidth">768</sys:Double>
+    <sys:Double x:Key="SettingsWindowHeight">560</sys:Double>
+
+    <sys:Double x:Key="SettingsConfigWidth">1020</sys:Double>
+    <sys:Double x:Key="SettingsConfigHeight">680</sys:Double>
+    <sys:Double x:Key="SettingsRailWidth">196</sys:Double>
+
+</ResourceDictionary>

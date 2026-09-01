@@ -1,0 +1,172 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:BetterTranslator.Mac.App.Controls"
+             xmlns:vm="using:BetterTranslator.App.ViewModels"
+             x:Class="BetterTranslator.Mac.App.Views.FilePreviewView"
+             x:DataType="vm:FilePreviewViewModel"
+             Background="{StaticResource BrushSurface}">
+
+    <UserControl.Styles>
+        <Style Selector="StackPanel#PreviewFlow SelectableTextBlock">
+            <Setter Property="Theme" Value="{StaticResource SelectableMarkdownFlow}" />
+        </Style>
+
+        <Style Selector="SelectableTextBlock#PreviewSource.prose">
+            <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+            <Setter Property="FontSize" Value="{StaticResource TextBodySize}" />
+            <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        </Style>
+
+        <Style Selector="SelectableTextBlock#PreviewSource.mono">
+            <Setter Property="FontFamily" Value="{StaticResource FontFamilyMono}" />
+            <Setter Property="FontSize" Value="{StaticResource TextMonoPathSize}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+
+        <Grid Grid.Row="0" Margin="18,16,10,0" ColumnDefinitions="*,Auto">
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="{Binding FileName}"
+                           Theme="{StaticResource TextCardTitle}"
+                           TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="{Binding FilePath}"
+                           Theme="{StaticResource TextMonoSmall}"
+                           Foreground="{StaticResource BrushTextSubtle}"
+                           TextTrimming="CharacterEllipsis"
+                           Margin="0,3,0,0" />
+            </StackPanel>
+
+            <controls:ChromeButton Grid.Column="1"
+                                   Icon="{StaticResource IconCloseSmall}"
+                                   Command="{Binding CloseCommand}"
+                                   VerticalAlignment="Top"
+                                   ToolTip.Tip="Close the preview"
+                                   AutomationProperties.Name="Close the preview" />
+        </Grid>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="18,14,18,14">
+            <Button x:Name="VersionButton"
+                    Theme="{StaticResource SecondaryButton}"
+                    Height="{StaticResource SegmentHeight}"
+                    Padding="10,0,8,0"
+                    Command="{Binding ToggleVersionMenuCommand}"
+                    AutomationProperties.Name="Version">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding VersionLabel}"
+                               Theme="{StaticResource TextSecondary}"
+                               VerticalAlignment="Center" />
+                    <controls:IconView Definition="{StaticResource IconChevronDown}"
+                                       Foreground="{StaticResource BrushTextSecondary}"
+                                       Margin="7,0,0,0"
+                                       VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+
+            <Popup PlacementTarget="{Binding #VersionButton}"
+                   Placement="Bottom"
+                   VerticalOffset="4"
+                   IsLightDismissEnabled="True"
+                   IsOpen="{Binding IsVersionMenuOpen, Mode=TwoWay}">
+                <Border Background="{StaticResource BrushSurface}"
+                        BorderBrush="{StaticResource BrushBorder}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusCard}"
+                        Padding="{StaticResource Space2Thickness}"
+                        Effect="{StaticResource ShadowPopover}"
+                        MinWidth="150">
+                    <StackPanel>
+                        <Button Theme="{StaticResource MenuRowButton}"
+                                Content="Source"
+                                AutomationProperties.Name="Source"
+                                Command="{Binding ShowSourceVersionCommand}" />
+                        <Button Theme="{StaticResource MenuRowButton}"
+                                Content="Translate"
+                                AutomationProperties.Name="Translate"
+                                Command="{Binding ShowTranslatedVersionCommand}" />
+                    </StackPanel>
+                </Border>
+            </Popup>
+
+            <Border Background="{StaticResource BrushTrack}"
+                    CornerRadius="{StaticResource RadiusDefault}"
+                    Padding="{StaticResource Space1Thickness}"
+                    Margin="10,0,0,0"
+                    IsVisible="{Binding HasRenderingSwitch}">
+                <StackPanel Orientation="Horizontal">
+                    <controls:ChromeButton Icon="{StaticResource IconEyeFormatted}"
+                                           Width="{StaticResource ChromeButtonSizeSmall}"
+                                           Height="{StaticResource SegmentHeight}"
+                                           IsActive="{Binding ShowFormatted}"
+                                           Command="{Binding ShowFormattedViewCommand}"
+                                           ToolTip.Tip="Formatted"
+                                           AutomationProperties.Name="Formatted" />
+                    <controls:ChromeButton Icon="{StaticResource IconCodeBrackets}"
+                                           Width="{StaticResource ChromeButtonSizeSmall}"
+                                           Height="{StaticResource SegmentHeight}"
+                                           IsActive="{Binding ShowSourceText}"
+                                           Command="{Binding ShowSourceViewCommand}"
+                                           ToolTip.Tip="Source"
+                                           AutomationProperties.Name="Source" />
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="{Binding VersionNotice}"
+                       Theme="{StaticResource TextMeta}"
+                       Foreground="{StaticResource BrushTextMuted}"
+                       VerticalAlignment="Center"
+                       Margin="12,0,0,0"
+                       IsVisible="{Binding ShowVersionNotice}" />
+
+            <Button Theme="{StaticResource SecondaryButton}"
+                    Height="{StaticResource SegmentHeight}"
+                    Padding="12,0,12,0"
+                    Margin="12,0,0,0"
+                    Content="Stop"
+                    Command="{Binding StopTranslatingCommand}"
+                    IsVisible="{Binding IsTranslating}"
+                    ToolTip.Tip="Stop translating"
+                    AutomationProperties.Name="Stop translating" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2"
+                    Margin="18,0,18,14"
+                    IsVisible="{Binding HasRunNote}">
+            <ProgressBar Theme="{StaticResource AppProgressBar}"
+                         Value="{Binding Percent, Mode=OneWay}"
+                         Maximum="100"
+                         IsVisible="{Binding IsTranslating}" />
+
+            <TextBlock Text="{Binding RunNote}"
+                       Theme="{StaticResource TextMeta}"
+                       Foreground="{StaticResource BrushTextMuted}"
+                       TextWrapping="Wrap"
+                       Margin="0,6,0,0" />
+        </StackPanel>
+
+        <Border Grid.Row="3"
+                Background="{StaticResource BrushSurface}"
+                BorderBrush="{StaticResource BrushBorderSoft}"
+                BorderThickness="0,1,0,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="18,14,18,18">
+                <Grid>
+                    <StackPanel x:Name="PreviewFlow"
+                                controls:MarkdownFlow.Blocks="{Binding Blocks}"
+                                AutomationProperties.Name="File contents, formatted"
+                                IsVisible="{Binding ShowFormatted}" />
+
+                    <SelectableTextBlock x:Name="PreviewSource"
+                                         Text="{Binding SourceText}"
+                                         Theme="{StaticResource SelectableMarkdownSyntax}"
+                                         Classes.prose="{Binding !HasRenderingSwitch}"
+                                         Classes.mono="{Binding IsMonospace}"
+                                         IsVisible="{Binding ShowSourceText}"
+                                         AutomationProperties.Name="File contents" />
+                </Grid>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "note": "Only a difference declared here may differ visually between the Windows head and the macOS wrapper. A gate is never widened, disabled or given a looser tolerance to make a screen pass. A visual difference not declared here is a defect.",
+  "deltas": [
+    {
+      "id": "traffic-lights",
+      "screens": [
+        "main-window-shell"
+      ],
+      "region": "titlebar caption controls",
+      "reason": "macOS draws close, minimise and zoom as traffic lights at the leading edge, painted by the platform. The Windows head draws minimise, maximise and close as 46 wide caption buttons at the trailing edge. The platform owns the control, so neither its geometry nor its position can match."
+    },
+    {
+      "id": "menu-bar",
+      "screens": [
+        "main-window-shell"
+      ],
+      "region": "application menu bar",
+      "reason": "macOS carries the application menu in the system menu bar outside the window. The Windows head has no menu bar at all, so the wrapper gains a surface the Windows head never renders."
+    },
+    {
+      "id": "command-accelerators",
+      "screens": [
+        "main-window-shell",
+        "chat-populated",
+        "settings-memory",
+        "settings-your-data",
+        "settings-runtime",
+        "settings-downloads",
+        "settings-agent",
+        "settings-config",
+        "settings-updates"
+      ],
+      "region": "rendered keyboard shortcut hints",
+      "reason": "Command replaces Control in every accelerator, so a rendered shortcut hint differs by one glyph."
+    },
+    {
+      "id": "system-font",
+      "screens": [
+        "*"
+      ],
+      "region": "every text run",
+      "reason": "The wrapper uses the macOS system font in place of Segoe UI Variable Text. The two do not share metrics, so advance widths, line boxes and the resulting text bounds differ. Font metric differences are excluded from the pixel gate for this reason. The token, text and string gates still apply in full, and the structural gate still applies to every bound that is not text derived."
+    },
+    {
+      "id": "overlay-scrollbars",
+      "screens": [
+        "*"
+      ],
+      "region": "scroll bars",
+      "reason": "macOS draws overlay scrollbars that occupy no layout width and fade when idle. The Windows head reserves an 8 wide track through the ScrollThumbWidth token."
+    },
+    {
+      "id": "focus-ring",
+      "screens": [
+        "*"
+      ],
+      "region": "focused control outline",
+      "reason": "The macOS focus ring is drawn by the platform with its own inset and corner radius. The Windows head draws a 2 wide accent rectangle at offset 2 through the FocusRingWidth and FocusRingOffset tokens."
+    },
+    {
+      "id": "hig-control-metrics",
+      "screens": [
+        "*"
+      ],
+      "region": "platform drawn push buttons, text fields, checkboxes and toggles",
+      "reason": "Human Interface Guidelines control heights and corner radii differ from the Windows values where the platform draws the control rather than the application. Application drawn controls keep the Windows token values exactly."
+    },
+    {
+      "id": "native-file-panels",
+      "screens": [
+        "add-sources-empty",
+        "add-sources-files-chosen",
+        "settings-your-data",
+        "settings-downloads",
+        "first-run-choosing"
+      ],
+      "region": "the button that opens a file or folder panel",
+      "reason": "The wrapper opens the native macOS panel through the storage provider seam instead of the Win32 common dialog. The panel is not part of the window and is not captured; only the wording on the button that opens it is platform specific."
+    },
+    {
+      "id": "cpu-only-backend-section",
+      "screens": [
+        "settings-runtime",
+        "first-run-choosing",
+        "main-window-shell"
+      ],
+      "region": "runtime backend section",
+      "reason": "The wrapper runs the CPU inference backend and nothing else. The Windows accelerator picker, its hardware line, its install and repair flow and its restart notice are absent from the wrapper's view tree rather than disabled, and are replaced by a single CPU-only statement driven by the backend seam."
+    },
+    {
+      "id": "updates-unsupported",
+      "screens": [
+        "settings-updates"
+      ],
+      "region": "update controls",
+      "reason": "The Windows head installs updates through an elevated Windows service. There is no background installer on this platform yet, so the wrapper renders the seam's unsupported reason in place of the enable, check and install controls."
+    }
+  ]
+}

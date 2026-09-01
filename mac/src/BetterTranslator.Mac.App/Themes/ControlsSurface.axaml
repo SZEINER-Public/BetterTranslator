@@ -1,0 +1,889 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System"
+                    xmlns:controls="using:BetterTranslator.Mac.App.Controls"
+                    xmlns:conv="using:BetterTranslator.Mac.App.Converters"
+                    xmlns:vm="using:BetterTranslator.App.ViewModels">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Colors.axaml" />
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Typography.axaml" />
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Metrics.axaml" />
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Icons.axaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <ControlTheme x:Key="ListRow" TargetType="ListBoxItem">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="10,6,8,7" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ListBoxItem">
+                <Grid>
+                    <Border x:Name="Fill"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource RadiusDefault}"
+                            Margin="{StaticResource ListRowInsetThickness}" />
+                    <Border x:Name="Current"
+                            x:DataType="vm:ChatRowViewModel"
+                            Background="{StaticResource BrushRowActive}"
+                            CornerRadius="{StaticResource RadiusDefault}"
+                            Margin="{StaticResource ListRowInsetThickness}"
+                            IsVisible="{Binding IsCurrent}" />
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      Margin="{TemplateBinding Padding}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushTrackAlt}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="AppContextMenu" TargetType="ContextMenu">
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        <Setter Property="Padding" Value="{StaticResource Space2Thickness}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ContextMenu">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusCard}"
+                        Padding="{TemplateBinding Padding}"
+                        Effect="{StaticResource ShadowPopover}">
+                    <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <StackPanel />
+            </ItemsPanelTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <ControlTheme x:Key="AppMenuItem" TargetType="MenuItem">
+        <Setter Property="Height" Value="{StaticResource MenuItemHeight}" />
+        <Setter Property="Padding" Value="9,0,12,0" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="MenuItem">
+                <Border x:Name="Fill"
+                        Background="Transparent"
+                        CornerRadius="{StaticResource RadiusDefault}"
+                        Padding="{TemplateBinding Padding}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <controls:IconView x:Name="Glyph"
+                                           Definition="{TemplateBinding Icon}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,9,0"
+                                           Foreground="{StaticResource BrushIcon}" />
+                        <ContentPresenter x:Name="PART_HeaderPresenter"
+                                          Content="{TemplateBinding Header}"
+                                          VerticalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHover}" />
+        </Style>
+        <Style Selector="^:selected /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHover}" />
+        </Style>
+
+        <Style Selector="^:danger">
+            <Setter Property="Foreground" Value="{StaticResource BrushDangerText}" />
+        </Style>
+        <Style Selector="^:danger /template/ controls|IconView#Glyph">
+            <Setter Property="Foreground" Value="{StaticResource BrushDangerText}" />
+        </Style>
+        <Style Selector="^:danger:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushDangerSurface}" />
+        </Style>
+        <Style Selector="^:danger:selected /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushDangerSurface}" />
+        </Style>
+
+        <Style Selector="^:disabled /template/ Border#Fill">
+            <Setter Property="Opacity" Value="0.5" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="AppMenuSeparator" TargetType="Separator">
+        <Setter Property="Height" Value="{StaticResource BorderWidth}" />
+        <Setter Property="Margin" Value="5,3,5,3" />
+        <Setter Property="Background" Value="{StaticResource BrushTrackAlt}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Separator">
+                <Border Background="{TemplateBinding Background}" UseLayoutRounding="True" />
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <ControlTheme x:Key="RowMenuButton" TargetType="controls:ChromeButton">
+        <Setter Property="Width" Value="{StaticResource ChipButtonSize}" />
+        <Setter Property="Height" Value="{StaticResource ChipButtonSize}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+        <Setter Property="Opacity" Value="0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:ChromeButton">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{StaticResource RadiusMd}"
+                        UseLayoutRounding="True">
+                    <controls:IconView Definition="{TemplateBinding Icon}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHoverStrong}" />
+        </Style>
+        <Style Selector="^.revealed">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+        <Style Selector="^:focus">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="ChatRowList" TargetType="ListBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ListBox">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <ScrollViewer Name="PART_ScrollViewer"
+                                  HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                                  VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+                        <ItemsPresenter Name="PART_ItemsPresenter"
+                                        ItemsPanel="{TemplateBinding ItemsPanel}"
+                                        Margin="{TemplateBinding Padding}" />
+                    </ScrollViewer>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <VirtualizingStackPanel />
+            </ItemsPanelTemplate>
+        </Setter>
+        <Setter Property="ItemContainerTheme">
+            <ControlTheme TargetType="ListBoxItem" BasedOn="{StaticResource ListRow}" x:DataType="vm:ChatRowViewModel">
+                <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
+            </ControlTheme>
+        </Setter>
+        <Setter Property="ItemTemplate">
+            <DataTemplate x:DataType="vm:ChatRowViewModel">
+                <Grid ColumnDefinitions="*,Auto" Tag="{Binding $parent[ListBox].DataContext}">
+                    <Grid.ContextMenu>
+                        <ContextMenu Theme="{StaticResource AppContextMenu}"
+                                     x:DataType="vm:ChatWorkspaceViewModel"
+                                     DataContext="{Binding $self.PlacementTarget.Tag}">
+                            <MenuItem Theme="{StaticResource AppMenuItem}"
+                                      Header="{Binding $parent[ContextMenu].PlacementTarget.((vm:ChatRowViewModel)DataContext).PinLabel}"
+                                      Icon="{StaticResource IconPin}"
+                                      Command="{Binding TogglePinCommand}"
+                                      CommandParameter="{Binding $parent[ContextMenu].PlacementTarget.DataContext}" />
+                            <MenuItem Theme="{StaticResource AppMenuItem}"
+                                      Header="Rename"
+                                      Icon="{StaticResource IconRename}"
+                                      Command="{Binding RenameFromRowCommand}"
+                                      CommandParameter="{Binding $parent[ContextMenu].PlacementTarget.DataContext}" />
+                            <Separator Theme="{StaticResource AppMenuSeparator}" />
+                            <MenuItem Theme="{StaticResource AppMenuItem}"
+                                      Header="Delete"
+                                      controls:Menus.IsDanger="True"
+                                      Icon="{StaticResource IconDeleteBin}"
+                                      Command="{Binding ConfirmDeleteChatCommand}"
+                                      CommandParameter="{Binding $parent[ContextMenu].PlacementTarget.DataContext}" />
+                        </ContextMenu>
+                    </Grid.ContextMenu>
+
+                    <StackPanel Grid.Column="0">
+                        <Grid>
+                            <TextBlock Text="{Binding Name}"
+                                       Theme="{StaticResource TextDefault}"
+                                       TextTrimming="CharacterEllipsis"
+                                       IsVisible="{Binding !IsNaming}" />
+                            <controls:SkeletonLines SourceLength="{Binding NameLength}"
+                                                    IsVisible="{Binding IsNaming}"
+                                                    AutomationProperties.Name="Naming this chat" />
+                        </Grid>
+                        <TextBlock Text="{Binding Stamp}"
+                                   Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   ToolTip.Tip="{Binding Tooltip}"
+                                   TextTrimming="CharacterEllipsis"
+                                   Margin="0,2,0,0" />
+                    </StackPanel>
+
+                    <controls:ChromeButton Grid.Column="1"
+                                           Theme="{StaticResource RowMenuButton}"
+                                           Icon="{StaticResource IconMoreHorizontal}"
+                                           controls:Menus.OpensRowMenu="True"
+                                           Tag="{Binding $parent[ListBox].DataContext}"
+                                           Classes.revealed="{Binding $parent[ListBoxItem].IsPointerOver}"
+                                           ToolTip.Tip="More"
+                                           AutomationProperties.Name="More" />
+                </Grid>
+            </DataTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ScrollBar}" TargetType="ScrollBar">
+        <Setter Property="Width" Value="{StaticResource ScrollThumbWidth}" />
+        <Setter Property="MinWidth" Value="{StaticResource ScrollThumbWidth}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ScrollBar">
+                <Grid Background="{TemplateBinding Background}">
+                    <Track Name="PART_Track"
+                           Minimum="{TemplateBinding Minimum}"
+                           Maximum="{TemplateBinding Maximum}"
+                           Value="{TemplateBinding Value, Mode=TwoWay}"
+                           ViewportSize="{TemplateBinding ViewportSize}"
+                           Orientation="{TemplateBinding Orientation}"
+                           IsDirectionReversed="True">
+                        <Track.Thumb>
+                            <Thumb Name="ScrollThumb" Margin="1,0,1,0">
+                                <Thumb.Template>
+                                    <ControlTemplate TargetType="Thumb">
+                                        <Border Background="{StaticResource BrushBorder}"
+                                                CornerRadius="{StaticResource RadiusMd}" />
+                                    </ControlTemplate>
+                                </Thumb.Template>
+                            </Thumb>
+                        </Track.Thumb>
+                    </Track>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:horizontal">
+            <Setter Property="Width" Value="NaN" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="Height" Value="{StaticResource ScrollThumbWidth}" />
+            <Setter Property="MinHeight" Value="{StaticResource ScrollThumbWidth}" />
+        </Style>
+        <Style Selector="^:horizontal /template/ Track#PART_Track">
+            <Setter Property="IsDirectionReversed" Value="False" />
+        </Style>
+        <Style Selector="^:horizontal /template/ Thumb#ScrollThumb">
+            <Setter Property="Margin" Value="0,1,0,1" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="MenuRowButton" TargetType="Button">
+        <Setter Property="Height" Value="{StaticResource MenuItemHeight}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Padding" Value="9,0,12,0" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{StaticResource RadiusDefault}"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Left" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHover}" />
+        </Style>
+        <Style Selector="^:disabled">
+            <Setter Property="Cursor" Value="Arrow" />
+        </Style>
+        <Style Selector="^:disabled /template/ Border#Fill">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Opacity" Value="0.5" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="LanguagePillButton" TargetType="Button">
+        <Setter Property="Height" Value="{StaticResource LanguagePillHeight}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Padding" Value="6,0,7,0" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource LanguagePillRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHover}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="FolderSegment" TargetType="RadioButton">
+        <Setter Property="Height" Value="{StaticResource SegmentHeight}" />
+        <Setter Property="Padding" Value="12,0,12,0" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextSecondarySize}" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="RadioButton">
+                <Border x:Name="Fill"
+                        Background="Transparent"
+                        CornerRadius="{StaticResource RadiusDefault}"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:checked">
+            <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        </Style>
+        <Style Selector="^:checked /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+            <Setter Property="Effect" Value="{StaticResource ShadowThumb}" />
+        </Style>
+        <Style Selector="^:pointerover:not(:checked) /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHoverStrong}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="StartTile" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorderSoft}" />
+        <Setter Property="Margin" Value="4,0,4,0" />
+        <Setter Property="Padding" Value="0,20,0,20" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusCardLg}"
+                        Padding="{TemplateBinding Padding}"
+                        UseLayoutRounding="True">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushAccentTintSoft}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushAccentBorderStrong}" />
+        </Style>
+        <Style Selector="^:disabled">
+            <Setter Property="Cursor" Value="Arrow" />
+        </Style>
+        <Style Selector="^:disabled /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderSoft}" />
+            <Setter Property="Opacity" Value="0.55" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="LinkButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushAccent}" />
+        <Setter Property="Padding" Value="4,2,4,2" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextSecondarySize}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{StaticResource RadiusMd}"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushAccentTint}" />
+        </Style>
+        <Style Selector="^:disabled">
+            <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+            <Setter Property="Cursor" Value="Arrow" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="MemoryWordButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{StaticResource RadiusXs}"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushAccentTint}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="Keycap" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorderSoft}" />
+        <Setter Property="BorderThickness" Value="{StaticResource BorderThickness}" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}" />
+        <Setter Property="MinWidth" Value="{StaticResource KeycapSize}" />
+        <Setter Property="Height" Value="{StaticResource KeycapSize}" />
+        <Setter Property="Padding" Value="{StaticResource Space2Thickness}" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="AppCheckBox" TargetType="CheckBox">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="CheckBox">
+                <Border x:Name="Box"
+                        Width="{StaticResource CheckboxSize}"
+                        Height="{StaticResource CheckboxSize}"
+                        Background="{StaticResource BrushSurface}"
+                        BorderBrush="{StaticResource BrushBorder}"
+                        BorderThickness="{StaticResource BorderThicknessControl}"
+                        CornerRadius="{StaticResource RadiusMd}"
+                        UseLayoutRounding="True">
+                    <controls:IconView x:Name="Tick"
+                                       Definition="{StaticResource IconCheckCheckbox}"
+                                       Foreground="{StaticResource BrushSurface}"
+                                       Opacity="0"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:checked /template/ Border#Box">
+            <Setter Property="Background" Value="{StaticResource BrushAccentDeep}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushAccentDeep}" />
+        </Style>
+        <Style Selector="^:checked /template/ controls|IconView#Tick">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+        <Style Selector="^:disabled /template/ Border#Box">
+            <Setter Property="Opacity" Value="0.55" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type controls:ToggleSwitch}" TargetType="controls:ToggleSwitch">
+        <Setter Property="Width" Value="{StaticResource ToggleTrackWidth}" />
+        <Setter Property="Height" Value="{StaticResource ToggleTrackHeight}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:ToggleSwitch">
+                <Border x:Name="Track"
+                        Background="{StaticResource BrushSurface}"
+                        BorderBrush="{StaticResource BrushBorder}"
+                        BorderThickness="{StaticResource BorderThicknessControl}"
+                        CornerRadius="{StaticResource ToggleTrackRadius}"
+                        UseLayoutRounding="True">
+                    <Ellipse x:Name="PART_Knob"
+                             Width="{StaticResource Space9}"
+                             Height="{StaticResource Space9}"
+                             Fill="{StaticResource BrushBorderStrong}"
+                             HorizontalAlignment="Left"
+                             VerticalAlignment="Center"
+                             Margin="2,0,0,0" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:on /template/ Border#Track">
+            <Setter Property="Background" Value="{StaticResource BrushAccentDeep}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushAccentDeep}" />
+        </Style>
+        <Style Selector="^:on /template/ Ellipse#PART_Knob">
+            <Setter Property="Fill" Value="{StaticResource BrushSurface}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#Track">
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderStrong}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="AppProgressBar" TargetType="ProgressBar">
+        <Setter Property="Height" Value="{StaticResource ProgressBarHeight}" />
+        <Setter Property="Maximum" Value="100" />
+        <Setter Property="Foreground" Value="{StaticResource BrushAccentDeep}" />
+        <Setter Property="Background" Value="{StaticResource BrushProgressTrack}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ProgressBar">
+                <Border Background="{TemplateBinding Background}"
+                        CornerRadius="{StaticResource ProgressBarRadius}"
+                        ClipToBounds="True">
+                    <Panel>
+                        <Border Name="PART_Indicator"
+                                Background="{TemplateBinding Foreground}"
+                                CornerRadius="{StaticResource ProgressBarRadius}"
+                                HorizontalAlignment="Left">
+                            <Border Background="{StaticResource BrushSuccess}"
+                                    CornerRadius="{StaticResource ProgressBarRadius}">
+                                <Border.IsVisible>
+                                    <MultiBinding Converter="{x:Static conv:Converters.EqualToVisibility}">
+                                        <Binding Path="Value" RelativeSource="{RelativeSource TemplatedParent}" />
+                                        <Binding Path="Maximum" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    </MultiBinding>
+                                </Border.IsVisible>
+                            </Border>
+                        </Border>
+                    </Panel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <ControlTheme x:Key="ChoiceCard" TargetType="Button">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="Card"
+                        Background="{StaticResource BrushSurface}"
+                        BorderBrush="{StaticResource BrushBorderSoft}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusCard}"
+                        Padding="14,11,14,11"
+                        UseLayoutRounding="True">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalAlignment="Stretch" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover /template/ Border#Card">
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderStrong}" />
+        </Style>
+        <Style Selector="^.chosen /template/ Border#Card">
+            <Setter Property="Background" Value="{StaticResource BrushAccentTintSoft}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushAccentBorderStrong}" />
+        </Style>
+        <Style Selector="^:disabled">
+            <Setter Property="Cursor" Value="Arrow" />
+        </Style>
+        <Style Selector="^:disabled /template/ Border#Card">
+            <Setter Property="Opacity" Value="0.55" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="SourceCard" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorderSoft}" />
+        <Setter Property="BorderThickness" Value="{StaticResource BorderThickness}" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusCard}" />
+        <Setter Property="Padding" Value="14,11,14,11" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="EntryColumnFold" TargetType="Border">
+        <Setter Property="Background" Value="Transparent" />
+
+        <Style Selector="^.collapsed:not(.file)">
+            <Setter Property="MaxHeight" Value="{StaticResource EntryCollapsedHeight}" />
+            <Setter Property="ClipToBounds" Value="True" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type controls:SkeletonLines}" TargetType="controls:SkeletonLines">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:SkeletonLines">
+                <StackPanel Name="PART_Lines" />
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <DataTemplate x:Key="LanguageTile" x:DataType="vm:TargetLanguage">
+        <Grid Width="{StaticResource LanguageTileWidth}"
+              Height="{StaticResource LanguageTileHeight}">
+            <Border CornerRadius="{StaticResource RadiusXs}"
+                    Background="{Binding FlagKey, Converter={x:Static conv:Converters.FlagBrush}}"
+                    BorderBrush="{StaticResource BrushBorderSoft}"
+                    BorderThickness="{StaticResource BorderThickness}"
+                    IsVisible="{Binding HasFlag}" />
+            <Border CornerRadius="{StaticResource RadiusXs}"
+                    Background="{StaticResource BrushTrackAlt}"
+                    BorderBrush="{StaticResource BrushBorderSoft}"
+                    BorderThickness="{StaticResource BorderThickness}"
+                    IsVisible="{Binding !HasFlag}">
+                <TextBlock Text="{Binding CodeLabel}"
+                           Theme="{StaticResource TextMicro}"
+                           Foreground="{StaticResource BrushTextSecondary}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+            </Border>
+        </Grid>
+    </DataTemplate>
+
+    <ControlTheme x:Key="FilePreviewScroll" TargetType="ScrollViewer">
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="controls:WheelChaining.Chains" Value="True" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ScrollViewer">
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">
+                    <ScrollContentPresenter Name="PART_ContentPresenter"
+                                            Grid.Row="0"
+                                            Grid.Column="0"
+                                            Background="{TemplateBinding Background}"
+                                            Padding="{TemplateBinding Padding}"
+                                            CanHorizontallyScroll="False"
+                                            CanVerticallyScroll="True" />
+                    <ScrollBar Name="PART_VerticalScrollBar"
+                               Grid.Row="0"
+                               Grid.Column="1"
+                               Orientation="Vertical"
+                               Background="{StaticResource BrushBorderFaint}"
+                               Margin="6,0,0,0" />
+                    <ScrollBar Name="PART_HorizontalScrollBar"
+                               Grid.Row="1"
+                               Grid.Column="0"
+                               Orientation="Horizontal" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^.file">
+            <Setter Property="MaxHeight" Value="{StaticResource FilePreviewMaxHeight}" />
+        </Style>
+        <Style Selector="^.file.expanded">
+            <Setter Property="MaxHeight" Value="{x:Static sys:Double.PositiveInfinity}" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="ComposerAttachmentsScroll" TargetType="ScrollViewer">
+        <Setter Property="MaxHeight" Value="{StaticResource ComposerAttachmentsMaxHeight}" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="controls:WheelChaining.Chains" Value="True" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ScrollViewer">
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">
+                    <ScrollContentPresenter Name="PART_ContentPresenter"
+                                            Grid.Row="0"
+                                            Grid.Column="0"
+                                            Background="{TemplateBinding Background}"
+                                            Padding="{TemplateBinding Padding}"
+                                            CanHorizontallyScroll="False"
+                                            CanVerticallyScroll="True" />
+                    <ScrollBar Name="PART_VerticalScrollBar"
+                               Grid.Row="0"
+                               Grid.Column="1"
+                               Orientation="Vertical"
+                               Background="{StaticResource BrushBorderFaint}"
+                               Margin="6,0,0,0" />
+                    <ScrollBar Name="PART_HorizontalScrollBar"
+                               Grid.Row="1"
+                               Grid.Column="0"
+                               Orientation="Horizontal" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type controls:BilingualRow}" TargetType="controls:BilingualRow">
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:BilingualRow">
+                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*">
+                    <ContentPresenter Grid.Row="0"
+                                      Grid.ColumnSpan="3"
+                                      Content="{TemplateBinding HeaderContent}"
+                                      HorizontalAlignment="Left"
+                                      Margin="0,0,0,6" />
+
+                    <Border Grid.Row="1"
+                            Grid.Column="0"
+                            x:DataType="vm:EntryViewModel"
+                            Theme="{StaticResource EntryColumnFold}"
+                            Classes.collapsed="{Binding IsCollapsed}"
+                            Classes.file="{Binding IsFile}"
+                            Margin="0,0,16,0">
+                        <StackPanel>
+                            <TextBlock Text="{TemplateBinding SourceLabel}"
+                                       Theme="{StaticResource TextEntryHeading}" />
+                            <ContentPresenter Content="{TemplateBinding SourceContent}"
+                                              Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <controls:IconView Grid.Row="1"
+                                       Grid.Column="1"
+                                       Definition="{StaticResource IconArrowRightLong}"
+                                       Foreground="{StaticResource BrushBorderStrong}"
+                                       Margin="0,26,0,0"
+                                       VerticalAlignment="Top" />
+
+                    <Border Grid.Row="1"
+                            Grid.Column="2"
+                            x:DataType="vm:EntryViewModel"
+                            Theme="{StaticResource EntryColumnFold}"
+                            Classes.collapsed="{Binding IsCollapsed}"
+                            Classes.file="{Binding IsFile}"
+                            Margin="16,0,0,0">
+                        <StackPanel>
+                            <TextBlock x:Name="TargetHeading"
+                                       Text="{TemplateBinding TargetLabel}"
+                                       Theme="{StaticResource TextEntryHeading}" />
+
+                            <Grid Margin="0,4,0,0"
+                                  AutomationProperties.LabeledBy="{Binding #TargetHeading}">
+                                <ContentPresenter Content="{TemplateBinding TargetContent}" />
+
+                                <StackPanel IsVisible="{TemplateBinding HasFailed}">
+                                    <TextBlock Text="{TemplateBinding FailureText}"
+                                               Theme="{StaticResource TextWordResult}"
+                                               Foreground="{StaticResource BrushDangerText}" />
+
+                                    <TextBlock Text="{TemplateBinding Note}"
+                                               Theme="{StaticResource TextMeta}"
+                                               Foreground="{StaticResource BrushTextMuted}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,3,0,0"
+                                               IsVisible="{TemplateBinding HasNote}" />
+
+                                    <controls:ChromeButton Theme="{DynamicResource EntryCopyButton}"
+                                                           Icon="{StaticResource IconRefresh}"
+                                                           Opacity="1"
+                                                           Margin="-5,8,0,0"
+                                                           ToolTip.Tip="{TemplateBinding RetryText}"
+                                                           AutomationProperties.Name="{TemplateBinding RetryText}"
+                                                           Command="{TemplateBinding RetryCommand}"
+                                                           CommandParameter="{TemplateBinding RetryParameter}" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <ControlTheme x:Key="DialogSurface" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        <Setter Property="BorderThickness" Value="{StaticResource BorderThickness}" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusDialog}" />
+        <Setter Property="Effect" Value="{StaticResource ShadowDialog}" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </ControlTheme>
+
+</ResourceDictionary>

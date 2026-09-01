@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>BetterTranslator.Runtime</AssemblyName>
+    <RootNamespace>BetterTranslator.Runtime</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <MirrorSourceRoot>$(WindowsSourceRoot)BetterTranslator.Runtime\</MirrorSourceRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MirrorSourceRoot)**\*.cs"
+             Exclude="$(MirrorSourceRoot)bin\**\*.cs;$(MirrorSourceRoot)obj\**\*.cs"
+             Link="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(BetterRuntimeMacDir)' != ''">
+    <None Include="$(BetterRuntimeMacDir)\libBetterRuntimeCPU.dylib"
+          Condition="Exists('$(BetterRuntimeMacDir)\libBetterRuntimeCPU.dylib')"
+          Link="libBetterRuntimeCPU.dylib"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BetterTranslator.Core.Mirror\BetterTranslator.Core.Mirror.csproj" />
+    <ProjectReference Include="..\BetterTranslator.Indexing.Mirror\BetterTranslator.Indexing.Mirror.csproj" />
+    <ProjectReference Include="..\BetterTranslator.Engine.Mirror\BetterTranslator.Engine.Mirror.csproj" />
+  </ItemGroup>
+
+</Project>

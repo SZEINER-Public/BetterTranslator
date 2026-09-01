@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>BetterTranslator.Mac.Parity</AssemblyName>
+    <RootNamespace>BetterTranslator.Mac.Parity</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Headless" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="deltas.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BetterTranslator.Mac.App\BetterTranslator.Mac.App.csproj" />
+    <ProjectReference Include="..\..\src\BetterTranslator.Mac.Platform\BetterTranslator.Mac.Platform.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>BetterTranslator.Mac.Shared</AssemblyName>
+    <RootNamespace>BetterTranslator.App</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AppSourceRoot>$(WindowsSourceRoot)BetterTranslator.App\</AppSourceRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Shims\**\*.cs" />
+    <Compile Include="Seams\**\*.cs" />
+    <Compile Include="Adapters\**\*.cs" />
+    <Compile Include="$(AppSourceRoot)ViewModels\**\*.cs"
+             Link="ViewModels\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(AppSourceRoot)Controls\SegmentItem.cs" Link="Controls\SegmentItem.cs" />
+    <Compile Include="$(AppSourceRoot)Services\Tokens.cs" Link="Services\Tokens.cs" />
+    <Compile Include="$(AppSourceRoot)Services\ClockService.cs" Link="Services\ClockService.cs" />
+    <Compile Include="$(AppSourceRoot)Services\UpdaterGateway.cs" Link="Services\UpdaterGateway.cs" />
+    <Compile Include="$(AppSourceRoot)Services\RestartResources.cs" Link="Services\RestartResources.cs" />
+    <Compile Include="$(AppSourceRoot)Mcp\**\*.cs" Link="Mcp\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(AppSourceRoot)Resources\Strings.cs" Link="Resources\Strings.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(AppSourceRoot)Resources\Strings.resx"
+                      Link="Resources\Strings.resx"
+                      LogicalName="BetterTranslator.App.Resources.Strings.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="ModelContextProtocol" Version="2.1.0" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.1.0" />
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\proj\BetterTranslator.Core.Mirror\BetterTranslator.Core.Mirror.csproj" />
+    <ProjectReference Include="..\..\proj\BetterTranslator.Engine.Mirror\BetterTranslator.Engine.Mirror.csproj" />
+    <ProjectReference Include="..\..\proj\BetterTranslator.Indexing.Mirror\BetterTranslator.Indexing.Mirror.csproj" />
+    <ProjectReference Include="..\..\proj\BetterTranslator.Runtime.Mirror\BetterTranslator.Runtime.Mirror.csproj" />
+    <ProjectReference Include="..\..\proj\BetterTranslator.Map.Mirror\BetterTranslator.Map.Mirror.csproj" />
+    <ProjectReference Include="..\..\proj\BetterTranslator.Updates.Mirror\BetterTranslator.Updates.Mirror.csproj" />
+  </ItemGroup>
+
+</Project>

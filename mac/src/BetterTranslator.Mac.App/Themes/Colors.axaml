@@ -1,0 +1,60 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="BrushDesk" Color="#E8E8E8" />
+    <SolidColorBrush x:Key="BrushWindow" Color="#F3F3F3" />
+    <SolidColorBrush x:Key="BrushSurface" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="BrushSurfaceMuted" Color="#FAFAFA" />
+    <SolidColorBrush x:Key="BrushSurfaceSunken" Color="#FCFCFD" />
+    <SolidColorBrush x:Key="BrushTrack" Color="#EDEDED" />
+    <SolidColorBrush x:Key="BrushTrackAlt" Color="#F0F0F0" />
+    <SolidColorBrush x:Key="BrushHover" Color="#F3F3F3" />
+    <SolidColorBrush x:Key="BrushHoverStrong" Color="#E2E2E2" />
+    <SolidColorBrush x:Key="BrushRowActive" Color="#ECECEC" />
+
+    <SolidColorBrush x:Key="BrushSkeletonBar" Color="#DEDEDE" />
+
+    <SolidColorBrush x:Key="BrushText" Color="#1B1B1B" />
+    <SolidColorBrush x:Key="BrushTextSecondary" Color="#5D5D5D" />
+    <SolidColorBrush x:Key="BrushTextTertiary" Color="#6E6E6E" />
+    <SolidColorBrush x:Key="BrushTextMuted" Color="#676767" />
+    <SolidColorBrush x:Key="BrushTextSubtle" Color="#6B6B6B" />
+    <SolidColorBrush x:Key="BrushIcon" Color="#3B3B3B" />
+
+    <SolidColorBrush x:Key="BrushBorder" Color="#D2D2D2" />
+    <SolidColorBrush x:Key="BrushBorderSoft" Color="#E4E4E4" />
+    <SolidColorBrush x:Key="BrushBorderFaint" Color="#EFEFEF" />
+    <SolidColorBrush x:Key="BrushBorderHairline" Color="#F5F5F5" />
+    <SolidColorBrush x:Key="BrushBorderStrong" Color="#B4B4B4" />
+    <SolidColorBrush x:Key="BrushWindowEdge" Color="#D4D4D4" />
+
+    <SolidColorBrush x:Key="BrushAccent" Color="#005FB8" />
+    <SolidColorBrush x:Key="BrushAccentDeep" Color="#00457E" />
+    <SolidColorBrush x:Key="BrushAccentPressed" Color="#013A6B" />
+    <SolidColorBrush x:Key="BrushAccentTint" Color="#EFF6FC" />
+    <SolidColorBrush x:Key="BrushAccentTintSoft" Color="#F7FBFE" />
+    <SolidColorBrush x:Key="BrushAccentBorder" Color="#C4DCF2" />
+    <SolidColorBrush x:Key="BrushAccentHover" Color="#DCEAF7" />
+    <SolidColorBrush x:Key="BrushAccentBorderStrong" Color="#9CC4E6" />
+    <SolidColorBrush x:Key="BrushSelection" Color="#CFE4F7" />
+
+    <SolidColorBrush x:Key="BrushSuccess" Color="#2E9E5B" />
+    <SolidColorBrush x:Key="BrushSuccessDeep" Color="#2E7D51" />
+    <SolidColorBrush x:Key="BrushWarn" Color="#DCA83A" />
+    <SolidColorBrush x:Key="BrushWarnSurface" Color="#FDF6E7" />
+    <SolidColorBrush x:Key="BrushWarnBorder" Color="#E8D4A8" />
+    <SolidColorBrush x:Key="BrushWarnText" Color="#6B4A0F" />
+    <SolidColorBrush x:Key="BrushDanger" Color="#B42318" />
+    <SolidColorBrush x:Key="BrushDangerSurface" Color="#FDF4F3" />
+    <SolidColorBrush x:Key="BrushDangerBorder" Color="#E8B4AE" />
+    <SolidColorBrush x:Key="BrushDangerText" Color="#8A1F16" />
+
+    <SolidColorBrush x:Key="BrushChatSource" Color="#5B8DBE" />
+    <SolidColorBrush x:Key="BrushRepoSource" Color="#7A6FC0" />
+    <SolidColorBrush x:Key="BrushNodeIdle" Color="#C9CFD5" />
+    <SolidColorBrush x:Key="BrushProgressTrack" Color="#E9ECEF" />
+
+    <SolidColorBrush x:Key="BrushOverlay" Color="#571B1B1B" />
+    <SolidColorBrush x:Key="BrushBadgeOverlay" Color="#D11B1B1B" />
+
+</ResourceDictionary>
