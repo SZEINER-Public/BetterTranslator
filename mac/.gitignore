@@ -3,3 +3,4 @@ obj/
 parity-out/
 !reports/*.md
 !tools/parity/deltas.json
+publish/
