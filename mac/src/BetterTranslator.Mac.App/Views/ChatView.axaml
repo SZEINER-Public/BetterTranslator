@@ -1,0 +1,1344 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="using:System"
+             xmlns:controls="using:BetterTranslator.Mac.App.Controls"
+             xmlns:conv="using:BetterTranslator.Mac.App.Converters"
+             xmlns:res="using:BetterTranslator.App.Resources"
+             xmlns:verify="using:BetterTranslator.Mac.App.Verification"
+             xmlns:vm="using:BetterTranslator.App.ViewModels"
+             x:Class="BetterTranslator.Mac.App.Views.ChatView"
+             x:DataType="vm:ChatWorkspaceViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="StackPanel.markdownFlow SelectableTextBlock">
+            <Setter Property="Theme" Value="{StaticResource SelectableMarkdownFlow}" />
+        </Style>
+
+        <Style Selector="Border.composer">
+            <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        </Style>
+
+        <Style Selector="Border.composer.dropTarget">
+            <Setter Property="Background" Value="{StaticResource BrushAccentTint}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushAccent}" />
+        </Style>
+
+        <Style Selector="TextBlock.effortLabel.blocked">
+            <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Background="Transparent"
+          DragDrop.AllowDrop="True"
+          RowDefinitions="*,Auto">
+
+        <ScrollViewer Grid.Row="0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <Grid MaxWidth="{StaticResource ChatColumnWidth}"
+                  HorizontalAlignment="Stretch"
+                  Margin="24,0,24,0"
+                  RowDefinitions="Auto,Auto,Auto">
+
+                <StackPanel Grid.Row="0"
+                            Margin="0,24,0,0"
+                            IsVisible="{Binding HasSelection}">
+
+                    <TextBox x:Name="ChatNameEditor"
+                             Theme="{StaticResource TextField}"
+                             FontSize="{StaticResource TextChatNameSize}"
+                             FontWeight="{StaticResource TextChatNameWeight}"
+                             Text="{Binding ChatNameDraft, Mode=TwoWay}"
+                             HorizontalAlignment="Left"
+                             MinWidth="280"
+                             AutomationProperties.Name="Chat name"
+                             KeyDown="OnChatNameKeyDown"
+                             LostFocus="OnChatNameLostFocus"
+                             IsVisible="{Binding IsRenamingChat}" />
+
+                    <TextBlock Text="{Binding ChatHeaderStamp}"
+                               Theme="{StaticResource TextMeta}"
+                               Foreground="{StaticResource BrushTextMuted}"
+                               Margin="0,4,0,0" />
+
+                    <Border IsVisible="{Binding ShowMetrics}">
+                        <WrapPanel Margin="0,2,0,0"
+                                   IsVisible="{Binding HasChatMetrics}">
+                            <TextBlock Text="{Binding ChatTokenFigure}"
+                                       Theme="{StaticResource TextChatCost}"
+                                       Margin="0"
+                                       ToolTip.Tip="{x:Static vm:EntryViewModel.MetricsTooltip}" />
+                            <TextBlock Text="{Binding ChatDurationFigure}"
+                                       Theme="{StaticResource TextChatCost}" />
+                        </WrapPanel>
+                    </Border>
+                </StackPanel>
+
+                <Border Grid.Row="1"
+                        Background="{StaticResource BrushAccentTint}"
+                        BorderBrush="{StaticResource BrushBorderFaint}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusCard}"
+                        Padding="12,10,10,10"
+                        Margin="0,16,0,0"
+                        IsVisible="{Binding HasRegenerateOffer}">
+                    <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+
+                        <controls:IconView Grid.Column="0"
+                                           Definition="{StaticResource IconRefresh}"
+                                           Foreground="{StaticResource BrushAccent}"
+                                           VerticalAlignment="Center" />
+
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding RegenerateOfferText}"
+                                   Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center"
+                                   Margin="8,0,8,0" />
+
+                        <Button Grid.Column="2"
+                                Theme="{StaticResource LinkButton}"
+                                Content="Regenerate this conversation"
+                                VerticalAlignment="Center"
+                                Command="{Binding ConfirmRegenerateAllCommand}"
+                                AutomationProperties.Name="Regenerate this conversation" />
+
+                        <controls:ChromeButton Grid.Column="3"
+                                               Icon="{StaticResource IconCloseSmall}"
+                                               Margin="6,0,0,0"
+                                               VerticalAlignment="Center"
+                                               Command="{Binding DismissRegenerateOfferCommand}"
+                                               ToolTip.Tip="Dismiss"
+                                               AutomationProperties.Name="Dismiss this offer" />
+                    </Grid>
+                </Border>
+
+                <ItemsControl Grid.Row="2"
+                              ItemsSource="{Binding Entries}"
+                              Margin="0,20,0,24">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:EntryViewModel">
+                            <StackPanel Margin="0,0,0,18">
+
+                                <controls:BilingualRow SourceLabel="{Binding SourceHeading}"
+                                                       TargetLabel="{Binding TargetHeading}"
+                                                       HasFailed="{Binding HasFailed}"
+                                                       FailureText="{x:Static res:Strings.EntryFailed}"
+                                                       Note="{Binding Note}"
+                                                       HasNote="{Binding HasNote}"
+                                                       RetryText="{x:Static res:Strings.EntryRetry}"
+                                                       RetryCommand="{Binding $parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).RetryEntryCommand}"
+                                                       RetryParameter="{Binding}">
+
+                                    <controls:BilingualRow.HeaderContent>
+                                        <Button Theme="{StaticResource ToolbarChromeButton}"
+                                                HorizontalContentAlignment="Left"
+                                                Command="{Binding ToggleExpandCommand}"
+                                                AutomationProperties.Name="{Binding DisclosureLabel}"
+                                                IsVisible="{Binding CanCollapse}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <controls:IconView Definition="{StaticResource IconChevronDown}"
+                                                                   Foreground="{StaticResource BrushTextTertiary}"
+                                                                   VerticalAlignment="Center"
+                                                                   RenderTransformOrigin="50%,50%"
+                                                                   controls:Disclosure.TurnsWhenOpen="{Binding IsExpanded}" />
+                                                <TextBlock Text="{Binding DisclosureLabel}"
+                                                           Theme="{StaticResource TextMeta}"
+                                                           Foreground="{StaticResource BrushTextMuted}"
+                                                           VerticalAlignment="Center"
+                                                           Margin="4,0,0,0" />
+                                            </StackPanel>
+                                        </Button>
+                                    </controls:BilingualRow.HeaderContent>
+
+                                    <controls:BilingualRow.SourceContent>
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal"
+                                                        IsVisible="{Binding IsFile}">
+                                                <controls:IconView Definition="{StaticResource IconFileGeneric}"
+                                                                   Foreground="{StaticResource BrushTextTertiary}"
+                                                                   VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding FileName}"
+                                                           Theme="{StaticResource TextDefault}"
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           Margin="8,0,0,0" />
+                                                <TextBlock Text="{Binding FileSizeLabel}"
+                                                           Theme="{StaticResource TextMeta}"
+                                                           Foreground="{StaticResource BrushTextMuted}"
+                                                           VerticalAlignment="Center"
+                                                           Margin="10,0,0,0"
+                                                           IsVisible="{Binding HasFileSize}" />
+                                                <controls:ChromeButton Icon="{StaticResource IconEyePreview}"
+                                                                       Width="{StaticResource ChromeButtonSizeSmall}"
+                                                                       Height="{StaticResource ChromeButtonSizeSmall}"
+                                                                       Margin="8,0,0,0"
+                                                                       IsActive="{Binding IsSourcePreviewOpen}"
+                                                                       Command="{Binding ToggleSourcePreviewCommand}"
+                                                                       ToolTip.Tip="{x:Static res:Strings.EntryPreviewToggle}"
+                                                                       AutomationProperties.Name="{x:Static res:Strings.EntryPreviewToggle}"
+                                                                       AutomationProperties.HelpText="{Binding SourcePreviewState}" />
+
+                                                <controls:ChromeButton Icon="{StaticResource IconDownload}"
+                                                                       Width="{StaticResource ChromeButtonSizeSmall}"
+                                                                       Height="{StaticResource ChromeButtonSizeSmall}"
+                                                                       Margin="4,0,0,0"
+                                                                       Command="{Binding $parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).ExportSourceCommand}"
+                                                                       CommandParameter="{Binding}"
+                                                                       ToolTip.Tip="{x:Static res:Strings.EntryExportSource}"
+                                                                       AutomationProperties.Name="{x:Static res:Strings.EntryExportSource}"
+                                                                       IsVisible="{Binding CanExportSource}" />
+                                            </StackPanel>
+
+                                            <controls:ExpandArea IsOpen="{Binding IsSourceBodyOpen}">
+                                                <ScrollViewer Theme="{StaticResource FilePreviewScroll}"
+                                                              Classes.file="{Binding IsFile}"
+                                                              Classes.expanded="{Binding IsExpanded}">
+                                                <StackPanel>
+                                                    <SelectableTextBlock Text="{Binding Source, Mode=OneWay}"
+                                                                         Theme="{StaticResource SelectableWordSource}"
+                                                                         IsVisible="{Binding ShowsWordSource}" />
+
+                                                    <SelectableTextBlock Text="{Binding Source, Mode=OneWay}"
+                                                                         Theme="{StaticResource SelectableEntrySource}"
+                                                                         IsVisible="{Binding ShowsSentenceSource}" />
+
+                                                    <StackPanel Classes="markdownFlow"
+                                                                controls:MarkdownFlow.Blocks="{Binding SourceBlocks}"
+                                                                AutomationProperties.Name="Source, formatted"
+                                                                IsVisible="{Binding ShowsSourceMarkdown}" />
+
+                                                    <ItemsControl ItemsSource="{Binding SourceRows}"
+                                                                  Theme="{StaticResource JsonRows}"
+                                                                  IsVisible="{Binding ShowsSourceJson}" />
+
+                                                    <SelectableTextBlock Text="{Binding Source, Mode=OneWay}"
+                                                                         Theme="{StaticResource SelectableMarkdownSyntax}"
+                                                                         IsVisible="{Binding ShowsSourceSyntax}" />
+                                                </StackPanel>
+                                                </ScrollViewer>
+                                            </controls:ExpandArea>
+
+                                            <controls:ChromeButton Theme="{StaticResource EntryCopyButton}"
+                                                                   Icon="{StaticResource IconCopy}"
+                                                                   Command="{Binding CopySourceCommand}"
+                                                                   ToolTip.Tip="Copy the source"
+                                                                   AutomationProperties.Name="Copy the source"
+                                                                   IsVisible="{Binding !SourceCopied}" />
+
+                                            <controls:ChromeButton Theme="{StaticResource EntryCopyButton}"
+                                                                   Icon="{StaticResource IconCheckDone}"
+                                                                   Foreground="{StaticResource BrushSuccessDeep}"
+                                                                   Opacity="1"
+                                                                   Command="{Binding CopySourceCommand}"
+                                                                   ToolTip.Tip="Copied"
+                                                                   AutomationProperties.Name="Copied"
+                                                                   IsVisible="{Binding SourceCopied}" />
+                                        </StackPanel>
+                                    </controls:BilingualRow.SourceContent>
+
+                                    <controls:BilingualRow.TargetContent>
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal"
+                                                        IsVisible="{Binding IsFile}">
+                                                <controls:IconView Definition="{StaticResource IconFileGeneric}"
+                                                                   Foreground="{StaticResource BrushTextTertiary}"
+                                                                   VerticalAlignment="Center" />
+
+                                                <TextBlock Text="{Binding ResultFileName}"
+                                                           Theme="{StaticResource TextDefault}"
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           Margin="8,0,0,0"
+                                                           IsVisible="{Binding HasResultFileName}" />
+
+                                                <TextBlock Text="{Binding FileName}"
+                                                           Theme="{StaticResource TextDefault}"
+                                                           Foreground="{StaticResource BrushTextMuted}"
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           Margin="8,0,0,0"
+                                                           IsVisible="{Binding !HasResultFileName}" />
+
+                                                <TextBlock Text="{x:Static res:Strings.EntryQueued}"
+                                                           Theme="{StaticResource TextMeta}"
+                                                           Foreground="{StaticResource BrushTextMuted}"
+                                                           VerticalAlignment="Center"
+                                                           Margin="10,0,0,0"
+                                                           IsVisible="{Binding ShowsFileQueued}" />
+
+                                                <ProgressBar Width="72"
+                                                             Height="{StaticResource ProgressBarHeight}"
+                                                             VerticalAlignment="Center"
+                                                             Margin="10,0,0,0"
+                                                             Minimum="0"
+                                                             Maximum="1"
+                                                             Value="{Binding FileProgress, Mode=OneWay, FallbackValue=0}"
+                                                             IsVisible="{Binding ShowsFileProgressBar}" />
+
+                                                <controls:SkeletonLines Width="72"
+                                                                        VerticalAlignment="Center"
+                                                                        Margin="10,0,0,0"
+                                                                        SourceLength="60"
+                                                                        AutomationProperties.Name="Translating"
+                                                                        IsVisible="{Binding ShowsFileSkeleton}" />
+
+                                                <controls:ChromeButton Icon="{StaticResource IconEyePreview}"
+                                                                       Width="{StaticResource ChromeButtonSizeSmall}"
+                                                                       Height="{StaticResource ChromeButtonSizeSmall}"
+                                                                       Margin="8,0,0,0"
+                                                                       IsActive="{Binding IsResultPreviewOpen}"
+                                                                       Command="{Binding ToggleResultPreviewCommand}"
+                                                                       ToolTip.Tip="{x:Static res:Strings.EntryPreviewToggle}"
+                                                                       AutomationProperties.Name="{x:Static res:Strings.EntryPreviewToggle}"
+                                                                       AutomationProperties.HelpText="{Binding ResultPreviewState}"
+                                                                       IsVisible="{Binding ShowsFileDone}" />
+
+                                                <controls:ChromeButton Icon="{StaticResource IconDownload}"
+                                                                       Width="{StaticResource ChromeButtonSizeSmall}"
+                                                                       Height="{StaticResource ChromeButtonSizeSmall}"
+                                                                       Margin="4,0,0,0"
+                                                                       Command="{Binding $parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).ExportResultCommand}"
+                                                                       CommandParameter="{Binding}"
+                                                                       ToolTip.Tip="{x:Static res:Strings.EntryExportResult}"
+                                                                       AutomationProperties.Name="{x:Static res:Strings.EntryExportResult}"
+                                                                       IsVisible="{Binding CanExportResult}" />
+                                            </StackPanel>
+
+                                            <controls:ExpandArea IsOpen="{Binding IsResultBodyOpen}">
+                                                <ScrollViewer Theme="{StaticResource FilePreviewScroll}"
+                                                              Classes.file="{Binding IsFile}"
+                                                              Classes.expanded="{Binding IsExpanded}">
+                                                <StackPanel>
+                                                    <controls:SkeletonLines SourceLength="{Binding SourceLength}"
+                                                                            LineLengths="{Binding SourceLineLengths}"
+                                                                            AutomationProperties.Name="Translating"
+                                                                            IsVisible="{Binding ShowsSkeleton}" />
+
+                                                    <SelectableTextBlock Text="{Binding Result, Mode=OneWay}"
+                                                                         Theme="{StaticResource SelectableWordResult}"
+                                                                         AutomationProperties.LiveSetting="Polite"
+                                                                         controls:Reveal.Target="True"
+                                                                         IsVisible="{Binding ShowsWordResult}" />
+
+                                                    <SelectableTextBlock Text="{Binding Result, Mode=OneWay}"
+                                                                         Theme="{StaticResource SelectableEntryResult}"
+                                                                         AutomationProperties.LiveSetting="Polite"
+                                                                         controls:Reveal.Target="True"
+                                                                         IsVisible="{Binding ShowsSentenceResult}" />
+
+                                                    <TextBlock Theme="{StaticResource TextEntryResult}"
+                                                               TextWrapping="Wrap"
+                                                               verify:VerificationText.Text="{Binding Result}"
+                                                               verify:VerificationText.Result="{Binding Verification}"
+                                                               AutomationProperties.LiveSetting="Polite"
+                                                               controls:Reveal.Target="True"
+                                                               IsVisible="{Binding ShowsVerifiedResult}" />
+
+                                                    <StackPanel Classes="markdownFlow"
+                                                                controls:MarkdownFlow.Blocks="{Binding ResultBlocks}"
+                                                                AutomationProperties.LiveSetting="Polite"
+                                                                AutomationProperties.Name="Translation, formatted"
+                                                                controls:Reveal.Target="True"
+                                                                IsVisible="{Binding ShowsResultMarkdown}" />
+
+                                                    <ItemsControl ItemsSource="{Binding ResultRows}"
+                                                                  Theme="{StaticResource JsonRows}"
+                                                                  AutomationProperties.LiveSetting="Polite"
+                                                                  controls:Reveal.Target="True"
+                                                                  IsVisible="{Binding ShowsResultJson}" />
+
+                                                    <SelectableTextBlock Text="{Binding Result, Mode=OneWay}"
+                                                                         Theme="{StaticResource SelectableMarkdownSyntax}"
+                                                                         AutomationProperties.LiveSetting="Polite"
+                                                                         controls:Reveal.Target="True"
+                                                                         IsVisible="{Binding ShowsResultSyntax}" />
+
+                                                    <ItemsControl ItemsSource="{Binding Segments}"
+                                                                  IsVisible="{Binding ShowsMarkedResult}">
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <WrapPanel />
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate x:DataType="vm:MemorySegmentViewModel">
+                                                                <Grid>
+                                                                    <TextBlock Text="{Binding Text}"
+                                                                               Theme="{StaticResource TextProse}"
+                                                                               IsVisible="{Binding !IsFromMemory}" />
+
+                                                                    <Button Theme="{StaticResource MemoryWordButton}"
+                                                                            ToolTip.Tip="{Binding Tooltip}"
+                                                                            AutomationProperties.Name="{Binding Tooltip}"
+                                                                            IsVisible="{Binding IsFromMemory}"
+                                                                            Command="{Binding $parent[UserControl].((vm:ChatWorkspaceViewModel)DataContext).ShowMemoryWordCommand}"
+                                                                            CommandParameter="{Binding}">
+                                                                        <StackPanel>
+                                                                            <TextBlock Text="{Binding Text}" Theme="{StaticResource TextProse}" />
+                                                                            <Rectangle Height="{StaticResource BorderWidth}"
+                                                                                       Fill="{StaticResource BrushAccentDeep}"
+                                                                                       IsVisible="{Binding IsSolid}" />
+                                                                            <Rectangle Height="{StaticResource BorderWidth}"
+                                                                                       Fill="{StaticResource BrushWarn}"
+                                                                                       StrokeDashArray="2,2"
+                                                                                       Stroke="{StaticResource BrushWarn}"
+                                                                                       StrokeThickness="{StaticResource BorderWidth}"
+                                                                                       IsVisible="{Binding IsDotted}" />
+                                                                        </StackPanel>
+                                                                    </Button>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                                </ScrollViewer>
+                                            </controls:ExpandArea>
+
+                                            <StackPanel Orientation="Horizontal"
+                                                        HorizontalAlignment="Left"
+                                                        IsVisible="{Binding HasResultText}">
+                                                <Grid>
+                                                    <controls:ChromeButton Theme="{StaticResource EntryCopyButton}"
+                                                                           Icon="{StaticResource IconCopy}"
+                                                                           Command="{Binding CopyResultCommand}"
+                                                                           ToolTip.Tip="Copy the translation"
+                                                                           AutomationProperties.Name="Copy the translation"
+                                                                           IsVisible="{Binding !ResultCopied}" />
+
+                                                    <controls:ChromeButton Theme="{StaticResource EntryCopyButton}"
+                                                                           Icon="{StaticResource IconCheckDone}"
+                                                                           Foreground="{StaticResource BrushSuccessDeep}"
+                                                                           Opacity="1"
+                                                                           Command="{Binding CopyResultCommand}"
+                                                                           ToolTip.Tip="Copied"
+                                                                           AutomationProperties.Name="Copied"
+                                                                           IsVisible="{Binding ResultCopied}" />
+                                                </Grid>
+
+                                                <controls:ChromeButton Theme="{StaticResource EntryCopyButton}"
+                                                                       Icon="{StaticResource IconRefresh}"
+                                                                       Margin="4,2,0,0"
+                                                                       Command="{Binding $parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).RegenerateEntryCommand}"
+                                                                       CommandParameter="{Binding}"
+                                                                       ToolTip.Tip="Translate this again with the model selected now"
+                                                                       AutomationProperties.Name="Regenerate this translation"
+                                                                       IsVisible="{Binding CanRegenerate}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </controls:BilingualRow.TargetContent>
+                                </controls:BilingualRow>
+
+                                <Grid Margin="0,14,0,0" ColumnDefinitions="Auto,*">
+
+                                    <StackPanel Grid.Column="0"
+                                                Orientation="Horizontal"
+                                                HorizontalAlignment="Left"
+                                                Tag="{Binding $parent[ItemsControl].DataContext}">
+                                        <StackPanel.ContextMenu>
+                                            <ContextMenu Theme="{StaticResource AppContextMenu}"
+                                                         x:DataType="vm:ChatWorkspaceViewModel"
+                                                         DataContext="{Binding $self.PlacementTarget.Tag}">
+                                                <MenuItem Header="Copy source"
+                                                          Theme="{StaticResource AppMenuItem}"
+                                                          Icon="{StaticResource IconCopy}"
+                                                          Command="{Binding $parent[ContextMenu].PlacementTarget.((vm:EntryViewModel)DataContext).CopySourceCommand}" />
+                                                <MenuItem Header="Copy translation"
+                                                          Theme="{StaticResource AppMenuItem}"
+                                                          Icon="{StaticResource IconCopy}"
+                                                          Command="{Binding $parent[ContextMenu].PlacementTarget.((vm:EntryViewModel)DataContext).CopyResultCommand}" />
+                                                <MenuItem Header="Copy the translation this replaced"
+                                                          Theme="{StaticResource AppMenuItem}"
+                                                          Icon="{StaticResource IconCopy}"
+                                                          Command="{Binding $parent[ContextMenu].PlacementTarget.((vm:EntryViewModel)DataContext).CopyPreviousResultCommand}"
+                                                          IsVisible="{Binding $parent[ContextMenu].PlacementTarget.((vm:EntryViewModel)DataContext).HasPreviousResult}" />
+                                                <Separator Theme="{StaticResource AppMenuSeparator}" />
+                                                <MenuItem Header="Regenerate"
+                                                          Theme="{StaticResource AppMenuItem}"
+                                                          Icon="{StaticResource IconRefresh}"
+                                                          Command="{Binding RegenerateEntryCommand}"
+                                                          CommandParameter="{Binding $parent[ContextMenu].PlacementTarget.DataContext}"
+                                                          IsVisible="{Binding $parent[ContextMenu].PlacementTarget.((vm:EntryViewModel)DataContext).CanRegenerate}" />
+                                                <MenuItem Header="Stop"
+                                                          Theme="{StaticResource AppMenuItem}"
+                                                          Icon="{StaticResource IconCloseSmall}"
+                                                          Command="{Binding StopEntryCommand}"
+                                                          CommandParameter="{Binding $parent[ContextMenu].PlacementTarget.DataContext}"
+                                                          IsVisible="{Binding $parent[ContextMenu].PlacementTarget.((vm:EntryViewModel)DataContext).CanStop}" />
+                                                <Separator Theme="{StaticResource AppMenuSeparator}" />
+                                                <MenuItem Header="Delete"
+                                                          Theme="{StaticResource AppMenuItem}"
+                                                          controls:Menus.IsDanger="True"
+                                                          Icon="{StaticResource IconDeleteBin}"
+                                                          Command="{Binding ConfirmDeleteEntryCommand}"
+                                                          CommandParameter="{Binding $parent[ContextMenu].PlacementTarget.DataContext}" />
+                                            </ContextMenu>
+                                        </StackPanel.ContextMenu>
+
+                                        <TextBlock Text="{Binding TimeMarker}"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextMuted}"
+                                                   VerticalAlignment="Center" />
+
+                                        <Border Background="{StaticResource BrushTrack}"
+                                                CornerRadius="{StaticResource RadiusDefault}"
+                                                Padding="{StaticResource Space1Thickness}"
+                                                Margin="10,0,0,0"
+                                                IsVisible="{Binding ShowsFormatToggle}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <controls:ChromeButton Icon="{StaticResource IconEyeFormatted}"
+                                                                       Width="{StaticResource ChromeButtonSizeSmall}"
+                                                                       Height="{StaticResource SegmentHeight}"
+                                                                       IsActive="{Binding ShowsRendered}"
+                                                                       Command="{Binding ToggleFormatCommand}"
+                                                                       ToolTip.Tip="View"
+                                                                       AutomationProperties.Name="View" />
+                                                <controls:ChromeButton Icon="{StaticResource IconCodeBrackets}"
+                                                                       Width="{StaticResource ChromeButtonSizeSmall}"
+                                                                       Height="{StaticResource SegmentHeight}"
+                                                                       IsActive="{Binding IsSourceMode}"
+                                                                       Command="{Binding ToggleFormatCommand}"
+                                                                       ToolTip.Tip="Source"
+                                                                       AutomationProperties.Name="Source" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Button Theme="{StaticResource LinkButton}"
+                                                Content="Pause"
+                                                Margin="10,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Command="{Binding $parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).PauseEntryCommand}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip.Tip="Pause at the end of the piece being translated now"
+                                                AutomationProperties.Name="Pause this translation"
+                                                IsVisible="{Binding CanPause}" />
+
+                                        <Button Theme="{StaticResource LinkButton}"
+                                                Content="Resume"
+                                                Margin="10,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Command="{Binding $parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).ResumeEntryCommand}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip.Tip="Carry on from the first piece that is not translated yet"
+                                                AutomationProperties.Name="Resume this translation"
+                                                IsVisible="{Binding CanResume}" />
+
+                                        <Button Theme="{StaticResource LinkButton}"
+                                                Content="Stop"
+                                                Margin="10,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Command="{Binding $parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).StopEntryCommand}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip.Tip="Stop here and keep what has come back"
+                                                AutomationProperties.Name="Stop this translation"
+                                                IsVisible="{Binding CanStop}" />
+
+                                        <controls:ChromeButton Theme="{StaticResource RowMenuButton}"
+                                                               Icon="{StaticResource IconMoreHorizontal}"
+                                                               controls:Menus.OpensRowMenu="True"
+                                                               Tag="{Binding $parent[ItemsControl].DataContext}"
+                                                               Margin="10,0,0,0"
+                                                               ToolTip.Tip="More"
+                                                               AutomationProperties.Name="More actions for this message" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1"
+                                                HorizontalAlignment="Right"
+                                                IsVisible="{Binding $parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).ShowMetrics}">
+                                        <WrapPanel HorizontalAlignment="Right"
+                                                   IsVisible="{Binding HasMetrics}">
+                                            <TextBlock Text="{Binding TokenFigure}"
+                                                       Theme="{StaticResource TextEntryCost}"
+                                                       Margin="0"
+                                                       ToolTip.Tip="{x:Static vm:EntryViewModel.MetricsTooltip}" />
+                                            <TextBlock Text="{Binding DurationFigure}"
+                                                       Theme="{StaticResource TextEntryCost}" />
+                                            <TextBlock Text="{Binding RateFigure}"
+                                                       Theme="{StaticResource TextEntryCost}"
+                                                       IsVisible="{Binding RateFigure, Converter={x:Static conv:Converters.NotEmptyToVisibility}}" />
+                                        </WrapPanel>
+
+                                        <WrapPanel HorizontalAlignment="Right"
+                                                   IsVisible="{Binding HasFidelity}">
+                                            <TextBlock Text="{Binding CoverageFigure}"
+                                                       Theme="{StaticResource TextEntryAudit}"
+                                                       Margin="0"
+                                                       ToolTip.Tip="{x:Static vm:EntryViewModel.FidelityTooltip}" />
+                                            <TextBlock Text="{Binding LineFigure}"
+                                                       Theme="{StaticResource TextEntryAudit}"
+                                                       IsVisible="{Binding LineFigure, Converter={x:Static conv:Converters.NotEmptyToVisibility}}" />
+                                            <TextBlock Text="{Binding UnitFigure}"
+                                                       Theme="{StaticResource TextEntryAudit}"
+                                                       IsVisible="{Binding UnitFigure, Converter={x:Static conv:Converters.NotEmptyToVisibility}}" />
+                                            <TextBlock Text="{Binding DefectFigure}"
+                                                       Theme="{StaticResource TextEntryAuditFindings}"
+                                                       Classes.hasDefects="{Binding HasDefects}"
+                                                       ToolTip.Tip="{x:Static vm:EntryViewModel.DefectsTooltip}" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </ScrollViewer>
+
+        <Border Grid.Row="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="16,16,0,0"
+                IsVisible="{Binding HasExpandedEntry}">
+            <Button Theme="{StaticResource ToolbarChromeButton}"
+                    HorizontalContentAlignment="Left"
+                    Command="{Binding CollapseExpandedEntryCommand}"
+                    ToolTip.Tip="Fold this entry back"
+                    AutomationProperties.Name="Show less">
+                <StackPanel Orientation="Horizontal">
+                    <controls:IconView Definition="{StaticResource IconChevronDown}"
+                                       Foreground="{StaticResource BrushTextTertiary}"
+                                       VerticalAlignment="Center"
+                                       RenderTransformOrigin="50%,50%"
+                                       controls:Disclosure.TurnsWhenOpen="True" />
+                    <TextBlock Text="Show less"
+                               Theme="{StaticResource TextMeta}"
+                               Foreground="{StaticResource BrushTextMuted}"
+                               VerticalAlignment="Center"
+                               Margin="4,0,0,0" />
+                </StackPanel>
+            </Button>
+        </Border>
+
+        <Grid Grid.Row="0"
+              Background="Transparent"
+              PointerPressed="OnMemoryWordScrimPressed"
+              IsVisible="{Binding IsMemoryWordOpen}">
+
+            <Border Background="{StaticResource BrushSurface}"
+                    BorderBrush="{StaticResource BrushBorder}"
+                    BorderThickness="{StaticResource BorderThickness}"
+                    CornerRadius="{StaticResource RadiusCard}"
+                    Effect="{StaticResource ShadowPopover}"
+                    Width="296"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    DataContext="{Binding OpenMemoryWord}"
+                    x:DataType="vm:MemorySegmentViewModel">
+                <StackPanel Margin="14,12,14,12">
+                    <Grid>
+                        <TextBlock Text="{Binding Text}" Theme="{StaticResource TextCardTitle}" />
+                        <TextBlock Text="{Binding ConfidenceLabel}"
+                                   Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushSuccessDeep}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center" />
+                    </Grid>
+
+                    <ProgressBar Theme="{StaticResource AppProgressBar}"
+                                 Maximum="100"
+                                 Value="{Binding Match.Confidence, Mode=OneWay}"
+                                 Foreground="{StaticResource BrushSuccess}"
+                                 Margin="0,9,0,0" />
+
+                    <TextBlock Text="{Binding Origin}"
+                               Theme="{StaticResource TextMeta}"
+                               Foreground="{StaticResource BrushTextTertiary}"
+                               Margin="0,12,0,0" />
+
+                    <TextBlock Text="{Binding Reason}"
+                               Theme="{StaticResource TextProse}"
+                               Foreground="{StaticResource BrushTextSecondary}"
+                               TextWrapping="Wrap"
+                               Margin="0,4,0,0" />
+
+                    <ItemsControl ItemsSource="{Binding Alternatives}"
+                                  Margin="0,12,0,0"
+                                  IsVisible="{Binding HasAlternatives}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="sys:String">
+                                <Button Theme="{StaticResource SecondaryButton}"
+                                        Content="{Binding}"
+                                        Height="{StaticResource SegmentHeight}"
+                                        Padding="10,0,10,0"
+                                        Margin="0,0,6,6"
+                                        AutomationProperties.Name="{Binding}"
+                                        Command="{Binding $parent[UserControl].((vm:ChatWorkspaceViewModel)DataContext).ApplyAlternativeCommand}"
+                                        CommandParameter="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Button Theme="{StaticResource SecondaryButton}"
+                            Height="{StaticResource AddOwnWordButtonSize}"
+                            Width="{StaticResource AddOwnWordButtonSize}"
+                            Padding="0"
+                            HorizontalAlignment="Left"
+                            Margin="0,6,0,0"
+                            ToolTip.Tip="Use your own word"
+                            AutomationProperties.Name="Use your own word"
+                            Command="{Binding $parent[UserControl].((vm:ChatWorkspaceViewModel)DataContext).RevealOwnWordFieldCommand}"
+                            IsVisible="{Binding $parent[UserControl].((vm:ChatWorkspaceViewModel)DataContext).IsOwnWordFieldOpen, Converter={x:Static conv:Converters.InverseBoolToVisibility}}">
+                        <controls:IconView Definition="{StaticResource IconPlusSmall}" />
+                    </Button>
+
+                    <Grid Margin="0,8,0,0"
+                          ColumnDefinitions="*,Auto"
+                          IsVisible="{Binding $parent[UserControl].((vm:ChatWorkspaceViewModel)DataContext).IsOwnWordFieldOpen}">
+                        <TextBox Grid.Column="0"
+                                 Theme="{StaticResource TextField}"
+                                 Text="{Binding $parent[UserControl].((vm:ChatWorkspaceViewModel)DataContext).OwnWord, Mode=TwoWay}"
+                                 AutomationProperties.Name="Your own word" />
+                        <Button Grid.Column="1"
+                                Theme="{StaticResource PrimaryButton}"
+                                Content="Use"
+                                Margin="8,0,0,0"
+                                Command="{Binding $parent[UserControl].((vm:ChatWorkspaceViewModel)DataContext).UseOwnWordCommand}"
+                                AutomationProperties.Name="Use this word" />
+                    </Grid>
+
+                    <Button Theme="{StaticResource LinkButton}"
+                            Content="Done"
+                            HorizontalAlignment="Left"
+                            Margin="0,10,0,0"
+                            Command="{Binding $parent[UserControl].((vm:ChatWorkspaceViewModel)DataContext).CloseMemoryWordCommand}"
+                            AutomationProperties.Name="Done" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <StackPanel Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    MaxWidth="{StaticResource EmptyStateMaxWidthPane}"
+                    IsVisible="{Binding HasEntries, Converter={x:Static conv:Converters.InverseBoolToVisibility}}">
+            <controls:Wordmark BarBrush="{StaticResource BrushBorderStrong}"
+                               MarkHeight="26"
+                               HorizontalAlignment="Center" />
+            <TextBlock Text="No translations yet"
+                       Theme="{StaticResource TextTitle}"
+                       HorizontalAlignment="Center"
+                       Margin="0,16,0,0" />
+            <TextBlock Text="Type a word or a sentence below, or attach a PDF, DOCX, MD, JSON or TXT file. Nothing to set up."
+                       Theme="{StaticResource TextProse}"
+                       Foreground="{StaticResource BrushTextSecondary}"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Margin="0,6,0,0" />
+        </StackPanel>
+
+        <Grid Grid.Row="1"
+              MaxWidth="{StaticResource ChatColumnWidth}"
+              HorizontalAlignment="Stretch"
+              Margin="24,0,24,16"
+              RowDefinitions="Auto,Auto,Auto">
+
+            <TextBlock Grid.Row="0"
+                       Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Translation.SelectionNotice}"
+                       Theme="{StaticResource TextMeta}"
+                       Foreground="{StaticResource BrushWarnText}"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Left"
+                       Margin="2,0,2,8"
+                       IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Translation.SelectionNotice, Converter={x:Static conv:Converters.NotEmptyToVisibility}}" />
+
+            <Border Grid.Row="1"
+                    Classes="composer"
+                    Classes.dropTarget="{Binding IsDropTarget}"
+                    BorderThickness="{StaticResource BorderThickness}"
+                    CornerRadius="{StaticResource RadiusComposer}"
+                    Padding="16,12,12,10">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto">
+
+                    <TextBlock Grid.Row="0"
+                               Text="{Binding AttachmentSummary}"
+                               Theme="{StaticResource TextMicro}"
+                               Foreground="{StaticResource BrushTextMuted}"
+                               Margin="0,0,0,6"
+                               IsVisible="{Binding HasAttachments}" />
+
+                    <ScrollViewer Grid.Row="1"
+                                  Theme="{StaticResource ComposerAttachmentsScroll}"
+                                  Margin="0,0,0,10"
+                                  IsVisible="{Binding HasAttachments}">
+                        <ItemsControl x:Name="AttachmentStrip"
+                                      ItemsSource="{Binding Attachments}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:AttachmentViewModel">
+                                    <Border Height="{StaticResource ChipHeight}"
+                                            CornerRadius="{StaticResource ChipRadius}"
+                                            Background="{StaticResource BrushSurface}"
+                                            BorderBrush="{StaticResource BrushBorder}"
+                                            BorderThickness="{StaticResource BorderThickness}"
+                                            Padding="9,0,4,0"
+                                            Margin="0,0,6,6">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <controls:ChromeButton Icon="{StaticResource IconEyePreview}"
+                                                                   Width="{StaticResource Space14}"
+                                                                   Height="{StaticResource Space14}"
+                                                                   Margin="0,0,5,0"
+                                                                   ToolTip.Tip="Preview this file"
+                                                                   AutomationProperties.Name="Preview this file"
+                                                                   IsVisible="{Binding IsMemory, Converter={x:Static conv:Converters.InverseBoolToVisibility}}"
+                                                                   Command="{Binding $parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).PreviewFileCommand}"
+                                                                   CommandParameter="{Binding}" />
+                                            <controls:IconView Definition="{StaticResource IconFileGeneric}"
+                                                               Foreground="{StaticResource BrushTextTertiary}"
+                                                               VerticalAlignment="Center"
+                                                               IsVisible="{Binding IsMemory, Converter={x:Static conv:Converters.InverseBoolToVisibility}}" />
+                                            <controls:IconView Definition="{StaticResource IconMemoryGraphSmall}"
+                                                               Foreground="{StaticResource BrushTextTertiary}"
+                                                               VerticalAlignment="Center"
+                                                               IsVisible="{Binding IsMemory}" />
+                                            <TextBlock Text="{Binding Label}"
+                                                       Theme="{StaticResource TextSecondary}"
+                                                       VerticalAlignment="Center"
+                                                       MaxWidth="150"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Margin="6,0,0,0" />
+                                            <TextBlock Text="{Binding SizeLabel}"
+                                                       Theme="{StaticResource TextMicro}"
+                                                       Foreground="{StaticResource BrushTextMuted}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="6,0,0,0"
+                                                       IsVisible="{Binding HasSize}" />
+                                            <controls:ChromeButton Icon="{StaticResource IconCloseSmall}"
+                                                                   Width="{StaticResource Space14}"
+                                                                   Height="{StaticResource Space14}"
+                                                                   Margin="4,0,0,0"
+                                                                   ToolTip.Tip="Remove this attachment"
+                                                                   AutomationProperties.Name="Remove this attachment"
+                                                                   Command="{Binding $parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).RemoveAttachmentCommand}"
+                                                                   CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <Grid Grid.Row="2">
+                        <TextBox x:Name="ComposerInput"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Padding="0"
+                                 Foreground="{StaticResource BrushText}"
+                                 CaretBrush="{StaticResource BrushText}"
+                                 SelectionBrush="{StaticResource BrushSelection}"
+                                 FontFamily="{StaticResource FontFamilyUi}"
+                                 FontSize="{StaticResource TextBodySize}"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 MinHeight="{StaticResource ComposerMinHeight}"
+                                 MaxHeight="{StaticResource ComposerMaxHeight}"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 AutomationProperties.Name="Type a word or a sentence"
+                                 Text="{Binding Draft, Mode=TwoWay}" />
+
+                        <TextBlock Text="Type a word or a sentence"
+                                   Theme="{StaticResource PlaceholderText}"
+                                   FontSize="{StaticResource TextBodySize}"
+                                   VerticalAlignment="Top"
+                                   IsHitTestVisible="False"
+                                   IsVisible="{Binding Draft, Converter={x:Static conv:Converters.StringEmptyToVisibility}}" />
+                    </Grid>
+
+                    <Grid Grid.Row="3" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" MinWidth="0" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <controls:ChromeButton x:Name="AttachButton"
+                                               Grid.Column="0"
+                                               Icon="{StaticResource IconPlus}"
+                                               Width="{StaticResource ChromeButtonSizeSmall}"
+                                               Height="{StaticResource ChromeButtonSizeSmall}"
+                                               Command="{Binding ToggleAttachMenuCommand}"
+                                               ToolTip.Tip="Attach a file or project memory"
+                                               AutomationProperties.Name="Attach a file or project memory" />
+
+                        <Popup PlacementTarget="{Binding #AttachButton}"
+                               Placement="TopEdgeAlignedLeft"
+                               VerticalOffset="-6"
+                               IsLightDismissEnabled="True"
+                               IsOpen="{Binding IsAttachMenuOpen, Mode=TwoWay}">
+                            <Border Background="{StaticResource BrushSurface}"
+                                    BorderBrush="{StaticResource BrushBorder}"
+                                    BorderThickness="{StaticResource BorderThickness}"
+                                    CornerRadius="{StaticResource RadiusCard}"
+                                    Padding="{StaticResource Space2Thickness}"
+                                    Effect="{StaticResource ShadowPopover}"
+                                    MinWidth="180">
+                                <StackPanel>
+                                    <Button Theme="{StaticResource MenuRowButton}"
+                                            Command="{Binding AttachFilesCommand}"
+                                            AutomationProperties.Name="File">
+                                        <StackPanel Orientation="Horizontal">
+                                            <controls:IconView Definition="{StaticResource IconFileGeneric}"
+                                                               VerticalAlignment="Center" />
+                                            <TextBlock Text="File"
+                                                       Theme="{StaticResource TextDefault}"
+                                                       Margin="8,0,0,0"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Theme="{StaticResource MenuRowButton}"
+                                            Command="{Binding AttachMemoryCommand}"
+                                            AutomationProperties.Name="Memory">
+                                        <StackPanel Orientation="Horizontal">
+                                            <controls:IconView Definition="{StaticResource IconMemoryGraphSmall}"
+                                                               VerticalAlignment="Center" />
+                                            <TextBlock Text="Memory"
+                                                       Theme="{StaticResource TextDefault}"
+                                                       Margin="8,0,0,0"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    Margin="6,0,0,0">
+                            <Button x:Name="SourcePill"
+                                    Theme="{StaticResource LanguagePillButton}"
+                                    Command="{Binding ToggleSourcePickerCommand}"
+                                    ToolTip.Tip="{x:Static res:Strings.DirectionChooseSource}"
+                                    AutomationProperties.Name="{x:Static res:Strings.DirectionChooseSource}">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <ContentPresenter Content="{Binding SourceLanguage}"
+                                                      ContentTemplate="{StaticResource LanguageTile}"
+                                                      VerticalAlignment="Center" />
+                                    <TextBlock Text="{x:Static res:Strings.DirectionSourceLabel}"
+                                               Theme="{StaticResource TextSecondary}"
+                                               Foreground="{StaticResource BrushTextSecondary}"
+                                               Margin="7,0,0,0"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding SourceLanguage.Name}"
+                                               Theme="{StaticResource TextSecondary}"
+                                               Margin="5,0,0,0"
+                                               VerticalAlignment="Center" />
+                                    <controls:IconView Definition="{StaticResource IconChevronDown}"
+                                                       Foreground="{StaticResource BrushTextSecondary}"
+                                                       Margin="5,0,0,0"
+                                                       VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <controls:ChromeButton Icon="{StaticResource IconSwapDirection}"
+                                                   Width="{StaticResource ChromeButtonSizeSmall}"
+                                                   Height="{StaticResource ChromeButtonSizeSmall}"
+                                                   Margin="4,0,4,0"
+                                                   Command="{Binding SwapDirectionCommand}"
+                                                   IsEnabled="{Binding CanSwapDirection}"
+                                                   ToolTip.Tip="{x:Static res:Strings.DirectionSwap}"
+                                                   AutomationProperties.Name="{x:Static res:Strings.DirectionSwap}" />
+
+                            <Button x:Name="LanguagePill"
+                                    Theme="{StaticResource LanguagePillButton}"
+                                    Command="{Binding ToggleLanguagePickerCommand}"
+                                    ToolTip.Tip="{x:Static res:Strings.DirectionChooseTarget}"
+                                    AutomationProperties.Name="{x:Static res:Strings.DirectionChooseTarget}">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <ContentPresenter Content="{Binding Language}"
+                                                      ContentTemplate="{StaticResource LanguageTile}"
+                                                      VerticalAlignment="Center" />
+                                    <TextBlock x:Name="PillTo"
+                                               Text="{x:Static res:Strings.DirectionTargetLabel}"
+                                               Theme="{StaticResource TextSecondary}"
+                                               Foreground="{StaticResource BrushTextSecondary}"
+                                               Margin="7,0,0,0"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock x:Name="PillLanguage"
+                                               Text="{Binding Language.Name}"
+                                               Theme="{StaticResource TextSecondary}"
+                                               Margin="5,0,0,0"
+                                               VerticalAlignment="Center" />
+                                    <controls:IconView Definition="{StaticResource IconChevronDown}"
+                                                       Foreground="{StaticResource BrushTextSecondary}"
+                                                       Margin="5,0,0,0"
+                                                       VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+
+                        <Popup PlacementTarget="{Binding #SourcePill}"
+                               Placement="TopEdgeAlignedLeft"
+                               VerticalOffset="-6"
+                               IsLightDismissEnabled="True"
+                               IsOpen="{Binding IsSourcePickerOpen, Mode=TwoWay}">
+                            <Border Background="{StaticResource BrushSurface}"
+                                    BorderBrush="{StaticResource BrushBorder}"
+                                    BorderThickness="{StaticResource BorderThickness}"
+                                    CornerRadius="{StaticResource RadiusCard}"
+                                    Padding="{StaticResource Space2Thickness}"
+                                    Effect="{StaticResource ShadowPopover}"
+                                    Width="{StaticResource LanguagePickerWidth}">
+                                <Grid RowDefinitions="Auto,*">
+
+                                    <Grid Grid.Row="0" Margin="2,2,2,0">
+                                        <TextBox Theme="{StaticResource TextField}"
+                                                 Text="{Binding SourceLanguageSearch, Mode=TwoWay}"
+                                                 Padding="30,0,9,0"
+                                                 AutomationProperties.Name="Search languages" />
+
+                                        <controls:IconView Definition="{StaticResource IconSearch}"
+                                                           Foreground="{StaticResource BrushTextMuted}"
+                                                           HorizontalAlignment="Left"
+                                                           VerticalAlignment="Center"
+                                                           Margin="9,0,0,0"
+                                                           IsHitTestVisible="False" />
+
+                                        <TextBlock Text="Search languages"
+                                                   Theme="{StaticResource PlaceholderText}"
+                                                   Margin="30,0,9,0"
+                                                   VerticalAlignment="Center"
+                                                   IsHitTestVisible="False"
+                                                   IsVisible="{Binding SourceLanguageSearch, Converter={x:Static conv:Converters.StringEmptyToVisibility}}" />
+                                    </Grid>
+
+                                    <ScrollViewer Grid.Row="1"
+                                                  MaxHeight="{StaticResource LanguagePickerMaxHeight}"
+                                                  Margin="0,8,0,0"
+                                                  VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Disabled">
+                                        <ItemsControl ItemsSource="{Binding SourceLanguagesView}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:TargetLanguage">
+                                                    <Button Theme="{StaticResource MenuRowButton}"
+                                                            AutomationProperties.Name="{Binding Name}"
+                                                            IsEnabled="{Binding IsAvailable}"
+                                                            ToolTip.Tip="{Binding Reason}"
+                                                            ToolTip.ShowOnDisabled="True"
+                                                            Command="{Binding $parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).ChooseSourceLanguageCommand}"
+                                                            CommandParameter="{Binding}">
+                                                        <Grid ColumnDefinitions="Auto,*">
+                                                            <ContentPresenter Grid.Column="0"
+                                                                              Content="{Binding}"
+                                                                              ContentTemplate="{StaticResource LanguageTile}"
+                                                                              VerticalAlignment="Center" />
+
+                                                            <StackPanel Grid.Column="1"
+                                                                        Orientation="Horizontal"
+                                                                        Margin="9,0,0,0"
+                                                                        VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding Name}"
+                                                                           Theme="{StaticResource TextDefault}"
+                                                                           VerticalAlignment="Center" />
+                                                                <TextBlock Text="{Binding NativeName}"
+                                                                           Theme="{StaticResource TextMeta}"
+                                                                           Foreground="{StaticResource BrushTextMuted}"
+                                                                           Margin="7,0,0,0"
+                                                                           VerticalAlignment="Center" />
+                                                            </StackPanel>
+                                                        </Grid>
+                                                    </Button>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+                        </Popup>
+
+                        <Popup PlacementTarget="{Binding #LanguagePill}"
+                               Placement="TopEdgeAlignedLeft"
+                               VerticalOffset="-6"
+                               IsLightDismissEnabled="True"
+                               IsOpen="{Binding IsLanguagePickerOpen, Mode=TwoWay}">
+                            <Border Background="{StaticResource BrushSurface}"
+                                    BorderBrush="{StaticResource BrushBorder}"
+                                    BorderThickness="{StaticResource BorderThickness}"
+                                    CornerRadius="{StaticResource RadiusCard}"
+                                    Padding="{StaticResource Space2Thickness}"
+                                    Effect="{StaticResource ShadowPopover}"
+                                    Width="{StaticResource LanguagePickerWidth}">
+                                <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+                                    <Grid Grid.Row="0" Margin="2,2,2,0">
+                                        <TextBox x:Name="LanguageSearchField"
+                                                 Theme="{StaticResource TextField}"
+                                                 Text="{Binding LanguageSearch, Mode=TwoWay}"
+                                                 Padding="30,0,9,0"
+                                                 AutomationProperties.Name="Search languages" />
+
+                                        <controls:IconView Definition="{StaticResource IconSearch}"
+                                                           Foreground="{StaticResource BrushTextMuted}"
+                                                           HorizontalAlignment="Left"
+                                                           VerticalAlignment="Center"
+                                                           Margin="9,0,0,0"
+                                                           IsHitTestVisible="False" />
+
+                                        <TextBlock Text="Search languages"
+                                                   Theme="{StaticResource PlaceholderText}"
+                                                   Margin="30,0,9,0"
+                                                   VerticalAlignment="Center"
+                                                   IsHitTestVisible="False"
+                                                   IsVisible="{Binding LanguageSearch, Converter={x:Static conv:Converters.StringEmptyToVisibility}}" />
+                                    </Grid>
+
+                                    <TextBlock Grid.Row="1"
+                                               Theme="{StaticResource TextMeta}"
+                                               Foreground="{StaticResource BrushTextMuted}"
+                                               Margin="10,8,10,6">
+                                        <Run Text="{Binding AvailableLanguageCount, Mode=OneWay}" />
+                                        <Run Text="languages in" />
+                                        <Run Text="{Binding LanguageModelName, Mode=OneWay}" />
+                                    </TextBlock>
+
+                                    <ScrollViewer Grid.Row="2"
+                                                  MaxHeight="{StaticResource LanguagePickerMaxHeight}"
+                                                  VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Disabled">
+                                        <ItemsControl ItemsSource="{Binding LanguagesView}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:TargetLanguage">
+                                                    <Button Theme="{StaticResource MenuRowButton}"
+                                                            AutomationProperties.Name="{Binding Name}"
+                                                            AutomationProperties.HelpText="{Binding Reason}"
+                                                            IsEnabled="{Binding IsAvailable}"
+                                                            ToolTip.Tip="{Binding Reason}"
+                                                            ToolTip.ShowOnDisabled="True"
+                                                            Height="NaN"
+                                                            MinHeight="{StaticResource MenuItemHeight}"
+                                                            Padding="9,3,12,3"
+                                                            Command="{Binding $parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).ChooseLanguageCommand}"
+                                                            CommandParameter="{Binding}">
+                                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                                            <ContentPresenter Grid.Column="0"
+                                                                              Content="{Binding}"
+                                                                              ContentTemplate="{StaticResource LanguageTile}"
+                                                                              VerticalAlignment="Center" />
+
+                                                            <StackPanel Grid.Column="1"
+                                                                        Margin="9,0,0,0"
+                                                                        VerticalAlignment="Center">
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <TextBlock Text="{Binding Name}"
+                                                                               Theme="{StaticResource TextDefault}"
+                                                                               VerticalAlignment="Center" />
+                                                                    <TextBlock Text="{Binding NativeName}"
+                                                                               Theme="{StaticResource TextMeta}"
+                                                                               Foreground="{StaticResource BrushTextMuted}"
+                                                                               Margin="7,0,0,0"
+                                                                               VerticalAlignment="Center" />
+                                                                </StackPanel>
+
+                                                                <TextBlock Text="{Binding Reason}"
+                                                                           Theme="{StaticResource TextMicro}"
+                                                                           Foreground="{StaticResource BrushTextMuted}"
+                                                                           TextTrimming="CharacterEllipsis"
+                                                                           IsVisible="{Binding IsUnavailable}" />
+                                                            </StackPanel>
+
+                                                            <controls:IconView Grid.Column="2"
+                                                                               Definition="{StaticResource IconCheckDone}"
+                                                                               Foreground="{StaticResource BrushAccentDeep}"
+                                                                               VerticalAlignment="Center"
+                                                                               Margin="8,0,0,0">
+                                                                <controls:IconView.IsVisible>
+                                                                    <MultiBinding Converter="{x:Static conv:Converters.EqualToVisibility}">
+                                                                        <Binding Path="Code" />
+                                                                        <Binding Path="$parent[ItemsControl].((vm:ChatWorkspaceViewModel)DataContext).Language.Code" />
+                                                                    </MultiBinding>
+                                                                </controls:IconView.IsVisible>
+                                                            </controls:IconView>
+                                                        </Grid>
+                                                    </Button>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+
+                                    <TextBlock Grid.Row="3"
+                                               Text="{Binding NoLanguageMatchNote}"
+                                               Theme="{StaticResource TextMeta}"
+                                               Foreground="{StaticResource BrushTextMuted}"
+                                               TextWrapping="Wrap"
+                                               Margin="10,8,10,4"
+                                               IsVisible="{Binding NoLanguageMatchNote, Converter={x:Static conv:Converters.NotEmptyToVisibility}}" />
+                                </Grid>
+                            </Border>
+                        </Popup>
+
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding DirectionReason}"
+                                   Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushWarnText}"
+                                   TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center"
+                                   Margin="12,0,12,0"
+                                   IsVisible="{Binding HasDirectionReason}" />
+
+                        <Button x:Name="EffortButton"
+                                Grid.Column="2"
+                                Theme="{StaticResource LanguagePillButton}"
+                                HorizontalAlignment="Right"
+                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Translation.ToggleEffortMenuCommand}"
+                                ToolTip.Tip="Choose how much thinking to spend"
+                                AutomationProperties.Name="Choose how much thinking to spend">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <controls:IconView Definition="{StaticResource IconThinkingBubble}"
+                                                   Foreground="{StaticResource BrushTextSecondary}"
+                                                   VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Translation.EffortLabel}"
+                                           Theme="{StaticResource TextSecondary}"
+                                           Margin="6,0,0,0"
+                                           VerticalAlignment="Center" />
+                                <controls:IconView Definition="{StaticResource IconChevronDown}"
+                                                   Foreground="{StaticResource BrushTextSecondary}"
+                                                   Margin="5,0,0,0"
+                                                   VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <Popup PlacementTarget="{Binding #EffortButton}"
+                               Placement="TopEdgeAlignedRight"
+                               VerticalOffset="-6"
+                               IsLightDismissEnabled="True"
+                               IsOpen="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Translation.IsEffortMenuOpen, Mode=TwoWay}">
+                            <Border Background="{StaticResource BrushSurface}"
+                                    BorderBrush="{StaticResource BrushBorder}"
+                                    BorderThickness="{StaticResource BorderThickness}"
+                                    CornerRadius="{StaticResource RadiusCard}"
+                                    Padding="{StaticResource Space2Thickness}"
+                                    Effect="{StaticResource ShadowPopover}"
+                                    MinWidth="240">
+                                <ItemsControl ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Translation.Efforts}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:EffortOptionViewModel">
+                                            <Button Theme="{StaticResource MenuRowButton}"
+                                                    Height="NaN"
+                                                    Padding="9,7,12,8"
+                                                    ToolTip.Tip="{Binding BlockedTooltip}"
+                                                    AutomationProperties.Name="{Binding Label}"
+                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Translation.ChooseEffortCommand}"
+                                                    CommandParameter="{Binding}">
+                                                <Grid MinWidth="200">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Label}"
+                                                                   Theme="{StaticResource TextDefault}"
+                                                                   Classes="effortLabel"
+                                                                   Classes.blocked="{Binding IsBlocked}" />
+                                                        <TextBlock Text="{Binding Note}"
+                                                                   Theme="{StaticResource TextMeta}"
+                                                                   Foreground="{StaticResource BrushTextSecondary}"
+                                                                   Margin="0,2,0,0" />
+                                                    </StackPanel>
+
+                                                    <TextBlock Text="{Binding InstallHint}"
+                                                               Theme="{StaticResource TextMeta}"
+                                                               Foreground="{StaticResource BrushAccent}"
+                                                               HorizontalAlignment="Right"
+                                                               VerticalAlignment="Center"
+                                                               IsVisible="{Binding InstallHint, Converter={x:Static conv:Converters.NotEmptyToVisibility}}" />
+                                                </Grid>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Popup>
+
+                        <controls:ChromeButton Grid.Column="3"
+                                               Theme="{StaticResource SendButton}"
+                                               Icon="{StaticResource IconSendArrow}"
+                                               Command="{Binding SendCommand}"
+                                               IsEnabled="{Binding CanSend}"
+                                               ToolTip.Tip="Translate"
+                                               AutomationProperties.Name="Translate"
+                                               IsVisible="{Binding IsGenerating, Converter={x:Static conv:Converters.InverseBoolToVisibility}}" />
+
+                        <controls:ChromeButton Grid.Column="3"
+                                               Theme="{StaticResource SendButton}"
+                                               Icon="{StaticResource IconCloseCrossSearch}"
+                                               Command="{Binding StopGenerationCommand}"
+                                               ToolTip.Tip="Stop translating. What has come back so far is kept."
+                                               AutomationProperties.Name="Stop translating"
+                                               IsVisible="{Binding IsGenerating}" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <WrapPanel Grid.Row="2"
+                       HorizontalAlignment="Center"
+                       Margin="0,8,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <Border Theme="{StaticResource Keycap}"
+                            AutomationProperties.Name="Enter">
+                        <controls:IconView Definition="{StaticResource IconKeyEnter}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                    </Border>
+
+                    <TextBlock Text="Translate"
+                               Theme="{StaticResource TextFine}"
+                               Foreground="{StaticResource BrushTextMuted}"
+                               VerticalAlignment="Center"
+                               Margin="6,0,0,0" />
+
+                    <Border Theme="{StaticResource Keycap}"
+                            AutomationProperties.Name="Shift"
+                            Margin="16,0,0,0">
+                        <controls:IconView Definition="{StaticResource IconKeyShift}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                    </Border>
+
+                    <Border Theme="{StaticResource Keycap}"
+                            AutomationProperties.Name="Enter"
+                            Margin="3,0,0,0">
+                        <controls:IconView Definition="{StaticResource IconKeyEnter}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                    </Border>
+
+                    <TextBlock Text="New line"
+                               Theme="{StaticResource TextFine}"
+                               Foreground="{StaticResource BrushTextMuted}"
+                               VerticalAlignment="Center"
+                               Margin="6,0,0,0" />
+                </StackPanel>
+
+                <TextBlock Text="{x:Static res:Strings.ComposerDisclaimer}"
+                           Theme="{StaticResource TextMicro}"
+                           Foreground="{StaticResource BrushTextMuted}"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"
+                           IsHitTestVisible="False"
+                           Focusable="False"
+                           Margin="20,0,0,0" />
+            </WrapPanel>
+        </Grid>
+
+        <controls:IconView x:Name="DropMark"
+                           Grid.Row="0"
+                           Definition="{StaticResource IconUpload}"
+                           Foreground="{StaticResource BrushAccentDeep}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           RenderTransformOrigin="50%,50%"
+                           IsHitTestVisible="False"
+                           IsVisible="{Binding IsDropTarget}" />
+    </Grid>
+</UserControl>

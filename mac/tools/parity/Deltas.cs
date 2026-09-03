@@ -16,6 +16,12 @@ public sealed class DeltaEntry
 
     [JsonPropertyName("reason")]
     public string Reason { get; set; } = string.Empty;
+
+    [JsonPropertyName("deferred")]
+    public bool Deferred { get; set; }
+
+    [JsonPropertyName("deferredReason")]
+    public string DeferredReason { get; set; } = string.Empty;
 }
 
 public sealed class DeltaFile

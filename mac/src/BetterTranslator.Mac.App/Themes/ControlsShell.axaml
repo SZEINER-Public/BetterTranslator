@@ -57,7 +57,7 @@
         </Style>
     </ControlTheme>
 
-    <ControlTheme TargetType="controls:ChromeButton">
+    <ControlTheme x:Key="{x:Type controls:ChromeButton}" TargetType="controls:ChromeButton">
         <Setter Property="Width" Value="{StaticResource ChromeButtonSize}" />
         <Setter Property="Height" Value="{StaticResource ChromeButtonSize}" />
         <Setter Property="Background" Value="Transparent" />
@@ -302,7 +302,7 @@
         </Style>
     </ControlTheme>
 
-    <ControlTheme TargetType="controls:SegmentedControl">
+    <ControlTheme x:Key="{x:Type controls:SegmentedControl}" TargetType="controls:SegmentedControl">
         <Setter Property="Background" Value="{StaticResource BrushTrack}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="{StaticResource Space1Thickness}" />
@@ -333,7 +333,7 @@
         </Setter>
     </ControlTheme>
 
-    <ControlTheme TargetType="controls:ResizeSeparator">
+    <ControlTheme x:Key="{x:Type controls:ResizeSeparator}" TargetType="controls:ResizeSeparator">
         <Setter Property="Width" Value="{StaticResource SeparatorHitWidth}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="ZIndex" Value="1" />

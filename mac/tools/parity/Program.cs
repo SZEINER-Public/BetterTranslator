@@ -37,6 +37,7 @@ public static class Program
 
         var registered = screens.Select(s => s.Id).ToHashSet(StringComparer.Ordinal);
         var stale = deltas.Deltas
+            .Where(d => !d.Deferred)
             .SelectMany(d => d.Screens)
             .Where(s => s != "*" && !registered.Contains(s))
             .Distinct(StringComparer.Ordinal)
@@ -121,7 +122,7 @@ public static class Program
     private static TreeRecord? ReadTree(string path) =>
         File.Exists(path) ? JsonSerializer.Deserialize<TreeRecord>(File.ReadAllText(path), TreeOptions) : null;
 
-    private static readonly JsonSerializerOptions TreeOptions = new() { WriteIndented = true };
+    private static readonly JsonSerializerOptions TreeOptions = new() { WriteIndented = true, MaxDepth = 512 };
 
     private static string HostNote() =>
         $"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} on {System.Runtime.InteropServices.RuntimeInformation.OSArchitecture}. "

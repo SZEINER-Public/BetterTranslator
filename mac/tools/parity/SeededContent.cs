@@ -13,7 +13,7 @@ public static class SeededContent
     {
         var root = Path.Combine(parityOut, ".seed");
 
-        _seed = SeedFactory.CreateAsync(root).GetAwaiter().GetResult();
+        _seed = Pump.Wait(SeedFactory.CreateAsync(root));
     }
 
     private static SeedFactory Seed =>

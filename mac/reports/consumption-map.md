@@ -67,4 +67,4 @@ These Windows implementations are neither linked nor mirrored. The wrapper suppl
 
 ## Blocked (L4)
 
-Four items, listed with proposals in `blocked.md`: the native library resolver conflict in `BetterRuntime.cs`, the `kernel32` load path in `RuntimeSupport.cs`, the `.exe` host path in `HostedSession.cs`, and offscreen WPF capture on a non-Windows host.
+Five items, listed with proposals in `blocked.md`: the native library resolver conflict in `BetterRuntime.cs`, the `kernel32` load path in `RuntimeSupport.cs`, the `.exe` host path in `HostedSession.cs`, the get-only `MainWindowViewModel.Updates` that binds the Windows service gateway, and offscreen WPF capture on a non-Windows host.

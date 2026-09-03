@@ -4,6 +4,7 @@ The host for this run is macOS 26 on Apple silicon, with the .NET 10.0.400 SDK p
 
 | Item | Why it is deferred | What would verify it |
 |---|---|---|
+| The window shell itself, and with it the traffic lights and the native menu bar | `MainWindowViewModel` is a composition root: its parameterless constructor opens the profile database, starts the agent server and constructs a `LocalTranslator` (`MainWindowViewModel.cs:58-258`). The parity harness therefore registers the views, not the window, and the two window-level deltas are declared in `deltas.json` with `deferred: true` rather than exercised | run the harness on a macOS desktop session against a seeded profile root, or give `MainWindowViewModel` an injectable `AppPaths` |
 | Native menu bar placement | requires a running windowed session on the interactive desktop; opening one is forbidden for this run | launch the head on a macOS desktop session and read the menu bar |
 | Traffic light window controls | same; `ExtendClientAreaToDecorationsHint` and the inset are declared but their painted result was not observed | same |
 | Command key accelerators | declared as `KeyGesture` with `Cmd`; the platform mapping was not exercised | same |

@@ -441,7 +441,7 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <ItemsControl ItemsSource="{Binding Settings.Catalogue}" Margin="0,16,0,0" MaxWidth="470" HorizontalAlignment="Left">
+                        <ItemsControl ItemsSource="{Binding Catalogue}" Margin="0,16,0,0" MaxWidth="470" HorizontalAlignment="Left">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="vm:CatalogueRow">
                                     <Border Theme="{StaticResource SourceCard}">

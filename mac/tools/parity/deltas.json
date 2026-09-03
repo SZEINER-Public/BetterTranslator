@@ -8,7 +8,9 @@
         "main-window-shell"
       ],
       "region": "titlebar caption controls",
-      "reason": "macOS draws close, minimise and zoom as traffic lights at the leading edge, painted by the platform. The Windows head draws minimise, maximise and close as 46 wide caption buttons at the trailing edge. The platform owns the control, so neither its geometry nor its position can match."
+      "reason": "macOS draws close, minimise and zoom as traffic lights at the leading edge, painted by the platform. The Windows head draws minimise, maximise and close as 46 wide caption buttons at the trailing edge. The platform owns the control, so neither its geometry nor its position can match.",
+      "deferred": true,
+      "deferredReason": "MainWindowViewModel is a composition root: its parameterless constructor opens the profile database, starts the agent server and constructs a LocalTranslator. The window shell is therefore not rendered offscreen in this run, so this delta is declared but not exercised. See deferred-macos.md."
     },
     {
       "id": "menu-bar",
@@ -16,12 +18,13 @@
         "main-window-shell"
       ],
       "region": "application menu bar",
-      "reason": "macOS carries the application menu in the system menu bar outside the window. The Windows head has no menu bar at all, so the wrapper gains a surface the Windows head never renders."
+      "reason": "macOS carries the application menu in the system menu bar outside the window. The Windows head has no menu bar at all, so the wrapper gains a surface the Windows head never renders.",
+      "deferred": true,
+      "deferredReason": "MainWindowViewModel is a composition root: its parameterless constructor opens the profile database, starts the agent server and constructs a LocalTranslator. The window shell is therefore not rendered offscreen in this run, so this delta is declared but not exercised. See deferred-macos.md."
     },
     {
       "id": "command-accelerators",
       "screens": [
-        "main-window-shell",
         "chat-populated",
         "settings-memory",
         "settings-your-data",
@@ -82,8 +85,7 @@
       "id": "cpu-only-backend-section",
       "screens": [
         "settings-runtime",
-        "first-run-choosing",
-        "main-window-shell"
+        "first-run-choosing"
       ],
       "region": "runtime backend section",
       "reason": "The wrapper runs the CPU inference backend and nothing else. The Windows accelerator picker, its hardware line, its install and repair flow and its restart notice are absent from the wrapper's view tree rather than disabled, and are replaced by a single CPU-only statement driven by the backend seam."

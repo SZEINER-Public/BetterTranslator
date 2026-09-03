@@ -143,11 +143,11 @@ public sealed class SeedFactory
         var paths = new AppPaths(root);
         var database = new Database(paths);
 
-        database.MigrateAsync(CancellationToken.None).GetAwaiter().GetResult();
+        Pump.Wait(database.MigrateAsync(CancellationToken.None));
 
         var workspace = new ChatWorkspaceViewModel(new ChatStore(database), Clock, dialog => dialog);
 
-        workspace.LoadAsync(CancellationToken.None).GetAwaiter().GetResult();
+        Pump.Wait(workspace.LoadAsync(CancellationToken.None));
 
         return workspace;
     }
@@ -156,7 +156,7 @@ public sealed class SeedFactory
     {
         var workspace = new ChatWorkspaceViewModel(new ChatStore(Database), Clock, dialog => dialog);
 
-        workspace.LoadAsync(CancellationToken.None).GetAwaiter().GetResult();
+        Pump.Wait(workspace.LoadAsync(CancellationToken.None));
 
         return workspace;
     }
@@ -170,9 +170,12 @@ public sealed class SeedFactory
             _ => Task.CompletedTask,
             () => { },
             () => Task.CompletedTask,
-            () => { });
+            () => { })
+        {
+            Updates = new UpdatesViewModel(new MacUpdaterHost(Updates)),
+        };
 
-        settings.LoadAsync(CancellationToken.None).GetAwaiter().GetResult();
+        Pump.Wait(settings.LoadAsync(CancellationToken.None));
 
         return settings;
     }

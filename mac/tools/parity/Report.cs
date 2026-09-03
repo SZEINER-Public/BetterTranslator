@@ -62,12 +62,23 @@ public static class Report
 
         foreach (var outcome in outcomes)
         {
-            foreach (var gate in outcome.Gates.Where(g => g.Verdict is not GateVerdict.Pass))
+            foreach (var gate in outcome.Gates.Where(g => g.Verdict is GateVerdict.Fail))
             {
                 text.Append("| ").Append(outcome.Screen).Append(" | ").Append(outcome.Size).Append(" | ")
-                    .Append(gate.Gate).Append(" | ").Append(gate.Verdict.ToString().ToUpperInvariant()).Append(" | ")
-                    .Append(Escape(gate.Detail)).AppendLine(" |");
+                    .Append(gate.Gate).Append(" | FAIL | ").Append(Escape(gate.Detail)).AppendLine(" |");
             }
+        }
+
+        var deferred = outcomes.SelectMany(o => o.Gates)
+            .Where(g => g.Verdict is GateVerdict.Deferred or GateVerdict.Delta)
+            .GroupBy(g => (g.Gate, g.Verdict, g.Detail))
+            .OrderBy(g => g.Key.Gate);
+
+        foreach (var group in deferred)
+        {
+            text.Append("| every screen (").Append(group.Count()).Append(" captures) | both | ")
+                .Append(group.Key.Gate).Append(" | ").Append(group.Key.Verdict.ToString().ToUpperInvariant()).Append(" | ")
+                .Append(Escape(group.Key.Detail)).AppendLine(" |");
         }
 
         text.AppendLine();
@@ -75,13 +86,16 @@ public static class Report
         text.AppendLine();
         text.AppendLine(deltas.Note);
         text.AppendLine();
-        text.AppendLine("| Delta | Region | Screens | Reason |");
-        text.AppendLine("|---|---|---|---|");
+        text.AppendLine("| Delta | Region | Screens | Exercised | Reason |");
+        text.AppendLine("|---|---|---|---|---|");
 
         foreach (var delta in deltas.Deltas)
         {
             text.Append("| ").Append(delta.Id).Append(" | ").Append(delta.Region).Append(" | ")
-                .Append(string.Join(", ", delta.Screens)).Append(" | ").Append(Escape(delta.Reason)).AppendLine(" |");
+                .Append(string.Join(", ", delta.Screens)).Append(" | ")
+                .Append(delta.Deferred ? "deferred" : "yes").Append(" | ")
+                .Append(Escape(delta.Deferred ? delta.Reason + " " + delta.DeferredReason : delta.Reason))
+                .AppendLine(" |");
         }
 
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);

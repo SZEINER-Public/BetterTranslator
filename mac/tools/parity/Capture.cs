@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Shapes;
 using Avalonia.Headless;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -34,7 +36,7 @@ public static class Capture
         AvaloniaHeadlessPlatform.ForceRenderTimerTick();
 
         Directory.CreateDirectory(outputFolder);
-        var pngPath = Path.Combine(outputFolder, "mac.png");
+        var pngPath = System.IO.Path.Combine(outputFolder, "mac.png");
 
         var frame = window.CaptureRenderedFrame();
         frame?.Save(pngPath);
@@ -77,7 +79,8 @@ public static class Capture
         return node;
     }
 
-    private static double Round(double value) => Math.Round(value, 2, MidpointRounding.AwayFromZero);
+    private static double Round(double value) =>
+        double.IsFinite(value) ? Math.Round(value, 2, MidpointRounding.AwayFromZero) : 0;
 
     private static string Role(Visual visual) =>
         visual is Control { Name: { Length: > 0 } name }
@@ -91,10 +94,14 @@ public static class Capture
         _ => null,
     };
 
-    private static double? FontSizeOf(Visual visual) =>
-        visual is TextBlock block ? block.FontSize
-        : visual is TemplatedControl control ? control.FontSize
-        : null;
+    private static double? FontSizeOf(Visual visual)
+    {
+        var size = visual is TextBlock block ? block.FontSize
+            : visual is TemplatedControl control ? control.FontSize
+            : (double?)null;
+
+        return size is { } value && double.IsFinite(value) ? value : null;
+    }
 
     private static IBrush? Foreground(Visual visual) => visual switch
     {
