@@ -42,7 +42,7 @@ those terms would apply separately to anyone who chooses to bundle one.
 
 ## Shipped with the application
 
-These are the 43 distinct packages in the restored dependency graph of `BetterTranslator.App`,
+These are the 45 distinct packages in the restored dependency graph of `BetterTranslator.App`,
 `Core`, `Engine`, `Indexing`, `Map`, `Runtime`, `Cli` and `Host`.
 
 | Package | Version | License |
@@ -63,6 +63,8 @@ These are the 43 distinct packages in the restored dependency graph of `BetterTr
 | Microsoft.Extensions.Logging.Abstractions | 10.0.10 | MIT |
 | Microsoft.Extensions.Options | 10.0.10 | MIT |
 | Microsoft.Extensions.Primitives | 10.0.10 | MIT |
+| Microsoft.ML.OnnxRuntime | 1.29.0 | MIT, from the `LICENSE` file the package carries |
+| Microsoft.ML.OnnxRuntime.Managed | 1.29.0 | MIT, from the `LICENSE.txt` the package carries |
 | ModelContextProtocol | 2.1.0 | Apache-2.0 |
 | ModelContextProtocol.AspNetCore | 2.1.0 | Apache-2.0 |
 | ModelContextProtocol.Core | 2.1.0 | Apache-2.0 |
@@ -94,7 +96,8 @@ These are the 43 distinct packages in the restored dependency graph of `BetterTr
 Some of these carry prebuilt native binaries that are redistributed as they are, rather than
 compiled from source in this repository: `SkiaSharp.NativeAssets.Win32` and
 `SkiaSharp.NativeAssets.macOS` carry the Skia libraries, `SQLitePCLRaw.lib.e_sqlite3` carries
-SQLite, and `OpenTK.redist.glfw` carries GLFW.
+SQLite, `OpenTK.redist.glfw` carries GLFW, and `Microsoft.ML.OnnxRuntime` carries the ONNX Runtime
+library.
 
 ## Build and test only
 
@@ -117,7 +120,9 @@ covered by this file or by `LICENSE`.
 ## Not covered here
 
 The translation models the application downloads at run time are not part of this repository and
-carry their own licenses from their publishers. The BetterRuntime native inference library is built
+carry their own licenses from their publishers. The same holds for the sentence embedding model the
+semantic checks read from the models folder (`intfloat/multilingual-e5-small`, published under MIT),
+which is never committed here. The BetterRuntime native inference library is built
 out of tree and is not distributed from here.
 
 ## Regenerating

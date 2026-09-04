@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.29.0" />
     <!-- Microsoft.Data.Sqlite pulls e_sqlite3 2.1.11 transitively, which
          carries advisory GHSA-2m69-gcr7-jv3q. Pinned forward to the patched
          build; this is version management of an existing transitive

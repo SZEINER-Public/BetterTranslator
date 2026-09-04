@@ -67,4 +67,15 @@ public static class CheckId
 
         public const string ForcedDecodeAdequacy = "RUN-103";
     }
+
+    public static class Semantics
+    {
+        public const string Category = "SEM";
+
+        public const string EmbeddingSimilarity = "SEM-101";
+
+        public const string ReverseTranslation = "SEM-102";
+
+        public const string ReverseComparison = "SEM-103";
+    }
 }
