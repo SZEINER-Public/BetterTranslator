@@ -66,7 +66,7 @@ public sealed class TranslationGateway : IDisposable
             _registry.Resolve(settings.TargetLanguage)?.Code,
             new AppPaths().DictionariesFolder,
             semantics: _ => (_engine as LocalTranslationEngine)?.Translator is { Session: { IsAlive: true } session, LastJob: { } template }
-                ? Verification.SemanticRuntime.Services(_installPaths, session, template)
+                ? Verification.SemanticRuntime.Services(_installPaths, session, template, Verification.SemanticRuntime.SettingsFor(_settings.Verification))
                 : null);
         _chats = new ChatWriter(new ChatStore(database));
 
@@ -636,6 +636,9 @@ public sealed class TranslationGateway : IDisposable
                     {
                         flagged += verified.Spans.Count(s => !s.Exempt && s.Tier != Core.Verification.SeverityTier.Clean);
                     }
+
+                    tokens += verified.Gate?.Escalation?.ReverseTokens ?? 0;
+                    elapsed += TimeSpan.FromMilliseconds(verified.Gate?.Escalation?.ReverseDurationMs ?? 0);
                 }
 
                 tokens += answer.GeneratedTokens;
@@ -652,6 +655,9 @@ public sealed class TranslationGateway : IDisposable
         var verification = content.Text is { Length: > 0 }
             ? _pipeline.Verify(source, content.Text, content.Segments, direction.Source.Code.Value, direction.Target.Code.Value)
             : null;
+
+        tokens += verification?.Gate?.Escalation?.ReverseTokens ?? 0;
+        elapsed += TimeSpan.FromMilliseconds(verification?.Gate?.Escalation?.ReverseDurationMs ?? 0);
 
         return new ContentRun(content, tokens, elapsed) { Flagged = flagged, Verification = verification };
     }

@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using BetterTranslator.Core.Models;
 using BetterTranslator.Core.Services;
+using BetterTranslator.Core.Verification.Checks.Semantics;
 using BetterTranslator.Runtime.Downloads;
 using BetterTranslator.Runtime.Inference;
 using BetterTranslator.Runtime.Models;
@@ -570,6 +571,49 @@ public sealed partial class SettingsViewModel : ObservableObject
     public static string UnsureThresholdNote =>
         "Anything the engine is less certain about than this gets a dotted underline and shows up under Unsure.";
 
+    [ObservableProperty]
+    public partial string SemanticReverseCapText { get; set; } = SemanticSettings.Default.ReverseCap.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    [ObservableProperty]
+    public partial string EmbeddingModelStatus { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool IsEmbeddingModelInstalled { get; set; }
+
+    public bool EmbeddingModelNeedsInstall => !IsEmbeddingModelInstalled;
+
+    partial void OnIsEmbeddingModelInstalledChanged(bool value) => OnPropertyChanged(nameof(EmbeddingModelNeedsInstall));
+
+    public static string EmbeddingModelTitle => "Semantic checks";
+
+    public static string SemanticReverseCapNote =>
+        "Reverse translations the semantic stage may spend per answer, one per flagged span, each a call on the loaded model. "
+        + "0 switches reverse translation off; the similarity check still runs on the flagged spans.";
+
+    public int SemanticReverseCap =>
+        int.TryParse(SemanticReverseCapText, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var cap)
+            ? Math.Max(0, cap)
+            : _settings.Verification.SemanticReverseCap;
+
+    private void RefreshEmbeddingModelStatus()
+    {
+        var component = ComponentCatalog.Optional.Single(c => c.Kind == ComponentKind.Verification);
+        var installed = InstalledPath(component) is not null;
+
+        IsEmbeddingModelInstalled = installed;
+        EmbeddingModelStatus = installed
+            ? $"{component.Name} is installed in {_paths.ModelsFolder}. The similarity, reverse translation and reverse comparison checks can run."
+            : $"{component.Name} is not installed ({ByteSize.Format(component.InstallBytes)}, {EmbeddingModelDescription.MultilingualE5Small.License}). "
+              + "The semantic checks stay skipped until it is. Tick it in the download list to install it; nothing is fetched on its own.";
+    }
+
+    [RelayCommand]
+    private void GetEmbeddingModel()
+    {
+        _close();
+        _openDownloads();
+    }
+
     // ---- Your data ----
 
     public ObservableCollection<CacheEntry> CacheRows { get; } = [];
@@ -625,6 +669,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         ScopeIsWholeProject = settings.DefaultScopeForNewChats == ChatScope.WholeProject;
         UnsureThreshold = settings.UnsureThresholdPercent;
         SelectedBackend = settings.RuntimeBackend;
+        SemanticReverseCapText = settings.Verification.SemanticReverseCap.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
         McpEnabled = settings.McpEnabled;
         McpHost = settings.McpHost;
@@ -674,12 +719,18 @@ public sealed partial class SettingsViewModel : ObservableObject
             InstalledModels.Add(new InstalledModelRow(
                 component.Id,
                 component.Name,
-                component.Kind == ComponentKind.Runtime ? "Runtime" : "Model - translation model",
+                component.Kind switch
+                {
+                    ComponentKind.Runtime => "Runtime",
+                    ComponentKind.Verification => "Model - semantic checks",
+                    _ => "Model - translation model",
+                },
                 ByteSize.Format(bytes),
                 CanDelete: !component.IsRequired));
         }
 
         ModelsTotalLabel = ByteSize.Format(modelBytes);
+        RefreshEmbeddingModelStatus();
     }
 
     [RelayCommand]
@@ -913,7 +964,7 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     /// <summary>Every component this build knows about, runtimes included.</summary>
     private static IEnumerable<ModelComponent> AllComponents() =>
-        ComponentCatalog.RuntimesFor(BackendCatalog.Probe()).Concat(ComponentCatalog.BuiltIn);
+        ComponentCatalog.RuntimesFor(BackendCatalog.Probe()).Concat(ComponentCatalog.BuiltIn).Concat(ComponentCatalog.Optional);
 
     /// <summary>
     /// Where a component actually is, across every folder a flavour may sit in,
@@ -1203,6 +1254,12 @@ public sealed partial class SettingsViewModel : ObservableObject
         Persist();
     }
 
+    partial void OnSemanticReverseCapTextChanged(string value)
+    {
+        OnPropertyChanged(nameof(SemanticReverseCap));
+        Persist();
+    }
+
     partial void OnLearnFromMyEditsChanged(bool value) => Persist();
 
     partial void OnUnderlineMemoryWordsChanged(bool value) => Persist();
@@ -1233,6 +1290,7 @@ public sealed partial class SettingsViewModel : ObservableObject
             settings.DefaultScopeForNewChats = ScopeIsWholeProject ? ChatScope.WholeProject : ChatScope.ThisChat;
             settings.UnsureThresholdPercent = (int)UnsureThreshold;
             settings.RuntimeBackend = SelectedBackend;
+            settings.Verification.SemanticReverseCap = SemanticReverseCap;
 
             // Only when this screen is the one that moved it. Every toggle up
             // there writes the whole row, so re-asserting a selection nobody

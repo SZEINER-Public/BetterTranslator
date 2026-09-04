@@ -98,7 +98,7 @@ public sealed class VerificationPipeline
             BeforeEscalation = (ctx, findings) => EscalationGate.Admit(ctx, [.. findings, .. escalate ?? []], SemanticPorts.For(ctx).Settings.SpanCap),
         };
 
-        return gate.Run(context);
+        return gate.Run(context) with { Escalation = EscalationSummary.For(context) };
     }
 
     public CheckContext? BuildContext(

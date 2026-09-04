@@ -62,6 +62,10 @@ public sealed class ConceptEmbeddingBackend : IEmbeddingBackend
 
 public sealed class DictionaryReverseTranslator(IReadOnlyDictionary<string, string> answers) : IReverseTranslator
 {
+    public const int TokensPerCall = 5;
+
+    public static readonly TimeSpan DurationPerCall = TimeSpan.FromMilliseconds(40);
+
     public string ModelIdentity => "reverse-test-model";
 
     public bool Available => true;
@@ -69,6 +73,10 @@ public sealed class DictionaryReverseTranslator(IReadOnlyDictionary<string, stri
     public string UnavailableReason => string.Empty;
 
     public int Calls { get; private set; }
+
+    public int GeneratedTokens => Calls * TokensPerCall;
+
+    public TimeSpan Elapsed => Calls * DurationPerCall;
 
     public List<(string Text, string From, string To)> Requests { get; } = [];
 
@@ -130,7 +138,7 @@ public static class SemanticFixtures
         return EmbeddingMath.Normalize(vector);
     }
 
-    public static (SemanticServices Services, ConceptEmbeddingBackend Backend, DictionaryReverseTranslator Reverse) Services(int cap = 24)
+    public static (SemanticServices Services, ConceptEmbeddingBackend Backend, DictionaryReverseTranslator Reverse) Services(int cap = 24, int reverseCap = 24)
     {
         var tokenizer = UnigramTokenizer.Parse(TokenizerJson());
         var backend = new ConceptEmbeddingBackend(tokenizer, Concepts);
@@ -142,7 +150,7 @@ public static class SemanticFixtures
             ["Uložit změny."] = "Save changes.",
         });
 
-        return (new SemanticServices(host, reverse, new SemanticSettings(cap, 0.6)), backend, reverse);
+        return (new SemanticServices(host, reverse, new SemanticSettings(cap, 0.6, reverseCap)), backend, reverse);
     }
 
     public static CheckContext Context(IReadOnlyList<string> source, IReadOnlyList<string> target, IEnumerable<ExemptSpan>? exemptions = null)

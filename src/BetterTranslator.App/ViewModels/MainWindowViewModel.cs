@@ -440,7 +440,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             new Engine.Languages.LanguageRegistry().Resolve(_settings.TargetLanguage)?.Code,
             paths.DictionariesFolder,
             semantics: _ => _translator.Session is { IsAlive: true } session && _translator.LastJob is { } template
-                ? SemanticRuntime.Services(_installPaths, session, template)
+                ? SemanticRuntime.Services(_installPaths, session, template, SemanticRuntime.SettingsFor(_settings.Verification))
                 : null);
 
         Mcp.McpServerHost.PipelineProvider = () => _pipeline;

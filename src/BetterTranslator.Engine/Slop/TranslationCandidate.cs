@@ -54,6 +54,16 @@ public static class TranslationCandidate
     /// </summary>
     public const int HeadingMinLetters = 3;
 
+    public static bool IsSingleWord(string? text)
+    {
+        var trimmed = text?.Trim();
+
+        return !string.IsNullOrEmpty(trimmed) && !trimmed.Any(char.IsWhiteSpace) && trimmed.Any(char.IsLetter);
+    }
+
+    public static bool EchoIsDefect(string? source, IReadOnlyList<string>? doNotTranslate = null, int minLetters = DefaultMinLetters) =>
+        !IsSingleWord(source) && IsWorthSending(source, doNotTranslate, minLetters);
+
     public static bool IsWorthSending(
         string? line,
         IReadOnlyList<string>? doNotTranslate = null,

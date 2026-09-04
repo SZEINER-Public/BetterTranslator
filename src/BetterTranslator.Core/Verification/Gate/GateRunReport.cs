@@ -28,6 +28,11 @@ public static class GateRunReport
         builder.AppendLine(culture, $"routing {result.RoutingText}");
         builder.AppendLine(culture, $"stages {result.StageText}");
         builder.AppendLine(culture, $"caps {result.CapsText}");
+
+        if (result.Escalation is { } escalation)
+        {
+            builder.AppendLine(culture, $"escalation {escalation.Text}");
+        }
         builder.AppendLine("per-check counts");
 
         foreach (var (checkId, count) in result.FindingCounts.OrderBy(p => p.Key, StringComparer.Ordinal))

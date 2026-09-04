@@ -21,6 +21,8 @@ public sealed record GateRunResult(
 {
     public const string RuleId = Core.Verification.Checks.CheckId.Gate.RunResult;
 
+    public EscalationSummary? Escalation { get; init; }
+
     public string CompletionText => CompletionPercent.ToString("0.0", CultureInfo.InvariantCulture);
 
     public int Ran => Checks.Count(c => c.State == GateCheckState.Ran);
@@ -113,6 +115,13 @@ public sealed class VerificationGate
                 {
                     CheckInstrumentation.Hit("config/check-disabled/" + check.CheckId);
                     statuses.Add(new GateCheckStatus(category, check.CheckId, stage, GateCheckState.Skipped, "check disabled by run settings", 0));
+                    continue;
+                }
+
+                if (check is ISkippableCheck skippable && skippable.SkipReason(context) is { } why)
+                {
+                    CheckInstrumentation.Hit("config/check-skipped/" + check.CheckId);
+                    statuses.Add(new GateCheckStatus(category, check.CheckId, stage, GateCheckState.Skipped, why, 0));
                     continue;
                 }
 

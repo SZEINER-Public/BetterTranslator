@@ -56,8 +56,13 @@ public sealed class ComponentCatalog
         },
     ];
 
+    public static IReadOnlyList<ModelComponent> Optional { get; } =
+    [
+        Verification.SemanticRuntime.EmbeddingComponent(),
+    ];
+
     /// <summary>Built-ins plus anything added from a pasted link.</summary>
-    public IReadOnlyList<ModelComponent> All => [.. BuiltIn, .. _custom];
+    public IReadOnlyList<ModelComponent> All => [.. BuiltIn, .. Optional, .. _custom];
 
     public IReadOnlyList<ModelComponent> Custom => _custom;
 

@@ -7,6 +7,8 @@ public enum ComponentKind
 
     /// <summary>A translation model.</summary>
     Model,
+
+    Verification,
 }
 
 /// <summary>
@@ -65,6 +67,13 @@ public sealed record ModelComponent
     /// entries until the owner supplies real URLs.
     /// </summary>
     public Uri? DownloadUrl { get; init; }
+
+    public string? Sha256 { get; init; }
+
+    public Downloads.ArtifactIntegrity? DeclaredIntegrity =>
+        Sha256 is null
+            ? null
+            : new Downloads.ArtifactIntegrity { FileId = Id, FileName = FileName, SizeBytes = SizeBytes, Sha256 = Sha256 };
 
     /// <summary>
     /// Why this machine cannot use the component, or null when it can.

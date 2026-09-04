@@ -87,6 +87,24 @@ public sealed class SpecCorpusFidelityTests
     public void AUsableAnswerHasNoCause() =>
         MessageTranslation.Unusable("Sestavení je zelené.", "The build is green.").Should().BeNull();
 
+    [Theory]
+    [InlineData("Test")]
+    [InlineData("Sport")]
+    [InlineData("  Hotel  ")]
+    public void ASingleWordThatComesBackUnchangedIsATranslation(string word) =>
+        MessageTranslation.Unusable(word, word).Should().BeNull();
+
+    [Fact]
+    public async Task AOneWordMessageWhoseCzechIsTheSameWordIsNotReportedAsUntranslated()
+    {
+        var result = await MessageTranslation.TranslateAsync("Test", (text, _) => Task.FromResult<string?>(text), CancellationToken.None);
+
+        result.Translated.Should().Be(1);
+        result.Kept.Should().Be(0);
+        result.Text.Should().Be("Test");
+        result.Failures.Should().BeEmpty();
+    }
+
     [Fact]
     public async Task EveryRequestIsRecordedWithItsOutcome()
     {

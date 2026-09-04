@@ -28,6 +28,20 @@ public sealed record TranslationOutcome(string? Text, int GeneratedTokens, TimeS
 
     public bool HasText => !string.IsNullOrWhiteSpace(Text);
 
+    public TranslationOutcome CountingReverseCalls()
+    {
+        if (Verification?.Gate?.Escalation is not { ReverseCalls: > 0 } escalation)
+        {
+            return this;
+        }
+
+        return this with
+        {
+            GeneratedTokens = GeneratedTokens + escalation.ReverseTokens,
+            Duration = Duration + TimeSpan.FromMilliseconds(escalation.ReverseDurationMs),
+        };
+    }
+
     /// <summary>
     /// Tokens per second, or null when there is nothing to divide. Reported
     /// rather than the raw pair alone: it is the figure that says whether the

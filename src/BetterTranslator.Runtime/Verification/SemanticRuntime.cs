@@ -1,3 +1,4 @@
+using BetterTranslator.Core.Verification;
 using BetterTranslator.Core.Verification.Checks.Semantics;
 using BetterTranslator.Runtime.Downloads;
 using BetterTranslator.Runtime.Inference;
@@ -12,6 +13,10 @@ public sealed class SessionReverseTranslator : IReverseTranslator
     private readonly TranslationJob _template;
 
     private int _calls;
+
+    private int _tokens;
+
+    private TimeSpan _elapsed;
 
     public SessionReverseTranslator(IInferenceSession session, TranslationJob template)
     {
@@ -33,6 +38,10 @@ public sealed class SessionReverseTranslator : IReverseTranslator
 
     public int Calls => _calls;
 
+    public int GeneratedTokens => _tokens;
+
+    public TimeSpan Elapsed => _elapsed;
+
     public string? Translate(string text, string fromLanguage, string toLanguage)
     {
         ArgumentNullException.ThrowIfNull(text);
@@ -47,7 +56,10 @@ public sealed class SessionReverseTranslator : IReverseTranslator
         var sampling = reversed.Sampling(0);
 
         _calls++;
+        var started = System.Diagnostics.Stopwatch.GetTimestamp();
         var completion = _session.CompleteCounted(prompt, sampling, CancellationToken.None);
+        _elapsed += System.Diagnostics.Stopwatch.GetElapsedTime(started);
+        _tokens += Math.Max(0, completion.Tokens);
 
         return completion.Faulted || string.IsNullOrWhiteSpace(completion.Text) ? null : completion.Text.Trim();
     }
@@ -55,6 +67,20 @@ public sealed class SessionReverseTranslator : IReverseTranslator
 
 public static class SemanticRuntime
 {
+    public const string ModelSource = "https://huggingface.co/intfloat/multilingual-e5-small/resolve/main/onnx/model.onnx";
+
+    public const string TokenizerSource = "https://huggingface.co/intfloat/multilingual-e5-small/resolve/main/tokenizer.json";
+
+    public const long ModelBytes = 470268510;
+
+    public const string ModelSha256 = "ca456c06b3a9505ddfd9131408916dd79290368331e7d76bb621f1cba6bc8665";
+
+    public const long TokenizerBytes = 17082730;
+
+    public const string TokenizerSha256 = "0b44a9d7b51c3c62626640cda0e2c2f70fdacdc25bbbd68038369d14ebdf4c39";
+
+    public const string NoSessionReason = "no inference session is loaded for reverse translation";
+
     public static ModelComponent EmbeddingComponent(EmbeddingModelDescription? model = null)
     {
         model ??= EmbeddingModelDescription.MultilingualE5Small;
@@ -63,12 +89,36 @@ public static class SemanticRuntime
         {
             Id = "embedding-" + model.FileName.Replace(".onnx", string.Empty, StringComparison.OrdinalIgnoreCase),
             Name = model.Identity,
-            Kind = ComponentKind.Model,
-            Summary = $"Sentence embedding model for semantic verification ({model.SizeOnDisk}, {model.License}).",
-            SizeBytes = 471_000_000,
+            Kind = ComponentKind.Verification,
+            Summary = $"Sentence embedding model for the semantic checks ({model.License}). Optional; the checks stay skipped without it.",
+            SizeBytes = ModelBytes,
             Version = "onnx-fp32",
             ArtifactFileName = model.FileName,
+            DownloadUrl = new Uri(ModelSource),
+            Sha256 = ModelSha256,
             IsRequired = false,
+            Companions =
+            [
+                new CompanionArtifact
+                {
+                    FileName = EmbeddingModelStore.TokenizerFileName,
+                    SizeBytes = TokenizerBytes,
+                    Sha256 = TokenizerSha256,
+                    Reason = "Tokenizer the embedding model reads text through.",
+                    DownloadUrl = new Uri(TokenizerSource),
+                },
+            ],
+        };
+    }
+
+    public static SemanticSettings SettingsFor(VerificationSettings verification)
+    {
+        ArgumentNullException.ThrowIfNull(verification);
+
+        return SemanticSettings.Default with
+        {
+            ReverseCap = Math.Max(0, verification.SemanticReverseCap),
+            WholeUnitShare = FinalRepairPass.WholeLineShare,
         };
     }
 
@@ -84,7 +134,7 @@ public static class SemanticRuntime
 
         IReverseTranslator reverse = session is not null && template is not null
             ? new SessionReverseTranslator(session, template)
-            : new UnavailableReverseTranslator("no inference session is loaded for reverse translation");
+            : new UnavailableReverseTranslator(NoSessionReason);
 
         return new SemanticServices(
             embeddings,

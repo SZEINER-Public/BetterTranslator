@@ -15,6 +15,10 @@ public interface IReverseTranslator
     string? Translate(string text, string fromLanguage, string toLanguage);
 
     int Calls { get; }
+
+    int GeneratedTokens { get; }
+
+    TimeSpan Elapsed { get; }
 }
 
 public sealed class UnavailableReverseTranslator(string reason) : IReverseTranslator
@@ -27,12 +31,44 @@ public sealed class UnavailableReverseTranslator(string reason) : IReverseTransl
 
     public int Calls => 0;
 
+    public int GeneratedTokens => 0;
+
+    public TimeSpan Elapsed => TimeSpan.Zero;
+
     public string? Translate(string text, string fromLanguage, string toLanguage) => null;
 }
 
-public sealed record SemanticSettings(int SpanCap, double WholeUnitShare)
+public sealed record SemanticSettings(int SpanCap, double WholeUnitShare, int ReverseCap = 24)
 {
-    public static SemanticSettings Default { get; } = new(SpanCap: 24, WholeUnitShare: 0.6);
+    public static SemanticSettings Default { get; } = new(SpanCap: 24, WholeUnitShare: 0.6, ReverseCap: 24);
+}
+
+public sealed class CappedReverseTranslator(IReverseTranslator inner, int cap) : IReverseTranslator
+{
+    public const string DisabledReason = "reverse translation disabled: the reverse translation cap is 0";
+
+    public int Cap { get; } = Math.Max(0, cap);
+
+    public IReverseTranslator Inner { get; } = inner;
+
+    public string ModelIdentity => Inner.ModelIdentity;
+
+    public bool Available => Cap > 0 && Inner.Calls < Cap && Inner.Available;
+
+    public string UnavailableReason =>
+        Cap == 0 ? DisabledReason
+        : !Inner.Available ? Inner.UnavailableReason
+        : Inner.Calls >= Cap ? $"reverse translation cap of {Cap} reached"
+        : string.Empty;
+
+    public int Calls => Inner.Calls;
+
+    public int GeneratedTokens => Inner.GeneratedTokens;
+
+    public TimeSpan Elapsed => Inner.Elapsed;
+
+    public string? Translate(string text, string fromLanguage, string toLanguage) =>
+        Available ? Inner.Translate(text, fromLanguage, toLanguage) : null;
 }
 
 public sealed record SemanticResult(double? Similarity, string? Reverse, double? ReverseSimilarity, double? TokenOverlap);
@@ -80,8 +116,8 @@ public sealed class SemanticServices
         ArgumentNullException.ThrowIfNull(reverse);
 
         Embeddings = embeddings;
-        Reverse = reverse;
         Settings = settings ?? SemanticSettings.Default;
+        Reverse = new CappedReverseTranslator(reverse, Settings.ReverseCap);
         Cache = cache ?? new SemanticCache();
     }
 
@@ -92,6 +128,8 @@ public sealed class SemanticServices
     public SemanticSettings Settings { get; }
 
     public SemanticCache Cache { get; }
+
+    public bool ReverseEnabled => Settings.ReverseCap > 0;
 
     public static SemanticServices Unavailable(string reason) =>
         new(EmbeddingHost.Unavailable("none", reason), new UnavailableReverseTranslator(reason));

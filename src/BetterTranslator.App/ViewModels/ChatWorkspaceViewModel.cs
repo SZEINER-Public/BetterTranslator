@@ -1605,7 +1605,7 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
                     Verification = content.Text is { Length: > 0 }
                         ? Verify?.Invoke(entry.Source, content, direction)
                         : null,
-                };
+                }.CountingReverseCalls();
 
             // A run this entry no longer owns: something superseded it while it
             // was out. Its answer is stale by definition, and the runtime

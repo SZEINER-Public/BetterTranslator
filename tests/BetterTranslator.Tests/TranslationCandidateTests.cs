@@ -24,6 +24,21 @@ public sealed class TranslationCandidateTests
     }
 
     [Fact]
+    public void AnEchoOfASingleWordIsNotADefectWhileALongerLineStillIs()
+    {
+        TranslationCandidate.IsSingleWord("Test").Should().BeTrue();
+        TranslationCandidate.IsSingleWord(" Configuration ").Should().BeTrue();
+        TranslationCandidate.IsSingleWord("Save changes").Should().BeFalse();
+        TranslationCandidate.IsSingleWord("---").Should().BeFalse();
+        TranslationCandidate.IsSingleWord("").Should().BeFalse();
+
+        TranslationCandidate.EchoIsDefect("Configuration", Terms.Strict).Should().BeFalse();
+        TranslationCandidate.EchoIsDefect("Test", Terms.Strict).Should().BeFalse();
+        TranslationCandidate.EchoIsDefect("Save the changes", Terms.Strict).Should().BeTrue();
+        TranslationCandidate.EchoIsDefect("OK", Terms.Strict).Should().BeFalse();
+    }
+
+    [Fact]
     public void PureMarkupIsNot()
     {
         TranslationCandidate.IsWorthSending("|---|---|---|").Should().BeFalse();

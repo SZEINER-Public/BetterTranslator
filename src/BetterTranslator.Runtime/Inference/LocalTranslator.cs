@@ -904,7 +904,7 @@ public sealed class LocalTranslator : IDisposable
         // all: if there was nothing here worth translating, an identical answer
         // is not evidence the model ignored the request.
         if (string.Equals(slop.Text.Trim(), job.Text.Trim(), StringComparison.Ordinal)
-            && Engine.Slop.TranslationCandidate.IsWorthSending(job.Text, Terms.Strict))
+            && Engine.Slop.TranslationCandidate.EchoIsDefect(job.Text, Terms.Strict))
         {
             return "unchanged";
         }

@@ -561,6 +561,35 @@
                             </StackPanel>
                         </StackPanel>
 
+                        <Border Style="{StaticResource SourceCard}" Margin="0,16,0,0" MaxWidth="470" HorizontalAlignment="Left">
+                            <StackPanel>
+                                <TextBlock Text="{Binding EmbeddingModelTitle}" Style="{StaticResource TextCardTitle}" />
+                                <TextBlock Text="{Binding EmbeddingModelStatus}"
+                                           Style="{StaticResource TextMeta}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,3,0,0" />
+                                <Button Content="Open the download list"
+                                        Command="{Binding GetEmbeddingModelCommand}"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,10,0,0"
+                                        Visibility="{Binding EmbeddingModelNeedsInstall, Converter={StaticResource BoolToVisibility}}"
+                                        AutomationProperties.Name="Open the download list to install the embedding model" />
+                                <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                                    <TextBlock Text="Reverse translations per answer" Style="{StaticResource TextCardTitle}" VerticalAlignment="Center" />
+                                    <TextBox Text="{Binding SemanticReverseCapText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="56"
+                                             Margin="10,0,0,0"
+                                             AutomationProperties.Name="Reverse translations per answer" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding SemanticReverseCapNote}"
+                                           Style="{StaticResource TextMeta}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Border>
+
                         <ItemsControl ItemsSource="{Binding Catalogue}" Margin="0,16,0,0" MaxWidth="470" HorizontalAlignment="Left">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>

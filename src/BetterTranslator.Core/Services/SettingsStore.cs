@@ -46,6 +46,7 @@ public sealed class SettingsStore(Database database)
     private const string NaturalnessCandidates = "verification_naturalness_candidates_per_sentence";
     private const string NaturalnessRewrites = "verification_naturalness_rewrites_per_document";
     private const string NaturalnessMargin = "verification_naturalness_improvement_margin";
+    private const string SemanticReverseCapKey = "verification_semantic_reverse_cap";
     private const string RestartAfterInstallKey = "restart_after_install";
     private const string McpEnabledKey = "mcp_enabled";
     private const string McpHostKey = "mcp_host";
@@ -119,6 +120,7 @@ public sealed class SettingsStore(Database database)
                     RewritesPerDocument = Int(stored, NaturalnessRewrites, settings.Verification.Naturalness.RewritesPerDocument),
                     ImprovementMargin = Int(stored, NaturalnessMargin, settings.Verification.Naturalness.ImprovementMargin),
                 },
+                SemanticReverseCap = Math.Max(0, Int(stored, SemanticReverseCapKey, settings.Verification.SemanticReverseCap)),
             },
         };
     }
@@ -163,6 +165,7 @@ public sealed class SettingsStore(Database database)
             [NaturalnessCandidates] = settings.Verification.Naturalness.CandidatesPerSentence.ToString(CultureInfo.InvariantCulture),
             [NaturalnessRewrites] = settings.Verification.Naturalness.RewritesPerDocument.ToString(CultureInfo.InvariantCulture),
             [NaturalnessMargin] = settings.Verification.Naturalness.ImprovementMargin.ToString(CultureInfo.InvariantCulture),
+            [SemanticReverseCapKey] = Math.Max(0, settings.Verification.SemanticReverseCap).ToString(CultureInfo.InvariantCulture),
             [RestartAfterInstallKey] = settings.RestartAfterInstall ? "1" : "0",
             [McpEnabledKey] = settings.McpEnabled ? "1" : "0",
             [McpHostKey] = settings.McpHost,

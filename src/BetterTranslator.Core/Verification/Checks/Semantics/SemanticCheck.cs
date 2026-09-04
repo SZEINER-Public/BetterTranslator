@@ -2,8 +2,10 @@ using System.Globalization;
 
 namespace BetterTranslator.Core.Verification.Checks.Semantics;
 
-public abstract class SemanticCheck : ICheck
+public abstract class SemanticCheck : ICheck, ISkippableCheck
 {
+    public const string NothingEscalatedReason = "no span escalated";
+
     public abstract string CheckId { get; }
 
     public string Category => Checks.CheckId.Semantics.Category;
@@ -46,6 +48,18 @@ public abstract class SemanticCheck : ICheck
     }
 
     public abstract string? SkipReason(SemanticServices services);
+
+    public string? SkipReason(CheckContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        if (SkipReason(SemanticPorts.For(context)) is { } unavailable)
+        {
+            return unavailable;
+        }
+
+        return EscalationGate.AdmittedFor(context).Count == 0 ? NothingEscalatedReason : null;
+    }
 
     protected abstract string ModelIdentity(SemanticServices services);
 

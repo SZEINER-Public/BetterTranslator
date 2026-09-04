@@ -311,6 +311,7 @@ public sealed class DownloadManager(HttpClient httpClient, InstallPaths paths, M
             // Verify before promotion, never after. Until this passes the file
             // is a .part and nothing can mistake it for installed.
             var expected = integrity
+                ?? component.DeclaredIntegrity
                 ?? ArtifactManifest.ForFileName(component.FileName)
                 ?? new ArtifactIntegrity
                 {

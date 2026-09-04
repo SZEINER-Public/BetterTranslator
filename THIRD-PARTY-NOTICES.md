@@ -121,8 +121,9 @@ covered by this file or by `LICENSE`.
 
 The translation models the application downloads at run time are not part of this repository and
 carry their own licenses from their publishers. The same holds for the sentence embedding model the
-semantic checks read from the models folder (`intfloat/multilingual-e5-small`, published under MIT),
-which is never committed here. The BetterRuntime native inference library is built
+semantic checks read from the models folder (`intfloat/multilingual-e5-small` with its tokenizer,
+published under MIT), which the download list offers as an optional install and which is never
+committed here. The BetterRuntime native inference library is built
 out of tree and is not distributed from here.
 
 ## Regenerating

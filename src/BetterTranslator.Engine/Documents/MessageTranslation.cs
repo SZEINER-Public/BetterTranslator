@@ -290,7 +290,7 @@ public static class MessageTranslation
             return KeptCause.Reflowed;
         }
 
-        return string.Equals(answer.Trim(), source.Trim(), StringComparison.Ordinal)
+        return string.Equals(answer.Trim(), source.Trim(), StringComparison.Ordinal) && !TranslationCandidate.IsSingleWord(source)
             ? KeptCause.Echoed
             : null;
     }

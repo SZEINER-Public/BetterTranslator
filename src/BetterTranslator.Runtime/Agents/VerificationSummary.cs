@@ -26,6 +26,8 @@ public sealed record VerificationSummary(
 
     public const string GateOffReason = "the verification gate is switched off";
 
+    public string? Escalation { get; init; }
+
     public string? CompletionText => Completion is { } value ? value.ToString("0.0", CultureInfo.InvariantCulture) : null;
 
     public static VerificationSummary Unavailable(string reason) => new(false, reason, null, 0, 0, [], 0, 0, []);
@@ -51,7 +53,10 @@ public sealed record VerificationSummary(
             [.. gate.Defects.Select(d => new RedSpan(d.TargetRange.UnitPath, d.TargetRange.Offset, d.TargetRange.Length, d.CheckIds, d.Finding.Evidence))],
             gate.Routed.Count(r => r.Action == CheckAction.Rewrite),
             gate.RepairCandidates.Count,
-            [.. gate.Checks.Where(c => c.State == GateCheckState.Skipped).Select(c => new SkippedCheck(c.CheckId, c.Reason))]);
+            [.. gate.Checks.Where(c => c.State == GateCheckState.Skipped).Select(c => new SkippedCheck(c.CheckId, c.Reason))])
+        {
+            Escalation = gate.Escalation?.Text,
+        };
     }
 
     public object Payload() =>
@@ -66,6 +71,7 @@ public sealed record VerificationSummary(
             suggestions = Suggestions,
             repair_candidates = RepairCandidates,
             skipped = Skipped.Select(s => new { check = s.CheckId, reason = s.Reason }).ToArray(),
+            escalation = Escalation,
         };
 
     public Dictionary<string, object?> Envelope() =>
@@ -87,6 +93,7 @@ public sealed record VerificationSummary(
             ["suggestions"] = Suggestions,
             ["repair_candidates"] = RepairCandidates,
             ["skipped"] = Skipped.Select(s => new Dictionary<string, object?> { ["check"] = s.CheckId, ["reason"] = s.Reason }).ToList(),
+            ["escalation"] = Escalation,
         };
 
     public const string SchemaObject =
@@ -124,7 +131,8 @@ public sealed record VerificationSummary(
                 "required": ["check", "reason"],
                 "properties": { "check": { "type": "string" }, "reason": { "type": "string" } }
               }
-            }
+            },
+            "escalation": { "type": ["string", "null"], "description": "How many flagged spans the semantic stage re-checked, the cap, and what the reverse translation calls cost." }
           }
         }
         """;

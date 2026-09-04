@@ -102,6 +102,8 @@ public sealed class VerificationSettings
     public RepairAutonomy Autonomy { get; set; } = RepairAutonomy.AutoRepair;
 
     public NaturalnessSettings Naturalness { get; set; } = new();
+
+    public int SemanticReverseCap { get; set; } = Checks.Semantics.SemanticSettings.Default.ReverseCap;
 }
 
 public enum RepairAutonomy
