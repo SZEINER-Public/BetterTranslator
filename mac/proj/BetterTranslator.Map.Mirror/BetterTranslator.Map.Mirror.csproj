@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>BetterTranslator.Map</AssemblyName>
+    <RootNamespace>BetterTranslator.Map</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <MirrorSourceRoot>$(WindowsSourceRoot)BetterTranslator.Map\</MirrorSourceRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MirrorSourceRoot)**\*.cs"
+             Exclude="$(MirrorSourceRoot)bin\**\*.cs;$(MirrorSourceRoot)obj\**\*.cs"
+             Link="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp" Version="4.151.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="4.151.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BetterTranslator.Core.Mirror\BetterTranslator.Core.Mirror.csproj" />
+  </ItemGroup>
+
+</Project>

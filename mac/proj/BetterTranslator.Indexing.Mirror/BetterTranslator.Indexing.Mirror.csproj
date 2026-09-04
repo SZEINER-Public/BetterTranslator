@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>BetterTranslator.Indexing</AssemblyName>
+    <RootNamespace>BetterTranslator.Indexing</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <MirrorSourceRoot>$(WindowsSourceRoot)BetterTranslator.Indexing\</MirrorSourceRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MirrorSourceRoot)**\*.cs"
+             Exclude="$(MirrorSourceRoot)bin\**\*.cs;$(MirrorSourceRoot)obj\**\*.cs"
+             Link="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
+    <PackageReference Include="Markdig" Version="1.3.2" />
+    <PackageReference Include="PdfPig" Version="0.1.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BetterTranslator.Core.Mirror\BetterTranslator.Core.Mirror.csproj" />
+    <ProjectReference Include="..\BetterTranslator.Engine.Mirror\BetterTranslator.Engine.Mirror.csproj" />
+  </ItemGroup>
+
+</Project>

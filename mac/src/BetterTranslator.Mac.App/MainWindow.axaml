@@ -1,0 +1,1041 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="using:System"
+        xmlns:controls="using:BetterTranslator.Mac.App.Controls"
+        xmlns:conv="using:BetterTranslator.Mac.App.Converters"
+        xmlns:views="using:BetterTranslator.Mac.App.Views"
+        xmlns:vm="using:BetterTranslator.App.ViewModels"
+        xmlns:adapt="using:BetterTranslator.Mac.Adapters"
+        x:Class="BetterTranslator.Mac.App.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="BetterTranslator"
+        Width="{StaticResource WindowDefaultWidth}"
+        Height="{StaticResource WindowDefaultHeight}"
+        MinWidth="{StaticResource WindowMinWidth}"
+        MinHeight="{StaticResource WindowMinHeight}"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BrushDesk}"
+        Foreground="{StaticResource BrushText}"
+        FontFamily="{StaticResource FontFamilyUi}"
+        FontSize="{StaticResource TextDefaultSize}"
+        UseLayoutRounding="True"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="PreferSystemChrome"
+        ExtendClientAreaTitleBarHeightHint="-1">
+
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="File">
+                <NativeMenuItem.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="New chat"
+                                        Gesture="Cmd+N"
+                                        Click="OnMenuNewChat" />
+                        <NativeMenuItem Header="Add sources"
+                                        Gesture="Cmd+Shift+A"
+                                        Click="OnMenuAddSources" />
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Models and runtimes"
+                                        Gesture="Cmd+Shift+D"
+                                        Click="OnMenuDownloads" />
+                        <NativeMenuItem Header="Settings"
+                                        Gesture="Cmd+OemComma"
+                                        Click="OnMenuSettings" />
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Close Window"
+                                        Gesture="Cmd+W"
+                                        Click="OnMenuCloseWindow" />
+                    </NativeMenu>
+                </NativeMenuItem.Menu>
+            </NativeMenuItem>
+
+            <NativeMenuItem Header="View">
+                <NativeMenuItem.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="Simple"
+                                        Gesture="Cmd+D1"
+                                        Click="OnMenuSimpleMode" />
+                        <NativeMenuItem Header="Advanced"
+                                        Gesture="Cmd+D2"
+                                        Click="OnMenuAdvancedMode" />
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Show or hide the chat sidebar"
+                                        Gesture="Cmd+Alt+S"
+                                        Click="OnMenuToggleSidebar" />
+                        <NativeMenuItem Header="Show or hide the right panel"
+                                        Gesture="Cmd+Alt+B"
+                                        Click="OnMenuToggleRightPanel" />
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Back to the chat"
+                                        Gesture="Cmd+D0"
+                                        Click="OnMenuBackToChat" />
+                    </NativeMenu>
+                </NativeMenuItem.Menu>
+            </NativeMenuItem>
+
+            <NativeMenuItem Header="Model">
+                <NativeMenuItem.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="Load the model"
+                                        Gesture="Cmd+R"
+                                        Click="OnMenuStartRuntime" />
+                        <NativeMenuItem Header="Stop this translation"
+                                        Gesture="Cmd+OemPeriod"
+                                        Click="OnMenuPauseRuntime" />
+                        <NativeMenuItem Header="Unload the model"
+                                        Gesture="Cmd+Shift+R"
+                                        Click="OnMenuUnloadRuntime" />
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Runtime status"
+                                        Gesture="Cmd+I"
+                                        Click="OnMenuToggleRuntimePanel" />
+                    </NativeMenu>
+                </NativeMenuItem.Menu>
+            </NativeMenuItem>
+        </NativeMenu>
+    </NativeMenu.Menu>
+
+    <Window.Resources>
+        <sys:Double x:Key="TitlebarLeadInset">62</sys:Double>
+
+        <ControlTheme x:Key="TitlebarButton" TargetType="controls:ChromeButton">
+            <Setter Property="Width" Value="{StaticResource CaptionButtonWidth}" />
+            <Setter Property="Height" Value="{StaticResource CaptionHeight}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource BrushIcon}" />
+            <Setter Property="FocusAdorner">
+                <FocusAdornerTemplate>
+                    <ContentControl Theme="{StaticResource FocusRing}" />
+                </FocusAdornerTemplate>
+            </Setter>
+            <Setter Property="Template">
+                <ControlTemplate TargetType="controls:ChromeButton">
+                    <Border x:Name="Fill" Background="{TemplateBinding Background}">
+                        <controls:IconView x:Name="Glyph"
+                                           Definition="{TemplateBinding Icon}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:active /template/ controls|IconView#Glyph">
+                <Setter Property="Foreground" Value="{StaticResource BrushAccentDeep}" />
+            </Style>
+            <Style Selector="^:pointerover /template/ Border#Fill">
+                <Setter Property="Background" Value="{StaticResource BrushHoverStrong}" />
+            </Style>
+            <Style Selector="^:pressed /template/ Border#Fill">
+                <Setter Property="Background" Value="{StaticResource BrushBorder}" />
+            </Style>
+            <Style Selector="^:disabled /template/ controls|IconView#Glyph">
+                <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+            </Style>
+        </ControlTheme>
+    </Window.Resources>
+
+    <Grid>
+        <Border x:Name="WindowRoot"
+                Background="{StaticResource BrushWindow}"
+                BorderBrush="{StaticResource BrushWindowEdge}"
+                BorderThickness="{StaticResource BorderThickness}">
+
+            <Grid RowDefinitions="Auto,Auto,*">
+
+                <Grid Grid.Row="0" Height="{StaticResource CaptionHeight}" ColumnDefinitions="Auto,*,Auto">
+
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="12,0,0,0">
+                        <Border x:Name="TitlebarLead" Width="{StaticResource TitlebarLeadInset}" />
+                        <controls:Wordmark BarBrush="{StaticResource BrushText}"
+                                           AccentBrush="{StaticResource BrushAccent}"
+                                           MarkHeight="{StaticResource TitlebarMarkHeight}"
+                                           VerticalAlignment="Center" />
+                        <TextBlock Text="BetterTranslator"
+                                   Theme="{StaticResource TextSecondary}"
+                                   VerticalAlignment="Center"
+                                   Margin="{StaticResource TitlebarMarkGap}" />
+                        <TextBlock Text="{Binding Updates.InstalledVersion}"
+                                   Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   VerticalAlignment="Center"
+                                   Margin="{StaticResource TitlebarMarkGap}"
+                                   AutomationProperties.Name="Installed version" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <controls:ChromeButton x:Name="RuntimeStartButton"
+                                               Theme="{StaticResource TitlebarButton}"
+                                               Icon="{StaticResource IconPlay}"
+                                               Command="{Binding Runtime.StartCommand}"
+                                               AutomationProperties.Name="Load the model"
+                                               ToolTip.Tip="{Binding Runtime.StateLabel, StringFormat='Load the model now - {0}'}"
+                                               IsVisible="{Binding Runtime.CanStart}" />
+
+                        <controls:ChromeButton x:Name="RuntimePauseButton"
+                                               Theme="{StaticResource TitlebarButton}"
+                                               Icon="{StaticResource IconPause}"
+                                               Command="{Binding Runtime.PauseCommand}"
+                                               AutomationProperties.Name="Stop this translation"
+                                               ToolTip.Tip="Stop this translation - the model stays loaded"
+                                               IsVisible="{Binding Runtime.CanPause}" />
+
+                        <controls:ChromeButton x:Name="RuntimeUnloadButton"
+                                               Theme="{StaticResource TitlebarButton}"
+                                               Icon="{StaticResource IconEject}"
+                                               Command="{Binding Runtime.UnloadCommand}"
+                                               AutomationProperties.Name="Unload the model"
+                                               ToolTip.Tip="Unload the model and give its memory back"
+                                               IsVisible="{Binding Runtime.CanUnload}" />
+
+                        <controls:ChromeButton x:Name="RuntimePanelButton"
+                                               Theme="{StaticResource TitlebarButton}"
+                                               Icon="{StaticResource IconInfoCircle}"
+                                               Command="{Binding Runtime.TogglePanelCommand}"
+                                               IsActive="{Binding Runtime.IsPanelOpen}"
+                                               AutomationProperties.Name="Runtime status"
+                                               ToolTip.Tip="What the runtime is doing" />
+
+                        <Popup PlacementTarget="{Binding #RuntimePanelButton}"
+                               Placement="BottomEdgeAlignedLeft"
+                               VerticalOffset="6"
+                               HorizontalOffset="-180"
+                               IsLightDismissEnabled="True"
+                               IsOpen="{Binding Runtime.IsPanelOpen, Mode=TwoWay}">
+                            <Border Background="{StaticResource BrushSurface}"
+                                    BorderBrush="{StaticResource BrushBorder}"
+                                    BorderThickness="{StaticResource BorderThickness}"
+                                    CornerRadius="{StaticResource RadiusCard}"
+                                    Effect="{StaticResource ShadowPopover}"
+                                    Width="300"
+                                    Padding="14,12,14,12">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Runtime.StateLabel}"
+                                               Theme="{StaticResource TextCardTitle}" />
+
+                                    <TextBlock Text="{Binding Runtime.StateDetail}"
+                                               Theme="{StaticResource TextMeta}"
+                                               Foreground="{StaticResource BrushTextSecondary}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,0,0" />
+
+                                    <Rectangle Height="{StaticResource BorderWidth}"
+                                               Fill="{StaticResource BrushBorderFaint}"
+                                               Margin="0,10,0,10" />
+
+                                    <StackPanel x:Name="RuntimeNature" x:DataType="adapt:MacRuntimeSurface">
+                                        <TextBlock Text="{Binding RuntimeTitle}"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextMuted}" />
+                                        <TextBlock Text="{Binding RuntimeSummary}"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,3,0,0" />
+                                    </StackPanel>
+
+                                    <Grid Margin="0,6,0,0">
+                                        <TextBlock Text="Model"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextMuted}" />
+                                        <TextBlock Text="{Binding Runtime.ModelLabel}"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   HorizontalAlignment="Right"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   MaxWidth="200" />
+                                    </Grid>
+
+                                    <Grid Margin="0,6,0,0">
+                                        <TextBlock Text="Prompt"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextMuted}" />
+                                        <TextBlock Text="{Binding Runtime.PromptShapeLabel}"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   HorizontalAlignment="Right" />
+                                    </Grid>
+
+                                    <Grid Margin="0,6,0,0" IsVisible="{Binding Runtime.HasLastRun}">
+                                        <TextBlock Text="Last run"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextMuted}" />
+                                        <TextBlock Text="{Binding Runtime.LastRun}"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   HorizontalAlignment="Right" />
+                                    </Grid>
+
+                                    <Border Background="{StaticResource BrushAccentTint}"
+                                            BorderBrush="{StaticResource BrushAccentBorder}"
+                                            BorderThickness="{StaticResource BorderThickness}"
+                                            CornerRadius="{StaticResource RadiusRow}"
+                                            Margin="0,10,0,0"
+                                            Padding="9,7,9,7"
+                                            IsVisible="{Binding Runtime.HasPromptWarning}">
+                                        <TextBlock Text="{Binding Runtime.PromptWarning}"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushText}"
+                                                   TextWrapping="Wrap" />
+                                    </Border>
+
+                                    <Border Background="{StaticResource BrushWarnSurface}"
+                                            BorderBrush="{StaticResource BrushWarnBorder}"
+                                            BorderThickness="{StaticResource BorderThickness}"
+                                            CornerRadius="{StaticResource RadiusRow}"
+                                            Margin="0,10,0,0"
+                                            Padding="9,7,9,7"
+                                            IsVisible="{Binding Runtime.HasConfigAdvisories}">
+                                        <TextBlock Text="{Binding Runtime.ConfigAdvisories}"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushWarnText}"
+                                                   TextWrapping="Wrap" />
+                                    </Border>
+
+                                    <Border Background="{StaticResource BrushWarnSurface}"
+                                            BorderBrush="{StaticResource BrushWarnBorder}"
+                                            BorderThickness="{StaticResource BorderThickness}"
+                                            CornerRadius="{StaticResource RadiusRow}"
+                                            Margin="0,10,0,0"
+                                            Padding="9,7,9,7"
+                                            IsVisible="{Binding Runtime.HasSelectionNote}">
+                                        <TextBlock Text="{Binding Runtime.SelectionNote}"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushWarnText}"
+                                                   TextWrapping="Wrap" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+
+                        <controls:ChromeButton x:Name="DownloadsButton"
+                                               Theme="{StaticResource TitlebarButton}"
+                                               Icon="{StaticResource IconDownload}"
+                                               Command="{Binding OpenDownloadsCommand}"
+                                               AutomationProperties.Name="Models and runtimes"
+                                               ToolTip.Tip="Models and runtimes - what is installed and what can be downloaded" />
+                        <controls:ChromeButton x:Name="SettingsButton"
+                                               Theme="{StaticResource TitlebarButton}"
+                                               Icon="{StaticResource IconGear}"
+                                               Command="{Binding OpenSettingsCommand}"
+                                               AutomationProperties.Name="Settings"
+                                               ToolTip.Tip="Settings - memory behaviour, your data, cache" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid Grid.Row="1" Height="{StaticResource ToolbarHeight}" ColumnDefinitions="Auto,*,Auto">
+
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="16,0,0,0">
+
+                        <controls:ChromeButton Icon="{StaticResource IconPanelLeft}"
+                                               IsOutlined="True"
+                                               IsActive="{Binding IsSidebarVisible}"
+                                               Command="{Binding ToggleSidebarCommand}"
+                                               ToolTip.Tip="Show or hide the chat sidebar"
+                                               AutomationProperties.Name="Show or hide the chat sidebar" />
+
+                        <controls:ChromeButton x:Name="ProjectSelector"
+                                               Theme="{StaticResource ProjectSelectorButton}"
+                                               Command="{Binding ToggleProjectMenuCommand}"
+                                               Margin="8,0,0,0"
+                                               ToolTip.Tip="{Binding ProjectSelectorTooltip}"
+                                               AutomationProperties.Name="{Binding ProjectSelectorLabel}"
+                                               IsVisible="{Binding !HasProject}">
+                            <StackPanel Orientation="Horizontal">
+                                <controls:IconView Definition="{StaticResource IconFolder}"
+                                                   VerticalAlignment="Center" />
+                                <controls:IconView x:Name="ScopeChevron"
+                                                   Definition="{StaticResource IconChevronDown}"
+                                                   Margin="5,0,0,0"
+                                                   VerticalAlignment="Center"
+                                                   RenderTransformOrigin="0.5,0.5" />
+                            </StackPanel>
+                        </controls:ChromeButton>
+
+                        <Border Height="{StaticResource ChromeButtonSize}"
+                                Background="{StaticResource BrushAccentTint}"
+                                BorderBrush="{StaticResource BrushAccentBorder}"
+                                BorderThickness="{StaticResource BorderThickness}"
+                                CornerRadius="{StaticResource RadiusDefault}"
+                                Padding="10,0,4,0"
+                                Margin="8,0,0,0"
+                                UseLayoutRounding="True"
+                                IsVisible="{Binding HasProject}">
+                            <StackPanel Orientation="Horizontal">
+                                <controls:IconView Definition="{StaticResource IconFolder}"
+                                                   Foreground="{StaticResource BrushAccentDeep}"
+                                                   VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding ScopeKindLabel}"
+                                           Theme="{StaticResource TextDefault}"
+                                           Foreground="{StaticResource BrushAccentDeep}"
+                                           VerticalAlignment="Center"
+                                           Margin="8,0,0,0" />
+                                <TextBlock Text="{Binding ProjectPath}"
+                                           Theme="{StaticResource TextMonoPath}"
+                                           VerticalAlignment="Center"
+                                           Margin="8,0,0,0"
+                                           MaxWidth="{StaticResource ScopePathMaxWidth}"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip.Tip="{Binding ProjectPath}" />
+                                <controls:ChromeButton Theme="{StaticResource ScopeChipClearButton}"
+                                                       Icon="{StaticResource IconCloseSmall}"
+                                                       Command="{Binding ClearProjectCommand}"
+                                                       Margin="8,0,0,0"
+                                                       VerticalAlignment="Center"
+                                                       ToolTip.Tip="Remove scope"
+                                                       AutomationProperties.Name="Remove scope" />
+                            </StackPanel>
+                        </Border>
+
+                        <Popup x:Name="ProjectMenuPopup"
+                               PlacementTarget="{Binding #ProjectSelector}"
+                               Placement="BottomEdgeAlignedLeft"
+                               VerticalOffset="6"
+                               IsLightDismissEnabled="False"
+                               IsOpen="{Binding IsProjectMenuOpen, Mode=TwoWay}">
+                            <Border Background="{StaticResource BrushSurface}"
+                                    BorderBrush="{StaticResource BrushBorder}"
+                                    BorderThickness="{StaticResource BorderThickness}"
+                                    CornerRadius="{StaticResource RadiusCard}"
+                                    Padding="{StaticResource Space2Thickness}"
+                                    Effect="{StaticResource ShadowPopover}"
+                                    MinWidth="300">
+                                <ItemsControl ItemsSource="{Binding ProjectScopes}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:ProjectScopeViewModel">
+                                            <Button Theme="{StaticResource MenuRowButton}"
+                                                    Height="NaN"
+                                                    Padding="11,9,12,10"
+                                                    IsEnabled="{Binding IsUnlocked}"
+                                                    ToolTip.Tip="{Binding LockedReason}"
+                                                    ToolTip.ShowOnDisabled="True"
+                                                    AutomationProperties.Name="{Binding AutomationName}"
+                                                    Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).ChooseScopeCommand}"
+                                                    CommandParameter="{Binding}">
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <controls:IconView Definition="{StaticResource IconLockSegment}"
+                                                                           Margin="0,0,6,0"
+                                                                           VerticalAlignment="Center"
+                                                                           IsVisible="{Binding IsLocked}" />
+                                                        <TextBlock Text="{Binding Title}"
+                                                                   Theme="{StaticResource TextCardTitle}"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding Detail}"
+                                                               Theme="{StaticResource TextMeta}"
+                                                               Foreground="{StaticResource BrushTextSecondary}"
+                                                               TextWrapping="Wrap"
+                                                               MaxWidth="252"
+                                                               Margin="0,3,0,0" />
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Popup>
+
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="0,0,16,0">
+
+                        <controls:SegmentedControl ItemsSource="{Binding WorkspaceModes}"
+                                                   SelectedItem="{Binding SelectedWorkspaceMode, Mode=TwoWay}"
+                                                   AutomationProperties.Name="Workspace mode" />
+
+                        <controls:ChromeButton Icon="{StaticResource IconPanelRight}"
+                                               IsOutlined="True"
+                                               IsActive="{Binding IsRightPanelVisible}"
+                                               Command="{Binding ToggleRightPanelCommand}"
+                                               IsVisible="{Binding IsAdvancedMode}"
+                                               Margin="8,0,0,0"
+                                               ToolTip.Tip="Show or hide the right panel"
+                                               AutomationProperties.Name="Show or hide the right panel" />
+                    </StackPanel>
+                </Grid>
+
+                <Border Grid.Row="2"
+                        Background="{StaticResource BrushSurface}"
+                        BorderBrush="{StaticResource BrushBorderSoft}"
+                        BorderThickness="0,1,0,0">
+
+                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto">
+
+                        <Border x:Name="SidebarHost"
+                                Grid.Column="0"
+                                ClipToBounds="True">
+                            <views:SidebarView Width="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SidebarWidth}"
+                                               HorizontalAlignment="Left"
+                                               DataContext="{Binding Workspace}" />
+                        </Border>
+
+                        <controls:ResizeSeparator x:Name="SidebarSeparator"
+                                                  Grid.Column="1"
+                                                  Value="{Binding SidebarWidth, Mode=TwoWay}"
+                                                  Minimum="{Binding SidebarMinWidth}"
+                                                  Maximum="{Binding SidebarMaxWidth}"
+                                                  AutomationProperties.Name="Resize chats panel"
+                                                  ToolTip.Tip="Resize chats panel" />
+
+                        <views:ChatView Grid.Column="2"
+                                        DataContext="{Binding Workspace}"
+                                        IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsMemoryMode, Converter={x:Static conv:Converters.InverseBoolToVisibility}}" />
+
+                        <Grid Grid.Column="2"
+                              RowDefinitions="Auto,*"
+                              ColumnDefinitions="Auto,*"
+                              IsVisible="{Binding IsMemoryMode}">
+
+                            <Grid Grid.Row="0" Grid.ColumnSpan="2" Margin="16,10,16,10">
+                            <TextBlock Text="{Binding Memory.IndexedStatus}"
+                                       Theme="{StaticResource TextMeta}"
+                                       Foreground="{StaticResource BrushTextTertiary}"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal">
+                                <Button Theme="{StaticResource LinkButton}"
+                                        Command="{Binding BackToChatCommand}"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,10,0"
+                                        AutomationProperties.Name="Back to the chat">
+                                    <StackPanel Orientation="Horizontal">
+                                        <controls:IconView Definition="{StaticResource IconChevronLeftSmall}"
+                                                           VerticalAlignment="Center" />
+                                        <TextBlock Text="Chat"
+                                                   Theme="{StaticResource TextSecondary}"
+                                                   Margin="5,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <Rectangle Width="{StaticResource BorderWidth}"
+                                           Fill="{StaticResource BrushBorderSoft}"
+                                           Margin="0,4,10,4" />
+
+                                <Border Background="{StaticResource BrushTrack}"
+                                        CornerRadius="{StaticResource RadiusPanel}"
+                                        Padding="{StaticResource Space1Thickness}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton Theme="{StaticResource FolderSegment}"
+                                                     Content="Overview"
+                                                     IsChecked="{Binding Memory.ShowOverviewTabChecked, Mode=OneWay}"
+                                                     Command="{Binding Memory.ShowOverviewCommand}"
+                                                     AutomationProperties.Name="Overview" />
+                                        <RadioButton Theme="{StaticResource FolderSegment}"
+                                                     Content="Retrieval map"
+                                                     IsChecked="{Binding Memory.IsMapTab, Mode=OneWay}"
+                                                     Command="{Binding Memory.ShowMapCommand}"
+                                                     AutomationProperties.Name="Retrieval map" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Rectangle Width="{StaticResource BorderWidth}"
+                                           Fill="{StaticResource BrushBorderSoft}"
+                                           Margin="10,4,10,4" />
+
+                                <Button Theme="{StaticResource SecondaryButton}"
+                                        Height="{StaticResource SegmentHeight}"
+                                        Command="{Binding OpenAddSourcesCommand}"
+                                        AutomationProperties.Name="Add sources">
+                                    <StackPanel Orientation="Horizontal">
+                                        <controls:IconView Definition="{StaticResource IconPlusSmall}"
+                                                           VerticalAlignment="Center" />
+                                        <TextBlock Text="Add sources"
+                                                   Theme="{StaticResource TextSecondary}"
+                                                   Margin="6,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                            </Grid>
+
+                            <views:RetrievalMapView Grid.Row="1" Grid.ColumnSpan="2"
+                                                    DataContext="{Binding Memory.Map}"
+                                                    IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Memory.IsMapTab}" />
+
+                            <Border Grid.Row="1" Grid.Column="0"
+                                    Width="{StaticResource SidebarDefaultWidth}"
+                                    Background="{StaticResource BrushSurfaceMuted}"
+                                    BorderBrush="{StaticResource BrushBorderSoft}"
+                                    BorderThickness="0,0,1,0"
+                                    IsVisible="{Binding !Memory.IsMapTab}">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16,16,12,16">
+                                    <StackPanel DataContext="{Binding Memory}" x:DataType="vm:MemoryViewModel">
+                                        <TextBlock Text="Project sources"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextTertiary}" />
+                                        <TextBlock Text="{Binding SourcesEmptyLine}"
+                                                   Theme="{StaticResource TextSecondary}"
+                                                   Foreground="{StaticResource BrushTextMuted}"
+                                                   Margin="0,8,0,0"
+                                                   IsVisible="{Binding !HasSources}" />
+                                        <ItemsControl ItemsSource="{Binding ProjectSources}" Margin="0,8,0,0">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:RailRow">
+                                                    <Grid Margin="0,0,0,7">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Rectangle Width="{StaticResource Space6}"
+                                                                       Height="{StaticResource Space6}"
+                                                                       RadiusX="{Binding TopLeft, Source={StaticResource RadiusXs}, x:CompileBindings=False}"
+                                                                       RadiusY="{Binding TopLeft, Source={StaticResource RadiusXs}, x:CompileBindings=False}"
+                                                                       Fill="{Binding Dot, Converter={x:Static conv:Converters.BrushShim}}"
+                                                                       VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding Label}"
+                                                                       Theme="{StaticResource TextSecondary}"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       MaxWidth="140"
+                                                                       Margin="9,0,0,0"
+                                                                       VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                        <TextBlock Text="{Binding Count}"
+                                                                   Theme="{StaticResource TextMicro}"
+                                                                   Foreground="{StaticResource BrushTextMuted}"
+                                                                   HorizontalAlignment="Right"
+                                                                   VerticalAlignment="Center" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <TextBlock Text="Learned"
+                                                   Theme="{StaticResource TextMeta}"
+                                                   Foreground="{StaticResource BrushTextTertiary}"
+                                                   Margin="0,20,0,0" />
+                                        <TextBlock Text="{Binding LearnedEmptyLine}"
+                                                   Theme="{StaticResource TextSecondary}"
+                                                   Foreground="{StaticResource BrushTextMuted}"
+                                                   Margin="0,8,0,0" />
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Border>
+
+                            <StackPanel Grid.Row="1" Grid.Column="1"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        MaxWidth="{StaticResource EmptyStateMaxWidthPane}"
+                                        IsVisible="{Binding Memory.ShowOverviewEmptyState}">
+                                <TextBlock Text="Nothing is indexed yet"
+                                           Theme="{StaticResource TextTitle}"
+                                           HorizontalAlignment="Center" />
+                                <TextBlock Text="Point memory at a folder, a repository or a few files and it starts matching your own wording."
+                                           Theme="{StaticResource TextProse}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           Margin="0,6,0,0" />
+                                <Button Theme="{StaticResource PrimaryButton}"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,16,0,0"
+                                        Command="{Binding OpenAddSourcesCommand}"
+                                        AutomationProperties.Name="Add sources">
+                                    <StackPanel Orientation="Horizontal">
+                                        <controls:IconView Definition="{StaticResource IconPlusSmall}"
+                                                           VerticalAlignment="Center" />
+                                        <TextBlock Text="Add sources"
+                                                   VerticalAlignment="Center"
+                                                   Margin="8,0,0,0" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="1" Grid.Column="1"
+                                        Margin="24,20,24,0"
+                                        VerticalAlignment="Top"
+                                        IsVisible="{Binding Memory.ShowOverviewContent}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Memory.TextIndexedLabel}" Theme="{StaticResource TextHeading}" />
+                                    <TextBlock Text="pieces ready to search"
+                                               Theme="{StaticResource TextMeta}"
+                                               Foreground="{StaticResource BrushTextTertiary}"
+                                               Margin="8,0,0,0"
+                                               VerticalAlignment="Bottom" />
+                                    <Button Theme="{StaticResource SecondaryButton}"
+                                            Content="Add sources"
+                                            Margin="20,0,0,0"
+                                            Command="{Binding OpenAddSourcesCommand}"
+                                            AutomationProperties.Name="Add sources" />
+                                </StackPanel>
+
+                                <Grid Margin="0,16,0,0"
+                                      ColumnDefinitions="*,Auto"
+                                      IsVisible="{Binding Memory.IsIndexing}">
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding Memory.ProgressActivity}"
+                                                   Theme="{StaticResource TextSecondary}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <ProgressBar Theme="{StaticResource AppProgressBar}"
+                                                     Value="{Binding Memory.ProgressPercent}"
+                                                     Margin="0,8,0,0" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Memory.QueuedLabel}"
+                                               Theme="{StaticResource TextMeta}"
+                                               Foreground="{StaticResource BrushTextMuted}"
+                                               Margin="14,0,0,0"
+                                               VerticalAlignment="Top" />
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+
+                        <controls:ResizeSeparator Grid.Column="3"
+                                                  Value="{Binding PreviewWidth, Mode=TwoWay}"
+                                                  Minimum="{Binding PreviewMinWidth}"
+                                                  Maximum="{Binding PreviewMaxWidth}"
+                                                  Inverted="True"
+                                                  AutomationProperties.Name="Resize panel"
+                                                  ToolTip.Tip="Resize panel"
+                                                  x:Name="PreviewSeparator" />
+
+                        <Border x:Name="PreviewHost"
+                                Grid.Column="4"
+                                ClipToBounds="True">
+                            <views:FilePreviewView Width="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).PreviewWidth}"
+                                                   HorizontalAlignment="Left"
+                                                   DataContext="{Binding Workspace.Preview}" />
+                        </Border>
+
+                        <controls:ResizeSeparator x:Name="RightPanelSeparator"
+                                                  Grid.Column="5"
+                                                  Value="{Binding RightPanelWidth, Mode=TwoWay}"
+                                                  Minimum="{Binding RightPanelMinWidth}"
+                                                  Maximum="{Binding RightPanelMaxWidth}"
+                                                  Inverted="True"
+                                                  AutomationProperties.Name="Resize advanced panel"
+                                                  ToolTip.Tip="Resize advanced panel" />
+
+                        <Border x:Name="RightPanelHost"
+                                Grid.Column="6"
+                                ClipToBounds="True">
+                        <Border Width="{Binding RightPanelWidth}"
+                                HorizontalAlignment="Right"
+                                Background="{StaticResource BrushSurface}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="18,18,18,18">
+                                <StackPanel DataContext="{Binding Translation}" x:DataType="vm:TranslationSettingsViewModel">
+
+                                    <Grid Margin="0,0,0,18">
+                                        <TextBlock Text="Advanced" Theme="{StaticResource TextTitle}" />
+                                        <controls:ChromeButton Icon="{StaticResource IconCloseCrossSearch}"
+                                                               HorizontalAlignment="Right"
+                                                               VerticalAlignment="Top"
+                                                               Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ToggleRightPanelCommand}"
+                                                               ToolTip.Tip="Close the advanced panel"
+                                                               AutomationProperties.Name="Close the advanced panel" />
+                                    </Grid>
+
+                                    <TextBlock Text="Model" Theme="{StaticResource TextSubheading}" />
+
+                                    <ItemsControl ItemsSource="{Binding Efforts}" Margin="0,10,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:EffortOptionViewModel">
+                                                <Border Background="{StaticResource BrushSurface}"
+                                                        BorderBrush="{StaticResource BrushBorder}"
+                                                        BorderThickness="{StaticResource BorderThickness}"
+                                                        CornerRadius="{StaticResource RadiusDefault}"
+                                                        Padding="12,10,12,11"
+                                                        Margin="0,0,0,10">
+                                                <StackPanel>
+                                                    <Grid ColumnDefinitions="*,Auto">
+
+                                                        <RadioButton Grid.Column="0"
+                                                                     GroupName="AdvancedModel"
+                                                                     Content="{Binding Model.Name}"
+                                                                     IsChecked="{Binding IsChosen, Mode=OneWay}"
+                                                                     IsEnabled="{Binding IsInstalled}"
+                                                                     ToolTip.Tip="{Binding BlockedTooltip}"
+                                                                     ToolTip.ShowOnDisabled="True"
+                                                                     AutomationProperties.Name="{Binding Model.Name}"
+                                                                     Command="{Binding $parent[ItemsControl].((vm:TranslationSettingsViewModel)DataContext).ChooseEffortCommand}"
+                                                                     CommandParameter="{Binding}" />
+
+                                                        <Button Grid.Column="1"
+                                                                Theme="{StaticResource LinkButton}"
+                                                                Content="Get it"
+                                                                VerticalAlignment="Top"
+                                                                IsVisible="{Binding IsBlocked}"
+                                                                Command="{Binding $parent[ItemsControl].((vm:TranslationSettingsViewModel)DataContext).GetModelCommand}"
+                                                                CommandParameter="{Binding}"
+                                                                AutomationProperties.Name="Get this model" />
+                                                    </Grid>
+
+                                                    <TextBlock Text="{Binding RadioNote}"
+                                                               Theme="{StaticResource TextMeta}"
+                                                               Foreground="{StaticResource BrushTextTertiary}"
+                                                               TextWrapping="Wrap"
+                                                               Margin="24,3,0,0"
+                                                               IsVisible="{Binding RadioNote, Converter={x:Static conv:Converters.NotEmptyToVisibility}}" />
+                                                </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <Grid Margin="0,10,0,8">
+                                        <TextBlock Text="Temperature" Theme="{StaticResource TextSubheading}" />
+                                        <TextBlock Text="{Binding TemperatureReadout}"
+                                                   Theme="{StaticResource TextMonoSmall}"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+                                    <Slider Minimum="0"
+                                            Maximum="1"
+                                            SmallChange="{StaticResource TemperatureStep}"
+                                            LargeChange="{StaticResource TemperatureStep}"
+                                            Value="{Binding Temperature, Mode=TwoWay}"
+                                            IsEnabled="{Binding TemperatureIsAdjustable}"
+                                            AutomationProperties.Name="Temperature"
+                                            AutomationProperties.HelpText="{Binding TemperatureNote}" />
+                                    <TextBlock Text="{Binding TemperatureNote}"
+                                               Theme="{StaticResource TextMeta}"
+                                               Foreground="{StaticResource BrushTextTertiary}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,0,0" />
+
+                                    <TextBlock Text="User prompt"
+                                               Theme="{StaticResource TextSubheading}"
+                                               Margin="0,20,0,0" />
+                                    <Grid Margin="0,8,0,0">
+                                        <TextBox Theme="{StaticResource TextField}"
+                                                 Height="NaN"
+                                                 MinHeight="72"
+                                                 AcceptsReturn="True"
+                                                 TextWrapping="Wrap"
+                                                 VerticalContentAlignment="Stretch"
+                                                 Padding="9,7,9,7"
+                                                 Text="{Binding UserPrompt}"
+                                                 AutomationProperties.Name="User prompt" />
+                                        <TextBlock Text="Sent with every request. Example: keep product names in English."
+                                                   Theme="{StaticResource PlaceholderText}"
+                                                   VerticalAlignment="Top"
+                                                   TextWrapping="Wrap"
+                                                   Margin="10,8,10,0"
+                                                   IsVisible="{Binding UserPrompt, Converter={x:Static conv:Converters.StringEmptyToVisibility}}" />
+                                    </Grid>
+
+                                    <Border BorderBrush="{StaticResource BrushBorderSoft}"
+                                            BorderThickness="0,1,0,0"
+                                            Margin="0,20,0,0"
+                                            Padding="0,12,0,0">
+                                        <Button Theme="{StaticResource LinkButton}"
+                                                Content="Reset to defaults"
+                                                HorizontalAlignment="Left"
+                                                Command="{Binding ResetToDefaultsCommand}"
+                                                AutomationProperties.Name="Reset to defaults" />
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Border>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <Border HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Margin="0,0,0,24"
+                Height="{StaticResource SizePillHeight}"
+                CornerRadius="{StaticResource ChipRadius}"
+                Background="{StaticResource BrushBadgeOverlay}"
+                Padding="12,0,12,0"
+                IsHitTestVisible="False"
+                IsVisible="{Binding IsSizeReadoutVisible}">
+            <TextBlock Text="{Binding SizeReadout}"
+                       Theme="{StaticResource TextMeta}"
+                       Foreground="{StaticResource BrushSurface}"
+                       VerticalAlignment="Center" />
+        </Border>
+
+        <Grid Background="{StaticResource BrushOverlay}"
+              Tag="{Binding FirstRun.DismissCommand}"
+              PointerPressed="OnBackdropClick"
+              IsVisible="{Binding HasFirstRun}">
+            <views:FirstRunView x:Name="FirstRunHost" />
+        </Grid>
+
+        <Grid Background="{StaticResource BrushOverlay}"
+              Tag="{Binding Settings.CloseCommand}"
+              PointerPressed="OnBackdropClick"
+              IsVisible="{Binding HasSettings}">
+            <views:SettingsView x:Name="SettingsHost" />
+        </Grid>
+
+        <Grid Background="{StaticResource BrushOverlay}"
+              IsVisible="{Binding HasRestartNotice}">
+            <Border Theme="{StaticResource DialogSurface}"
+                    DataContext="{Binding RestartNotice}"
+                    x:DataType="vm:RestartNoticeViewModel"
+                    MinWidth="{StaticResource EmptyStateMaxWidthDialog}">
+                <StackPanel Margin="20,18,20,0">
+                    <TextBlock Text="{Binding Title}" Theme="{StaticResource TextTitle}" />
+
+                    <TextBlock Text="{Binding Body}"
+                               Theme="{StaticResource TextProse}"
+                               Foreground="{StaticResource BrushTextSecondary}"
+                               TextWrapping="Wrap"
+                               Margin="0,8,0,0" />
+
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0,10,0,0"
+                                IsVisible="{Binding IsCountingDown}">
+                        <TextBlock Text="Restarting in" Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextMuted}" />
+                        <TextBlock Text="{Binding CountdownLabel}"
+                                   Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   Margin="4,0,0,0" />
+                    </StackPanel>
+
+                    <Border Background="{StaticResource BrushSurfaceSunken}"
+                            BorderBrush="{StaticResource BrushBorderFaint}"
+                            BorderThickness="0,1,0,0"
+                            CornerRadius="0,0,11,11"
+                            Margin="-20,18,-20,0"
+                            Padding="20,14,20,14">
+                        <Grid>
+                            <Button Theme="{StaticResource LinkButton}"
+                                    Content="Never restart on its own"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding TurnOffCommand}"
+                                    AutomationProperties.Name="Never restart on its own" />
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Theme="{StaticResource SecondaryButton}"
+                                        Content="Not now"
+                                        Command="{Binding PostponeCommand}"
+                                        IsEnabled="{Binding CanPostpone}"
+                                        AutomationProperties.Name="Not now" />
+
+                                <Button Theme="{StaticResource PrimaryButton}"
+                                        Content="Restart now"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding RestartNowCommand}"
+                                        IsVisible="{Binding !IsHeld}"
+                                        AutomationProperties.Name="Restart now" />
+
+                                <Button Theme="{StaticResource PrimaryButton}"
+                                        Content="Stop translating and restart"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding CancelWorkAndRestartCommand}"
+                                        IsVisible="{Binding IsHeld}"
+                                        AutomationProperties.Name="Stop translating and restart" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid Background="{StaticResource BrushOverlay}"
+              Tag="{Binding AddSources.CancelCommand}"
+              PointerPressed="OnBackdropClick"
+              IsVisible="{Binding HasAddSources}">
+            <views:AddSourcesView DataContext="{Binding AddSources}" />
+        </Grid>
+
+        <Grid Background="{StaticResource BrushOverlay}"
+              Tag="{Binding ActiveDialog.CancelCommand}"
+              PointerPressed="OnBackdropClick"
+              IsVisible="{Binding HasDialog}">
+
+            <Border Theme="{StaticResource DialogSurface}"
+                    DataContext="{Binding ActiveDialog}"
+                    x:DataType="vm:ConfirmDialogViewModel"
+                    MinWidth="{StaticResource EmptyStateMaxWidthDialog}">
+                <StackPanel Margin="20,18,20,0">
+                    <TextBlock Text="{Binding Title}" Theme="{StaticResource TextTitle}" />
+                    <TextBlock Text="{Binding Body}"
+                               Theme="{StaticResource TextProse}"
+                               Foreground="{StaticResource BrushTextSecondary}"
+                               TextWrapping="Wrap"
+                               Margin="0,8,0,0" />
+
+                    <Border Background="{StaticResource BrushSurfaceSunken}"
+                            BorderBrush="{StaticResource BrushBorderFaint}"
+                            BorderThickness="0,1,0,0"
+                            CornerRadius="0,0,11,11"
+                            Margin="-20,18,-20,0"
+                            Padding="20,14,20,14">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Theme="{StaticResource SecondaryButton}"
+                                    Command="{Binding CancelCommand}"
+                                    AutomationProperties.Name="{Binding CancelLabel}">
+                                <StackPanel Orientation="Horizontal">
+                                    <controls:IconView Definition="{Binding CancelIconKey, Converter={x:Static conv:Converters.KeyToIcon}}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,4,0" />
+                                    <TextBlock Text="{Binding CancelLabel}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                            <Button Theme="{StaticResource DestructiveButton}"
+                                    Command="{Binding ConfirmCommand}"
+                                    Margin="8,0,0,0"
+                                    AutomationProperties.Name="{Binding ConfirmLabel}">
+                                <StackPanel Orientation="Horizontal">
+                                    <controls:IconView Definition="{Binding ConfirmIconKey, Converter={x:Static conv:Converters.KeyToIcon}}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,4,0" />
+                                    <TextBlock Text="{Binding ConfirmLabel}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="0,0,22,22"
+                MaxWidth="360"
+                Background="{StaticResource BrushSurface}"
+                BorderBrush="{StaticResource BrushBorder}"
+                BorderThickness="{StaticResource BorderThickness}"
+                CornerRadius="{StaticResource RadiusPanel}"
+                Padding="16,14,16,14"
+                DataContext="{Binding Updates}"
+                x:DataType="vm:UpdatesViewModel"
+                IsVisible="{Binding ShowNotice}">
+            <StackPanel>
+                <TextBlock Text="{Binding NoticeTitle}" Theme="{StaticResource TextCardTitle}" />
+                <TextBlock Text="{Binding NoticeDetail}"
+                           Theme="{StaticResource TextMeta}"
+                           Foreground="{StaticResource BrushTextSecondary}"
+                           TextWrapping="Wrap"
+                           Margin="0,4,0,0" />
+                <ProgressBar Height="4"
+                             Minimum="0"
+                             Maximum="100"
+                             Value="{Binding DownloadPercent, Mode=OneWay}"
+                             Margin="0,12,0,0"
+                             IsVisible="{Binding IsDownloading}"
+                             AutomationProperties.Name="Download progress" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                    <Button Theme="{StaticResource SecondaryButton}"
+                            Content="Later"
+                            Command="{Binding DismissCommand}"
+                            AutomationProperties.Name="Update later" />
+                    <Button Theme="{StaticResource PrimaryButton}"
+                            Content="Download"
+                            Margin="8,0,0,0"
+                            IsEnabled="{Binding CanInteract}"
+                            IsVisible="{Binding CanDownload}"
+                            Command="{Binding DownloadCommand}"
+                            AutomationProperties.Name="Download the update" />
+                    <Button Theme="{StaticResource PrimaryButton}"
+                            Content="Restart now"
+                            Margin="8,0,0,0"
+                            IsEnabled="{Binding CanInteract}"
+                            IsVisible="{Binding UpdateReady}"
+                            Command="{Binding RestartCommand}"
+                            AutomationProperties.Name="Restart now to finish the update" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

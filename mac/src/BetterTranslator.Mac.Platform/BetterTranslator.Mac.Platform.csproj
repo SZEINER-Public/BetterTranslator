@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>BetterTranslator.Mac.Platform</AssemblyName>
+    <RootNamespace>BetterTranslator.Mac.Platform</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BetterTranslator.Mac.Shared\BetterTranslator.Mac.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

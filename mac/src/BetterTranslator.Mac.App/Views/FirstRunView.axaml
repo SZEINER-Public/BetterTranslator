@@ -1,0 +1,432 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:BetterTranslator.Mac.App.Controls"
+             xmlns:conv="using:BetterTranslator.Mac.App.Converters"
+             xmlns:vm="using:BetterTranslator.App.ViewModels"
+             xmlns:adapt="using:BetterTranslator.Mac.Adapters"
+             x:Class="BetterTranslator.Mac.App.Views.FirstRunView"
+             x:DataType="adapt:MacInstallSurface">
+
+    <UserControl.Resources>
+
+        <ControlTheme x:Key="InstallCardToggle" TargetType="CheckBox">
+            <Setter Property="Template">
+                <ControlTemplate TargetType="CheckBox">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+
+        <ControlTheme x:Key="InstallCard" TargetType="Border" BasedOn="{StaticResource SourceCard}">
+            <Style Selector="^.selected">
+                <Setter Property="Background" Value="{StaticResource BrushAccentTintSoft}" />
+                <Setter Property="BorderBrush" Value="{StaticResource BrushAccentBorder}" />
+            </Style>
+
+            <Style Selector="^.installedHere">
+                <Setter Property="Background" Value="{StaticResource BrushSurfaceSunken}" />
+                <Setter Property="BorderBrush" Value="{StaticResource BrushBorderFaint}" />
+                <Setter Property="TextElement.Foreground" Value="{StaticResource BrushTextMuted}" />
+            </Style>
+        </ControlTheme>
+
+        <ControlTheme x:Key="InstallDot" TargetType="Ellipse">
+            <Setter Property="Fill" Value="{StaticResource BrushWarn}" />
+
+            <Style Selector="^.installed">
+                <Setter Property="Fill" Value="{StaticResource BrushSuccess}" />
+            </Style>
+        </ControlTheme>
+
+        <ControlTheme x:Key="InstallStatusText" TargetType="TextBlock" BasedOn="{StaticResource TextSecondary}">
+            <Setter Property="Foreground" Value="{StaticResource BrushAccentDeep}" />
+
+            <Style Selector="^.installed">
+                <Setter Property="Foreground" Value="{StaticResource BrushSuccessDeep}" />
+            </Style>
+        </ControlTheme>
+
+    </UserControl.Resources>
+
+    <Border Theme="{StaticResource DialogSurface}" Width="520">
+        <StackPanel>
+
+            <Grid Margin="20,18,20,0">
+                <StackPanel Orientation="Horizontal">
+                    <controls:Wordmark BarBrush="{StaticResource BrushText}"
+                                       AccentBrush="{StaticResource BrushAccent}"
+                                       MarkHeight="11"
+                                       VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Model.Title}"
+                               Theme="{StaticResource TextTitle}"
+                               Margin="10,0,0,0"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <controls:ChromeButton Icon="{StaticResource IconCloseCrossSearch}"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Top"
+                                       Command="{Binding Model.DismissCommand}"
+                                       ToolTip.Tip="Close without installing"
+                                       AutomationProperties.Name="Close without installing"
+                                       IsVisible="{Binding Model.IsChoosing}" />
+            </Grid>
+
+            <StackPanel IsVisible="{Binding Model.IsChoosing}">
+
+                <StackPanel Orientation="Horizontal" Margin="20,16,20,0">
+                    <Border Background="{StaticResource BrushTrack}"
+                            CornerRadius="{StaticResource RadiusPanel}"
+                            Padding="{StaticResource Space1Thickness}">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Theme="{StaticResource FolderSegment}"
+                                         Content="Default folder"
+                                         IsChecked="{Binding Model.IsUsingDefaultFolder, Mode=OneWay}"
+                                         Command="{Binding Model.UseDefaultFolderCommand}"
+                                         AutomationProperties.Name="Default folder" />
+                            <RadioButton Theme="{StaticResource FolderSegment}"
+                                         Content="Pick a folder"
+                                         Command="{Binding Model.PickFolderCommand}"
+                                         AutomationProperties.Name="Pick a folder" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="20,10,20,0">
+                    <TextBlock Text="{Binding Model.PathLabel}"
+                               Theme="{StaticResource TextMeta}"
+                               Foreground="{StaticResource BrushTextTertiary}"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Model.ChosenPath}"
+                               Theme="{StaticResource TextMonoPath}"
+                               Foreground="{StaticResource BrushTextSubtle}"
+                               TextTrimming="CharacterEllipsis"
+                               MaxWidth="360"
+                               Margin="8,0,0,0"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <TextBlock Text="{Binding Model.FolderWarning}"
+                           Theme="{StaticResource TextMeta}"
+                           Foreground="{StaticResource BrushDangerText}"
+                           TextWrapping="Wrap"
+                           MaxWidth="520"
+                           HorizontalAlignment="Left"
+                           Margin="20,6,20,0"
+                           IsVisible="{Binding Model.FolderWarning, Converter={x:Static conv:Converters.NotEmptyToVisibility}}" />
+
+                <TextBlock Text="What to install"
+                           Theme="{StaticResource TextSubheading}"
+                           Margin="20,18,20,8" />
+
+                <ItemsControl ItemsSource="{Binding Items}" Margin="20,0,20,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:InstallItemViewModel">
+                            <CheckBox Theme="{StaticResource InstallCardToggle}"
+                                      IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                      IsEnabled="{Binding CanDeselect}"
+                                      AutomationProperties.Name="{Binding Name}"
+                                      HorizontalContentAlignment="Stretch"
+                                      Cursor="Hand">
+                                <Border Theme="{StaticResource InstallCard}"
+                                        Classes.selected="{Binding IsSelected}"
+                                        Classes.installedHere="{Binding IsInstalledHere}">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+
+                                        <CheckBox Grid.Column="0"
+                                                  Theme="{StaticResource AppCheckBox}"
+                                                  IsChecked="{Binding IsSelected, Mode=OneWay}"
+                                                  IsEnabled="{Binding CanDeselect}"
+                                                  IsHitTestVisible="False"
+                                                  Focusable="False"
+                                                  VerticalAlignment="Top"
+                                                  Margin="0,1,12,0"
+                                                  ToolTip.Tip="{Binding Name}"
+                                                  AutomationProperties.Name="{Binding Name}" />
+
+                                        <StackPanel Grid.Column="1">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Name}"
+                                                           Theme="{StaticResource TextCardTitle}"
+                                                           VerticalAlignment="Center" />
+                                                <Border Background="{StaticResource BrushAccentTint}"
+                                                        CornerRadius="{StaticResource RadiusSm}"
+                                                        Padding="6,1,6,2"
+                                                        Margin="8,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        IsVisible="{Binding HasTag}">
+                                                    <TextBlock Text="{Binding Tag}"
+                                                               Theme="{StaticResource TextMicro}"
+                                                               Foreground="{StaticResource BrushAccentDeep}" />
+                                                </Border>
+
+                                                <Border Background="Transparent"
+                                                        Margin="8,0,0,0"
+                                                        Padding="2"
+                                                        VerticalAlignment="Center"
+                                                        ToolTip.ShowDelay="150"
+                                                        ToolTip.Tip="{Binding PresenceNote}"
+                                                        AutomationProperties.Name="{Binding PresenceNote}"
+                                                        IsVisible="{Binding HasPresenceNote}">
+                                                    <controls:IconView Definition="{StaticResource IconInfoCircle}"
+                                                                       Foreground="{StaticResource BrushAccentDeep}"
+                                                                       Width="14"
+                                                                       Height="14"
+                                                                       IsHitTestVisible="False" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Summary}"
+                                                       Theme="{StaticResource TextMeta}"
+                                                       Foreground="{StaticResource BrushTextSecondary}"
+                                                       TextWrapping="Wrap"
+                                                       Margin="0,3,0,0" />
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding SizeLabel}"
+                                                   Theme="{StaticResource TextSecondary}"
+                                                   Foreground="{StaticResource BrushTextSecondary}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="12,0,0,0" />
+
+                                        <controls:ChromeButton Grid.Column="3"
+                                                               Icon="{StaticResource IconCloseSmall}"
+                                                               Width="{StaticResource Space16}"
+                                                               Height="{StaticResource Space16}"
+                                                               Margin="6,0,0,0"
+                                                               VerticalAlignment="Center"
+                                                               ToolTip.Tip="Remove this model"
+                                                               AutomationProperties.Name="Remove this model"
+                                                               IsVisible="{Binding IsCustom}"
+                                                               Command="{Binding $parent[ItemsControl].((adapt:MacInstallSurface)DataContext).Model.RemoveCustomModelCommand}"
+                                                               CommandParameter="{Binding}" />
+                                    </Grid>
+                                </Border>
+                            </CheckBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Border BorderBrush="{StaticResource BrushBorderSoft}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusCard}"
+                        Background="{StaticResource BrushSurfaceSunken}"
+                        Padding="14,12,14,12"
+                        Margin="20,4,20,0">
+                    <StackPanel>
+                        <TextBlock Text="Another model from the web" Theme="{StaticResource TextCardTitle}" />
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,9,0,0">
+                            <Grid Grid.Column="0">
+                                <TextBox Theme="{StaticResource TextField}"
+                                         Text="{Binding Model.CustomModelLink}"
+                                         AutomationProperties.Name="Link to a model" />
+                                <TextBlock Text="huggingface.co/owner/model or https://.../model.gguf"
+                                           Theme="{StaticResource PlaceholderText}"
+                                           Margin="10,0,0,0"
+                                           IsVisible="{Binding Model.CustomModelLink, Converter={x:Static conv:Converters.StringEmptyToVisibility}}" />
+                            </Grid>
+                            <Button Grid.Column="1"
+                                    Theme="{StaticResource SecondaryButton}"
+                                    Content="Add"
+                                    Margin="8,0,0,0"
+                                    Command="{Binding Model.AddCustomModelCommand}"
+                                    AutomationProperties.Name="Add this model" />
+                        </Grid>
+                        <TextBlock Text="{Binding Model.LinkRejection}"
+                                   Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushDangerText}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,8,0,0"
+                                   IsVisible="{Binding Model.LinkRejection, Converter={x:Static conv:Converters.NotEmptyToVisibility}}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{StaticResource BrushSurfaceSunken}"
+                        BorderBrush="{StaticResource BrushBorderFaint}"
+                        BorderThickness="0,1,0,0"
+                        CornerRadius="0,0,11,11"
+                        Padding="20,14,20,14"
+                        Margin="0,18,0,0">
+                    <Grid>
+                        <TextBlock Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Left"
+                                   Text="{Binding Model.DownloadSizeLabel}"
+                                   IsVisible="{Binding Model.DownloadSizeLabel, Converter={x:Static conv:Converters.NotEmptyToVisibility}}" />
+                        <TextBlock Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Left"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="300"
+                                   Text="{Binding Model.InstallBlockedReason}"
+                                   IsVisible="{Binding Model.CanInstall, Converter={x:Static conv:Converters.InverseBoolToVisibility}}" />
+
+                        <TextBlock Theme="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Left"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="300"
+                                   Text="{Binding Model.NoModelNote}"
+                                   IsVisible="{Binding Model.NoModelNote, Converter={x:Static conv:Converters.NotEmptyToVisibility}}" />
+
+                        <Button Theme="{StaticResource PrimaryButton}"
+                                HorizontalAlignment="Right"
+                                Content="{Binding Model.InstallLabel}"
+                                IsEnabled="{Binding Model.CanInstall}"
+                                ToolTip.Tip="{Binding Model.InstallBlockedReason}"
+                                Command="{Binding Model.InstallCommand}" />
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <StackPanel IsVisible="{Binding Model.IsInstalling}">
+                <ItemsControl ItemsSource="{Binding Items}" Margin="20,16,20,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:InstallItemViewModel">
+                            <StackPanel Margin="0,0,0,14" IsVisible="{Binding IsSelected}">
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Theme="{StaticResource InstallDot}"
+                                                 Classes.installed="{Binding IsInstalled}"
+                                                 Width="{StaticResource Space6}"
+                                                 Height="{StaticResource Space6}"
+                                                 VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Name}"
+                                                   Theme="{StaticResource TextDefault}"
+                                                   Margin="9,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+
+                                    <TextBlock Text="{Binding StatusLabel}"
+                                               Theme="{StaticResource InstallStatusText}"
+                                               Classes.installed="{Binding IsInstalled}"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+
+                                <ProgressBar Theme="{StaticResource AppProgressBar}"
+                                             Value="{Binding Percent}"
+                                             Margin="0,8,0,0" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Border Background="{StaticResource BrushSurfaceSunken}"
+                        BorderBrush="{StaticResource BrushBorderFaint}"
+                        BorderThickness="0,1,0,0"
+                        CornerRadius="0,0,11,11"
+                        Padding="20,13,20,13"
+                        Margin="0,6,0,0">
+                    <TextBlock Text="{Binding Model.FooterStatus}"
+                               Theme="{StaticResource TextFine}"
+                               Foreground="{StaticResource BrushTextSubtle}"
+                               TextTrimming="CharacterEllipsis" />
+                </Border>
+            </StackPanel>
+
+            <StackPanel IsVisible="{Binding Model.IsChoosingStart}">
+                <UniformGrid Rows="1" Margin="20,18,20,0">
+                    <Button Theme="{StaticResource StartTile}"
+                            Command="{Binding Model.StartCommand}"
+                            CommandParameter="JustChat"
+                            AutomationProperties.Name="Just chat">
+                        <StackPanel>
+                            <Border Background="{StaticResource BrushAccentTint}"
+                                    CornerRadius="{StaticResource RadiusCardLg}"
+                                    Width="{StaticResource Space16}"
+                                    Height="{StaticResource Space16}"
+                                    HorizontalAlignment="Center">
+                                <controls:IconView Definition="{StaticResource IconChatBubbleLarge}"
+                                                   Foreground="{StaticResource BrushAccent}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Text="Just chat"
+                                       Theme="{StaticResource TextCardTitle}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,12,0,0" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Theme="{StaticResource StartTile}"
+                            Command="{Binding Model.StartCommand}"
+                            CommandParameter="Repository"
+                            IsEnabled="False"
+                            ToolTip.Tip="Repository is coming soon"
+                            AutomationProperties.Name="Repository. Repository is coming soon">
+                        <StackPanel>
+                            <Border Background="{StaticResource BrushAccentTint}"
+                                    CornerRadius="{StaticResource RadiusCardLg}"
+                                    Width="{StaticResource Space16}"
+                                    Height="{StaticResource Space16}"
+                                    HorizontalAlignment="Center">
+                                <controls:IconView Definition="{StaticResource IconRepository}"
+                                                   Foreground="{StaticResource BrushAccent}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,12,0,0">
+                                <controls:IconView Definition="{StaticResource IconLockSegment}"
+                                                   Margin="0,0,6,0"
+                                                   VerticalAlignment="Center" />
+                                <TextBlock Text="Repository"
+                                           Theme="{StaticResource TextCardTitle}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Theme="{StaticResource StartTile}"
+                            Command="{Binding Model.StartCommand}"
+                            CommandParameter="Folder"
+                            IsEnabled="False"
+                            ToolTip.Tip="Folder is coming soon"
+                            AutomationProperties.Name="Folder. Folder is coming soon">
+                        <StackPanel>
+                            <Border Background="{StaticResource BrushAccentTint}"
+                                    CornerRadius="{StaticResource RadiusCardLg}"
+                                    Width="{StaticResource Space16}"
+                                    Height="{StaticResource Space16}"
+                                    HorizontalAlignment="Center">
+                                <controls:IconView Definition="{StaticResource IconFolderLarge}"
+                                                   Foreground="{StaticResource BrushAccent}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,12,0,0">
+                                <controls:IconView Definition="{StaticResource IconLockSegment}"
+                                                   Margin="0,0,6,0"
+                                                   VerticalAlignment="Center" />
+                                <TextBlock Text="Folder"
+                                           Theme="{StaticResource TextCardTitle}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Button>
+                </UniformGrid>
+
+                <Border Background="{StaticResource BrushSurfaceSunken}"
+                        BorderBrush="{StaticResource BrushBorderFaint}"
+                        BorderThickness="0,1,0,0"
+                        CornerRadius="0,0,11,11"
+                        Padding="20,13,20,13"
+                        Margin="0,18,0,0">
+                    <TextBlock Text="You can change this later"
+                               Theme="{StaticResource TextMeta}"
+                               Foreground="{StaticResource BrushTextMuted}" />
+                </Border>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

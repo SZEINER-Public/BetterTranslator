@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>BetterTranslator.Updates</AssemblyName>
+    <RootNamespace>BetterTranslator.Updates</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <MirrorSourceRoot>$(WindowsSourceRoot)BetterTranslator.Updates\</MirrorSourceRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MirrorSourceRoot)**\*.cs"
+             Exclude="$(MirrorSourceRoot)bin\**\*.cs;$(MirrorSourceRoot)obj\**\*.cs"
+             Link="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BetterTranslator.Core.Mirror\BetterTranslator.Core.Mirror.csproj" />
+  </ItemGroup>
+
+</Project>

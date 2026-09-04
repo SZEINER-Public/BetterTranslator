@@ -1,0 +1,593 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:BetterTranslator.Mac.App.Controls"
+                    xmlns:conv="using:BetterTranslator.Mac.App.Converters"
+                    xmlns:shared="using:BetterTranslator.App.Controls">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Colors.axaml" />
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Typography.axaml" />
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Metrics.axaml" />
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Icons.axaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
+    <conv:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibility" />
+    <conv:ResourceKeyToBrushConverter x:Key="FlagBrush" />
+    <conv:ResourceKeyToIconConverter x:Key="KeyToIcon" />
+    <conv:StringNotEmptyToVisibilityConverter x:Key="NotEmptyToVisibility" />
+    <conv:ZeroToVisibilityConverter x:Key="ZeroToVisibility" />
+    <conv:EqualToVisibilityConverter x:Key="EqualToVisibility" />
+
+    <ControlTheme x:Key="SendButton" TargetType="controls:ChromeButton">
+        <Setter Property="Width" Value="{StaticResource SendButtonSize}" />
+        <Setter Property="Height" Value="{StaticResource SendButtonSize}" />
+        <Setter Property="Background" Value="{StaticResource BrushAccentDeep}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushSurface}" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:ChromeButton">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{StaticResource SendButtonRadius}"
+                        UseLayoutRounding="True">
+                    <controls:IconView x:Name="Glyph"
+                                       Definition="{TemplateBinding Icon}"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushAccentPressed}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushAccentPressed}" />
+        </Style>
+        <Style Selector="^:disabled /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushTrackAlt}" />
+        </Style>
+        <Style Selector="^:disabled /template/ controls|IconView#Glyph">
+            <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type controls:ChromeButton}" TargetType="controls:ChromeButton">
+        <Setter Property="Width" Value="{StaticResource ChromeButtonSize}" />
+        <Setter Property="Height" Value="{StaticResource ChromeButtonSize}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushIcon}" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:ChromeButton">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="Transparent"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusDefault}"
+                        UseLayoutRounding="True">
+                    <controls:IconView x:Name="Glyph"
+                                       Definition="{TemplateBinding Icon}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:outlined /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        </Style>
+        <Style Selector="^:active /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushAccentTint}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushAccentBorder}" />
+        </Style>
+        <Style Selector="^:active /template/ controls|IconView#Glyph">
+            <Setter Property="Foreground" Value="{StaticResource BrushAccentDeep}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHover}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHoverStrong}" />
+        </Style>
+        <Style Selector="^:disabled /template/ Border#Fill">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="^:disabled /template/ controls|IconView#Glyph">
+            <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="ToolbarChromeButton" TargetType="Button">
+        <Setter Property="Height" Value="{StaticResource ChromeButtonSize}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushIcon}" />
+        <Setter Property="Padding" Value="7,0,7,0" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{StaticResource RadiusDefault}"
+                        Padding="{TemplateBinding Padding}"
+                        UseLayoutRounding="True">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHover}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHoverStrong}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="ProjectSelectorButton" TargetType="controls:ChromeButton">
+        <Setter Property="Height" Value="{StaticResource ChromeButtonSize}" />
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        <Setter Property="BorderThickness" Value="{StaticResource BorderThickness}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushIcon}" />
+        <Setter Property="Padding" Value="8,0,8,0" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:ChromeButton">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{StaticResource RadiusDefault}"
+                        Padding="{TemplateBinding Padding}"
+                        UseLayoutRounding="True">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      VerticalAlignment="Center"
+                                      TextElement.Foreground="{TemplateBinding Foreground}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHover}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHoverStrong}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="ScopeChipClearButton" TargetType="controls:ChromeButton">
+        <Setter Property="Width" Value="{StaticResource ChipButtonSize}" />
+        <Setter Property="Height" Value="{StaticResource ChipButtonSize}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushAccentDeep}" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:ChromeButton">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{StaticResource RadiusMd}"
+                        UseLayoutRounding="True">
+                    <controls:IconView Definition="{TemplateBinding Icon}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushAccentHover}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushAccentBorder}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="EntryCopyButton" TargetType="controls:ChromeButton">
+        <Setter Property="Width" Value="{StaticResource ChipButtonSize}" />
+        <Setter Property="Height" Value="{StaticResource ChipButtonSize}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextTertiary}" />
+        <Setter Property="Opacity" Value="{Binding $parent[Border].IsPointerOver, x:CompileBindings=False}" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Margin" Value="-5,2,0,0" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:ChromeButton">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{StaticResource RadiusDefault}"
+                        UseLayoutRounding="True">
+                    <controls:IconView Definition="{TemplateBinding Icon}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHover}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHoverStrong}" />
+        </Style>
+        <Style Selector="^:focus">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="SegmentItemStyle" TargetType="ListBoxItem" x:DataType="shared:SegmentItem">
+        <Setter Property="Width" Value="{Binding Width}" />
+        <Setter Property="Height" Value="{StaticResource SegmentHeight}" />
+        <Setter Property="IsEnabled" Value="{Binding IsUnlocked}" />
+        <Setter Property="ToolTip.Tip" Value="{Binding LockedReason}" />
+        <Setter Property="ToolTip.ShowOnDisabled" Value="True" />
+        <Setter Property="AutomationProperties.Name" Value="{Binding AutomationName}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextSecondarySize}" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ListBoxItem" x:DataType="shared:SegmentItem">
+                <Border x:Name="Fill"
+                        Background="Transparent"
+                        CornerRadius="{StaticResource RadiusDefault}"
+                        UseLayoutRounding="True">
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                        <controls:IconView x:Name="Glyph"
+                                           Definition="{Binding Icon}"
+                                           IsVisible="{Binding HasIcon}"
+                                           Margin="0,0,5,0"
+                                           VerticalAlignment="Center" />
+                        <controls:IconView x:Name="Padlock"
+                                           Definition="{StaticResource IconLockSegment}"
+                                           Margin="0,0,4,0"
+                                           IsVisible="False"
+                                           VerticalAlignment="Center" />
+                        <TextBlock x:Name="Label"
+                                   Text="{Binding Label}"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:selected">
+            <Setter Property="Foreground"
+                    Value="{Binding ActiveForeground, Converter={x:Static conv:Converters.BrushShim}, TargetNullValue={StaticResource BrushText}}" />
+        </Style>
+        <Style Selector="^:pointerover:not(:selected) /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHoverStrong}" />
+        </Style>
+        <Style Selector="^:disabled">
+            <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+        </Style>
+        <Style Selector="^:disabled /template/ controls|IconView#Padlock">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="^:disabled /template/ Border#Fill">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type controls:SegmentedControl}" TargetType="controls:SegmentedControl">
+        <Setter Property="Background" Value="{StaticResource BrushTrack}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="{StaticResource Space1Thickness}" />
+        <Setter Property="ItemContainerTheme" Value="{StaticResource SegmentItemStyle}" />
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:SegmentedControl">
+                <Border Background="{TemplateBinding Background}"
+                        CornerRadius="{StaticResource RadiusPanel}"
+                        Padding="{TemplateBinding Padding}"
+                        UseLayoutRounding="True">
+                    <Grid x:Name="PART_Track">
+                        <Border x:Name="PART_Thumb"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Stretch"
+                                Background="{StaticResource BrushSurface}"
+                                CornerRadius="{StaticResource RadiusDefault}"
+                                Effect="{StaticResource ShadowThumb}" />
+                        <ItemsPresenter x:Name="PART_ItemsPresenter"
+                                        ItemsPanel="{TemplateBinding ItemsPanel}" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type controls:ResizeSeparator}" TargetType="controls:ResizeSeparator">
+        <Setter Property="Width" Value="{StaticResource SeparatorHitWidth}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="ZIndex" Value="1" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:ResizeSeparator">
+                <Grid x:Name="Root"
+                      Background="{TemplateBinding Background}"
+                      ClipToBounds="True"
+                      UseLayoutRounding="True">
+                    <Grid x:Name="Grab"
+                          Width="{StaticResource SeparatorGrabWidth}"
+                          Margin="{StaticResource SeparatorGrabOffset}"
+                          HorizontalAlignment="Center"
+                          Background="Transparent">
+                        <StackPanel x:Name="Grip"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Opacity="{StaticResource SeparatorGripRestOpacity}">
+                            <Rectangle x:Name="GripLeading"
+                                       Width="{StaticResource BorderWidth}"
+                                       Height="{StaticResource SeparatorGripHeight}"
+                                       RadiusX="{StaticResource SeparatorGripRadius}"
+                                       RadiusY="{StaticResource SeparatorGripRadius}"
+                                       Fill="{StaticResource BrushTextSubtle}"
+                                       UseLayoutRounding="True" />
+                            <Rectangle x:Name="GripTrailing"
+                                       Width="{StaticResource BorderWidth}"
+                                       Height="{StaticResource SeparatorGripHeight}"
+                                       RadiusX="{StaticResource SeparatorGripRadius}"
+                                       RadiusY="{StaticResource SeparatorGripRadius}"
+                                       Margin="{StaticResource SeparatorGripGap}"
+                                       Fill="{StaticResource BrushTextSubtle}"
+                                       UseLayoutRounding="True" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Rectangle x:Name="Rule"
+                               Width="{StaticResource BorderWidth}"
+                               HorizontalAlignment="Center"
+                               Fill="{StaticResource BrushBorderSoft}"
+                               UseLayoutRounding="True" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Rectangle#Rule">
+            <Setter Property="Fill" Value="{StaticResource BrushAccent}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Rectangle#GripLeading">
+            <Setter Property="Fill" Value="{StaticResource BrushAccent}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Rectangle#GripTrailing">
+            <Setter Property="Fill" Value="{StaticResource BrushAccent}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ StackPanel#Grip">
+            <Setter Property="Opacity" Value="{StaticResource SeparatorGripActiveOpacity}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Rectangle#Rule">
+            <Setter Property="Fill" Value="{StaticResource BrushAccent}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Rectangle#GripLeading">
+            <Setter Property="Fill" Value="{StaticResource BrushAccent}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Rectangle#GripTrailing">
+            <Setter Property="Fill" Value="{StaticResource BrushAccent}" />
+        </Style>
+        <Style Selector="^:pressed /template/ StackPanel#Grip">
+            <Setter Property="Opacity" Value="{StaticResource SeparatorGripActiveOpacity}" />
+        </Style>
+        <Style Selector="^:focus /template/ Rectangle#Rule">
+            <Setter Property="Fill" Value="{StaticResource BrushAccent}" />
+        </Style>
+        <Style Selector="^:focus /template/ Rectangle#GripLeading">
+            <Setter Property="Fill" Value="{StaticResource BrushAccent}" />
+        </Style>
+        <Style Selector="^:focus /template/ Rectangle#GripTrailing">
+            <Setter Property="Fill" Value="{StaticResource BrushAccent}" />
+        </Style>
+        <Style Selector="^:focus /template/ StackPanel#Grip">
+            <Setter Property="Opacity" Value="{StaticResource SeparatorGripActiveOpacity}" />
+        </Style>
+        <Style Selector="^:disabled /template/ Grid#Root">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="PrimaryButton" TargetType="Button">
+        <Setter Property="Height" Value="{StaticResource PrimaryButtonHeight}" />
+        <Setter Property="Padding" Value="14,0,14,0" />
+        <Setter Property="Background" Value="{StaticResource BrushAccentDeep}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushAccentDeep}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="FocusAdorner">
+            <FocusAdornerTemplate>
+                <ContentControl Theme="{StaticResource FocusRing}" />
+            </FocusAdornerTemplate>
+        </Setter>
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusRow}"
+                        Padding="{TemplateBinding Padding}"
+                        UseLayoutRounding="True">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushAccentPressed}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushAccentPressed}" />
+        </Style>
+        <Style Selector="^:disabled /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushTrackAlt}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderSoft}" />
+        </Style>
+        <Style Selector="^:disabled">
+            <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusRow}"
+                        Padding="{TemplateBinding Padding}"
+                        UseLayoutRounding="True">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushHover}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        </Style>
+        <Style Selector="^:disabled /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushTrackAlt}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderSoft}" />
+        </Style>
+        <Style Selector="^:disabled">
+            <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="DestructiveButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+        <Setter Property="BorderBrush" Value="{StaticResource BrushDangerBorder}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushDanger}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="Fill"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusRow}"
+                        Padding="{TemplateBinding Padding}"
+                        UseLayoutRounding="True">
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushDangerSurface}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushDangerBorder}" />
+        </Style>
+        <Style Selector="^:disabled /template/ Border#Fill">
+            <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushDangerBorder}" />
+        </Style>
+        <Style Selector="^:disabled">
+            <Setter Property="Foreground" Value="{StaticResource BrushDanger}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextField" TargetType="TextBox">
+        <Setter Property="Height" Value="{StaticResource TextFieldHeight}" />
+        <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="SelectionBrush" Value="{StaticResource BrushSelection}" />
+        <Setter Property="CaretBrush" Value="{StaticResource BrushText}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="Padding" Value="9,0,9,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="TextBox">
+                <Border x:Name="Frame"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{StaticResource BorderThickness}"
+                        CornerRadius="{StaticResource RadiusRow}"
+                        UseLayoutRounding="True">
+                    <ScrollViewer x:Name="PART_ScrollViewer"
+                                  Padding="{TemplateBinding Padding}"
+                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                  HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                                  VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+                        <TextPresenter x:Name="PART_TextPresenter"
+                                       Text="{TemplateBinding Text, Mode=TwoWay}"
+                                       CaretBrush="{TemplateBinding CaretBrush}"
+                                       SelectionBrush="{TemplateBinding SelectionBrush}"
+                                       SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                       SelectionStart="{TemplateBinding SelectionStart}"
+                                       SelectionEnd="{TemplateBinding SelectionEnd}"
+                                       PasswordChar="{TemplateBinding PasswordChar}"
+                                       RevealPassword="{TemplateBinding RevealPassword}"
+                                       TextAlignment="{TemplateBinding TextAlignment}"
+                                       TextWrapping="{TemplateBinding TextWrapping}" />
+                    </ScrollViewer>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#Frame">
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderStrong}" />
+        </Style>
+        <Style Selector="^:focus-within /template/ Border#Frame">
+            <Setter Property="BorderBrush" Value="{StaticResource BrushAccentBorder}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="PlaceholderText" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+        <Setter Property="IsHitTestVisible" Value="False" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </ControlTheme>
+
+</ResourceDictionary>

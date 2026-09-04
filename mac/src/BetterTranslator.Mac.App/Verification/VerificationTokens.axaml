@@ -1,0 +1,18 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Colors.axaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <SolidColorBrush x:Key="BtVerifyWarningUnderlineBrush" Color="#8A5A00" />
+    <SolidColorBrush x:Key="BtVerifyErrorUnderlineBrush" Color="#B3261E" />
+
+    <sys:Double x:Key="BtVerifyWarningUnderlineThickness">1.5</sys:Double>
+    <sys:Double x:Key="BtVerifyErrorUnderlineThickness">2.5</sys:Double>
+
+    <DashStyle x:Key="BtVerifyWarningDashStyle" Dashes="2,2" />
+    <DashStyle x:Key="BtVerifyErrorDashStyle" Dashes="" />
+
+</ResourceDictionary>

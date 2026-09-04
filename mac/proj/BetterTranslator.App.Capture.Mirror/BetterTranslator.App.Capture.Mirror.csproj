@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <RuntimeIdentifier />
+    <UseWPF>true</UseWPF>
+    <OutputType>Library</OutputType>
+    <AssemblyName>BetterTranslator.App.Capture</AssemblyName>
+    <RootNamespace>BetterTranslator.App</RootNamespace>
+    <PlatformTarget>x64</PlatformTarget>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultPageItems>false</EnableDefaultPageItems>
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <MirrorSourceRoot>$(WindowsSourceRoot)BetterTranslator.App\</MirrorSourceRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MirrorSourceRoot)**\*.cs"
+             Exclude="$(MirrorSourceRoot)bin\**\*.cs;$(MirrorSourceRoot)obj\**\*.cs;$(MirrorSourceRoot)App.xaml.cs"
+             Link="%(RecursiveDir)%(Filename)%(Extension)" />
+    <Page Include="$(MirrorSourceRoot)MainWindow.xaml" Link="MainWindow.xaml" />
+    <Page Include="$(MirrorSourceRoot)Views\**\*.xaml" Link="Views\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Page Include="$(MirrorSourceRoot)Themes\**\*.xaml" Link="Themes\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Page Include="$(MirrorSourceRoot)Verification\**\*.xaml" Link="Verification\%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="$(MirrorSourceRoot)Resources\Strings.resx"
+                      Link="Resources\Strings.resx"
+                      LogicalName="BetterTranslator.App.Resources.Strings.resources" />
+    <Resource Include="$(MirrorSourceRoot)Assets\app-icon.ico" Link="Assets\app-icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="ModelContextProtocol" Version="2.1.0" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.1.0" />
+    <PackageReference Include="SkiaSharp.Views.WPF" Version="4.151.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\BetterTranslator.Core\BetterTranslator.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\BetterTranslator.Updates\BetterTranslator.Updates.csproj" />
+    <ProjectReference Include="..\..\..\src\BetterTranslator.Indexing\BetterTranslator.Indexing.csproj" />
+    <ProjectReference Include="..\..\..\src\BetterTranslator.Map\BetterTranslator.Map.csproj" />
+    <ProjectReference Include="..\..\..\src\BetterTranslator.Runtime\BetterTranslator.Runtime.csproj" />
+    <ProjectReference Include="..\..\..\src\BetterTranslator.Engine\BetterTranslator.Engine.csproj" />
+  </ItemGroup>
+
+</Project>

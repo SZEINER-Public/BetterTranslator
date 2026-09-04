@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <RuntimeIdentifier />
+    <UseWPF>true</UseWPF>
+    <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>BetterTranslator.Mac.ParityWindows</AssemblyName>
+    <RootNamespace>BetterTranslator.Mac.Parity.Windows</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\proj\BetterTranslator.App.Capture.Mirror\BetterTranslator.App.Capture.Mirror.csproj" />
+  </ItemGroup>
+
+</Project>

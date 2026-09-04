@@ -1,0 +1,22 @@
+<Project>
+
+  <PropertyGroup>
+    <Version>1.0.7</Version>
+    <Company>SZEINER s.r.o.</Company>
+    <Product>BetterTranslator</Product>
+    <Copyright>Copyright (c) 2026 SZEINER s.r.o.</Copyright>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifier>osx-arm64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <EnableWindowsTargeting>false</EnableWindowsTargeting>
+    <AvaloniaVersion>11.3.20</AvaloniaVersion>
+    <WindowsSourceRoot>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)..', 'src'))</WindowsSourceRoot>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <NoWarn>$(NoWarn);NETSDK1206</NoWarn>
+  </PropertyGroup>
+
+</Project>

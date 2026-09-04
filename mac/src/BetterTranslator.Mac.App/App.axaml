@@ -1,0 +1,30 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="BetterTranslator.Mac.App.App"
+             xmlns:controls="using:BetterTranslator.Mac.App.Controls"
+             xmlns:shared="using:BetterTranslator.App.Controls"
+             RequestedThemeVariant="Light">
+    <Application.DataTemplates>
+        <DataTemplate DataType="shared:IconDefinition">
+            <controls:IconView Definition="{Binding}" />
+        </DataTemplate>
+    </Application.DataTemplates>
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://BetterTranslator/Themes/Colors.axaml" />
+                <ResourceInclude Source="avares://BetterTranslator/Themes/Typography.axaml" />
+                <ResourceInclude Source="avares://BetterTranslator/Themes/Metrics.axaml" />
+                <ResourceInclude Source="avares://BetterTranslator/Themes/Icons.axaml" />
+                <ResourceInclude Source="avares://BetterTranslator/Themes/Flags.axaml" />
+                <ResourceInclude Source="avares://BetterTranslator/Themes/Controls.axaml" />
+                <ResourceInclude Source="avares://BetterTranslator/Themes/Markdown.axaml" />
+                <ResourceInclude Source="avares://BetterTranslator/Themes/Json.axaml" />
+                <ResourceInclude Source="avares://BetterTranslator/Verification/VerificationTokens.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

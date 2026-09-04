@@ -1,0 +1,211 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://BetterTranslator/Themes/Colors.axaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <FontFamily x:Key="FontFamilyUi">.AppleSystemUIFont, SF Pro Text, Helvetica Neue</FontFamily>
+    <FontFamily x:Key="FontFamilyMono">SF Mono, Menlo, Monaco</FontFamily>
+
+    <sys:Double x:Key="BodyLineHeight">20</sys:Double>
+    <sys:Double x:Key="ProseLineHeight">21</sys:Double>
+    <sys:Double x:Key="DenseLineHeight">18</sys:Double>
+
+    <FontWeight x:Key="WeightRegular">Normal</FontWeight>
+    <FontWeight x:Key="WeightSemiBold">SemiBold</FontWeight>
+
+    <sys:Double x:Key="TextTitleSize">16</sys:Double>
+    <sys:Double x:Key="TextHeadingSize">15</sys:Double>
+    <sys:Double x:Key="TextChatNameSize">14.5</sys:Double>
+    <sys:Double x:Key="TextSubheadingSize">14</sys:Double>
+    <sys:Double x:Key="TextBodySize">14</sys:Double>
+    <sys:Double x:Key="TextCardTitleSize">13.5</sys:Double>
+    <sys:Double x:Key="TextDefaultSize">13</sys:Double>
+    <sys:Double x:Key="TextSecondarySize">12.5</sys:Double>
+    <sys:Double x:Key="TextMetaSize">12</sys:Double>
+    <sys:Double x:Key="TextFineSize">11.5</sys:Double>
+    <sys:Double x:Key="TextMicroSize">11</sys:Double>
+    <sys:Double x:Key="TextMonoPathSize">11.5</sys:Double>
+    <sys:Double x:Key="TextMonoSmallSize">10.5</sys:Double>
+
+    <FontWeight x:Key="TextTitleWeight">SemiBold</FontWeight>
+    <FontWeight x:Key="TextHeadingWeight">SemiBold</FontWeight>
+    <FontWeight x:Key="TextChatNameWeight">SemiBold</FontWeight>
+    <FontWeight x:Key="TextSubheadingWeight">SemiBold</FontWeight>
+    <FontWeight x:Key="TextBodyWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextCardTitleWeight">SemiBold</FontWeight>
+    <FontWeight x:Key="TextDefaultWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextSecondaryWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextMetaWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextFineWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextMicroWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextMonoPathWeight">Normal</FontWeight>
+    <FontWeight x:Key="TextMonoSmallWeight">Normal</FontWeight>
+
+    <ControlTheme x:Key="TextTitle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextTitleSize}" />
+        <Setter Property="FontWeight" Value="{StaticResource TextTitleWeight}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextHeading" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}">
+        <Setter Property="FontSize" Value="{StaticResource TextHeadingSize}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextChatName" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}">
+        <Setter Property="FontSize" Value="{StaticResource TextChatNameSize}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextSubheading" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}">
+        <Setter Property="FontSize" Value="{StaticResource TextSubheadingSize}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextBody" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}">
+        <Setter Property="FontSize" Value="{StaticResource TextBodySize}" />
+        <Setter Property="FontWeight" Value="{StaticResource TextBodyWeight}" />
+        <Setter Property="LineHeight" Value="{StaticResource BodyLineHeight}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextCardTitle" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}">
+        <Setter Property="FontSize" Value="{StaticResource TextCardTitleSize}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextDefault" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}">
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="FontWeight" Value="{StaticResource TextDefaultWeight}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextSecondary" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="FontSize" Value="{StaticResource TextSecondarySize}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextMeta" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="FontSize" Value="{StaticResource TextMetaSize}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextTableHeader" TargetType="TextBlock" BasedOn="{StaticResource TextSecondary}">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextFine" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="FontSize" Value="{StaticResource TextFineSize}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextMicro" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="FontSize" Value="{StaticResource TextMicroSize}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextMonoPath" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyMono}" />
+        <Setter Property="FontSize" Value="{StaticResource TextMonoPathSize}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextMonoSmall" TargetType="TextBlock" BasedOn="{StaticResource TextMonoPath}">
+        <Setter Property="FontSize" Value="{StaticResource TextMonoSmallSize}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextProse" TargetType="TextBlock" BasedOn="{StaticResource TextBody}">
+        <Setter Property="LineHeight" Value="{StaticResource ProseLineHeight}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextEntrySource" TargetType="TextBlock" BasedOn="{StaticResource TextProse}">
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextTertiary}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextEntryResult" TargetType="TextBlock" BasedOn="{StaticResource TextProse}">
+        <Setter Property="FontSize" Value="{StaticResource TextHeadingSize}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextEntryHeading" TargetType="TextBlock" BasedOn="{StaticResource TextMicro}">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSubtle}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextWordSource" TargetType="TextBlock" BasedOn="{StaticResource TextDefault}">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextWordResult" TargetType="TextBlock" BasedOn="{StaticResource TextBody}" />
+
+    <ControlTheme x:Key="SelectableText" TargetType="SelectableTextBlock">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Cursor" Value="Ibeam" />
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource TextBodySize}" />
+        <Setter Property="FontWeight" Value="{StaticResource TextBodyWeight}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="SelectionBrush" Value="#47005FB8" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="SelectableEntrySource" TargetType="SelectableTextBlock" BasedOn="{StaticResource SelectableText}">
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextTertiary}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="SelectableEntryResult" TargetType="SelectableTextBlock" BasedOn="{StaticResource SelectableText}">
+        <Setter Property="FontSize" Value="{StaticResource TextHeadingSize}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="SelectableWordSource" TargetType="SelectableTextBlock" BasedOn="{StaticResource SelectableText}">
+        <Setter Property="FontSize" Value="{StaticResource TextDefaultSize}" />
+        <Setter Property="FontWeight" Value="{StaticResource TextDefaultWeight}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="SelectableWordResult" TargetType="SelectableTextBlock" BasedOn="{StaticResource SelectableText}" />
+
+    <ControlTheme x:Key="SelectableMarkdownSyntax" TargetType="SelectableTextBlock" BasedOn="{StaticResource SelectableText}">
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyMono}" />
+        <Setter Property="FontSize" Value="{StaticResource TextMonoPathSize}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="SelectableMarkdownFlow" TargetType="SelectableTextBlock">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Cursor" Value="Ibeam" />
+        <Setter Property="Foreground" Value="{StaticResource BrushText}" />
+        <Setter Property="SelectionBrush" Value="#47005FB8" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextDense" TargetType="TextBlock" BasedOn="{StaticResource TextSecondary}">
+        <Setter Property="LineHeight" Value="{StaticResource DenseLineHeight}" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextEntryCost" TargetType="TextBlock" BasedOn="{StaticResource TextMeta}">
+        <Setter Property="FontWeight" Value="{StaticResource WeightSemiBold}" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+        <Setter Property="LineHeight" Value="{StaticResource DenseLineHeight}" />
+        <Setter Property="Margin" Value="10,0,0,0" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextEntryAudit" TargetType="TextBlock" BasedOn="{StaticResource TextMicro}">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSubtle}" />
+        <Setter Property="LineHeight" Value="{StaticResource DenseLineHeight}" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="Margin" Value="10,0,0,0" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextEntryAuditFindings" TargetType="TextBlock" BasedOn="{StaticResource TextEntryAudit}">
+        <Setter Property="Margin" Value="20,0,0,0" />
+
+        <Style Selector="^.hasDefects">
+            <Setter Property="Foreground" Value="{StaticResource BrushWarnText}" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="TextChatCost" TargetType="TextBlock" BasedOn="{StaticResource TextMeta}">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+        <Setter Property="LineHeight" Value="{StaticResource DenseLineHeight}" />
+        <Setter Property="Margin" Value="10,0,0,0" />
+    </ControlTheme>
+
+</ResourceDictionary>
