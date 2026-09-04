@@ -71,6 +71,8 @@ public sealed record DocumentModel
 
     public int Length { get; init; }
 
+    public string Text { get; init; } = string.Empty;
+
     public IReadOnlyList<DocumentNode> Nodes { get; init; } = [];
 
     public IReadOnlyList<ChunkNode> Chunks { get; init; } = [];

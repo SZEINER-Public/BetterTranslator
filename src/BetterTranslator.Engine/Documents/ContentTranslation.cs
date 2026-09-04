@@ -38,6 +38,8 @@ public sealed record ContentTranslationResult(
     bool Stopped = false)
 {
     public IReadOnlyList<Verification.Structure.SegmentTrace> Segments { get; init; } = [];
+
+    public Core.Verification.Checks.Coverage.CompletionReport? Completion { get; init; }
 }
 
 /// <summary>
@@ -75,7 +77,7 @@ public static class ContentTranslation
         // send -- otherwise it would fail without ever being tried.
         if (JsonSyntax.HasTranslatableValues(source))
         {
-            return Json(await JsonTranslation.TranslateAsync(source, translate, cancellationToken)
+            return Json(source, await JsonTranslation.TranslateAsync(source, translate, cancellationToken)
                 .ConfigureAwait(false));
         }
 
@@ -87,7 +89,7 @@ public static class ContentTranslation
                     .ConfigureAwait(false));
         }
 
-        return Prose(await MessageTranslation.TranslateAsync(source, translate, cancellationToken)
+        return Prose(source, await MessageTranslation.TranslateAsync(source, translate, cancellationToken)
             .ConfigureAwait(false));
     }
 
@@ -106,12 +108,13 @@ public static class ContentTranslation
         return source.ReplaceLineEndings("\n").Split('\n').Count(line => line.Trim().Length > 0) > 1;
     }
 
-    private static ContentTranslationResult Json(JsonTranslationResult document) =>
+    private static ContentTranslationResult Json(string source, JsonTranslationResult document) =>
         document.Translated == 0
             ? new ContentTranslationResult(null, ContentShape.Json, Stopped: document.Stopped)
             : new ContentTranslationResult(document.Text, ContentShape.Json, KeptValues(document), Stopped: document.Stopped)
             {
                 Segments = document.Segments,
+                Completion = Verification.Coverage.CompletionReporting.For(source, document.Text, document.Segments),
             };
 
     private static ContentTranslationResult Markdown(string source, MarkdownTranslationResult document)
@@ -136,10 +139,11 @@ public static class ContentTranslation
         return new ContentTranslationResult(document.Text, ContentShape.Markdown, Recovery(document), Stopped: document.Stopped)
         {
             Segments = document.Segments,
+            Completion = Verification.Coverage.CompletionReporting.For(source, document.Text, document.Segments),
         };
     }
 
-    private static ContentTranslationResult Prose(MessageTranslationResult message)
+    private static ContentTranslationResult Prose(string source, MessageTranslationResult message)
     {
         // Recovered counts too: a block rescued phrase by phrase is translated
         // text, and judging on Translated alone threw away a document where
@@ -159,6 +163,7 @@ public static class ContentTranslation
         return new ContentTranslationResult(message.Text, ContentShape.Prose, note, Stopped: message.Stopped)
         {
             Segments = message.Segments,
+            Completion = Verification.Coverage.CompletionReporting.For(source, message.Text, message.Segments),
         };
     }
 

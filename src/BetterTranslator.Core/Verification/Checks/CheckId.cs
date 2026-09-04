@@ -24,4 +24,21 @@ public static class CheckId
 
         public const string InvariantMultiset = "STR-109";
     }
+
+    public static class Coverage
+    {
+        public const string Category = "COV";
+
+        public const string CopyThrough = "COV-101";
+
+        public const string EmptyOutput = "COV-102";
+
+        public const string DroppedUnit = "COV-103";
+
+        public const string SourceTokenSurvival = "COV-104";
+
+        public const string SegmentLanguage = "COV-105";
+
+        public const string ExemptionFilter = "COV-106";
+    }
 }

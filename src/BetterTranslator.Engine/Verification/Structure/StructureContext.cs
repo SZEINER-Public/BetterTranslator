@@ -47,8 +47,8 @@ public static class StructureContext
 
         adapter ??= AdapterFor(source);
 
-        var sourceModel = adapter.Read(source);
-        var targetModel = adapter.Read(target);
+        var sourceModel = adapter.Read(source) with { Text = source };
+        var targetModel = adapter.Read(target) with { Text = target };
         var registry = new ExemptionRegistry();
 
         foreach (var span in exemptions ?? [])
@@ -108,7 +108,7 @@ public static class StructureContext
             {
                 targetRange = new CheckRange(unitPath, explicitStart, trace.TargetLength ?? trace.SourceLength);
             }
-            else if (located[i] is { } found)
+            else if (trace.Outcome != SegmentOutcome.Dropped && located[i] is { } found)
             {
                 targetRange = new CheckRange(unitPath, found.Start, found.Length);
             }
