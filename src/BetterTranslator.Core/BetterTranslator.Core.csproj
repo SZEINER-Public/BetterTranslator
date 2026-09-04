@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Verification\Checks\Ratio\ratio-profile.json" LogicalName="BetterTranslator.Core.Verification.Checks.Ratio.ratio-profile.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
     <!-- Microsoft.Data.Sqlite pulls e_sqlite3 2.1.11 transitively, which

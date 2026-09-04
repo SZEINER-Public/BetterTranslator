@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "precisionFloor": 0.7,
+  "bandQuantile": 0,
+  "heldOutEvery": 4,
+  "negativeRecipe": "held-out positives are the committed pairs; negatives are derived from each held-out pair: RAT-101 target doubled and target cut to its first third; RAT-102 target cut to sixty percent at a word boundary with the terminal mark removed; RAT-103 last two words repeated six more times; RAT-104 a three word phrase appended eight times; RAT-105 a translator preamble prepended and three meta sentences appended",
+  "sources": [
+    {
+      "path": "tests/BetterTranslator.Tests/Fixtures/Parallel/en-cs.json",
+      "pairs": 44
+    },
+    {
+      "path": "src/BetterTranslator.Engine/Data/domain-terms-cs.md",
+      "pairs": 49
+    },
+    {
+      "path": "src/BetterTranslator.Engine/Data/glossary-cs.md",
+      "pairs": 14
+    }
+  ],
+  "bands": [
+    {
+      "pair": "en-cs",
+      "unit": "block",
+      "samples": 3,
+      "lengthRatio": {
+        "low": 0.788,
+        "high": 1.142,
+        "median": 0.828,
+        "samples": 3
+      },
+      "repetitionRun": {
+        "limit": 1,
+        "observedMax": 1,
+        "samples": 3
+      },
+      "compressionRatio": {
+        "limit": 1.282,
+        "observedMax": 1.282,
+        "samples": 3
+      },
+      "sentenceExcess": {
+        "limit": 0,
+        "observedMax": 0,
+        "samples": 3
+      }
+    },
+    {
+      "pair": "en-cs",
+      "unit": "sentence",
+      "samples": 32,
+      "lengthRatio": {
+        "low": 0.714,
+        "high": 1.316,
+        "median": 1,
+        "samples": 32
+      },
+      "repetitionRun": {
+        "limit": 1,
+        "observedMax": 1,
+        "samples": 32
+      },
+      "compressionRatio": {
+        "limit": 1.187,
+        "observedMax": 1.187,
+        "samples": 32
+      },
+      "sentenceExcess": {
+        "limit": 0,
+        "observedMax": 0,
+        "samples": 32
+      }
+    },
+    {
+      "pair": "en-cs",
+      "unit": "word",
+      "samples": 50,
+      "lengthRatio": {
+        "low": 0.375,
+        "high": 2.2,
+        "median": 1,
+        "samples": 50
+      },
+      "repetitionRun": {
+        "limit": 1,
+        "observedMax": 1,
+        "samples": 50
+      },
+      "compressionRatio": {
+        "limit": 0.857,
+        "observedMax": 0.857,
+        "samples": 50
+      },
+      "sentenceExcess": {
+        "limit": 0,
+        "observedMax": 0,
+        "samples": 50
+      }
+    }
+  ],
+  "checks": [
+    {
+      "id": "RAT-101",
+      "enabled": true,
+      "precision": 1,
+      "recall": 0.727,
+      "heldOutPositives": 22,
+      "heldOutNegatives": 44,
+      "truePositives": 32,
+      "falsePositives": 0,
+      "scoreWeight": 0.5
+    },
+    {
+      "id": "RAT-102",
+      "enabled": true,
+      "precision": 1,
+      "recall": 1,
+      "heldOutPositives": 22,
+      "heldOutNegatives": 9,
+      "truePositives": 9,
+      "falsePositives": 0,
+      "scoreWeight": 0.5
+    },
+    {
+      "id": "RAT-103",
+      "enabled": true,
+      "precision": 1,
+      "recall": 1,
+      "heldOutPositives": 22,
+      "heldOutNegatives": 9,
+      "truePositives": 9,
+      "falsePositives": 0,
+      "scoreWeight": 0.5
+    },
+    {
+      "id": "RAT-104",
+      "enabled": true,
+      "precision": 0.778,
+      "recall": 1,
+      "heldOutPositives": 22,
+      "heldOutNegatives": 7,
+      "truePositives": 7,
+      "falsePositives": 2,
+      "scoreWeight": 0.5
+    },
+    {
+      "id": "RAT-105",
+      "enabled": true,
+      "precision": 1,
+      "recall": 1,
+      "heldOutPositives": 22,
+      "heldOutNegatives": 44,
+      "truePositives": 44,
+      "falsePositives": 0,
+      "scoreWeight": 0.5
+    }
+  ]
+}

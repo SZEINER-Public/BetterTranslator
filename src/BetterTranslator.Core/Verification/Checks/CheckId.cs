@@ -41,4 +41,19 @@ public static class CheckId
 
         public const string ExemptionFilter = "COV-106";
     }
+
+    public static class Ratio
+    {
+        public const string Category = "RAT";
+
+        public const string LengthRatio = "RAT-101";
+
+        public const string Truncation = "RAT-102";
+
+        public const string Repetition = "RAT-103";
+
+        public const string Compression = "RAT-104";
+
+        public const string Insertion = "RAT-105";
+    }
 }

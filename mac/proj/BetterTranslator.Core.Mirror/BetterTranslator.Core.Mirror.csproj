@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="$(MirrorSourceRoot)Verification\Checks\Ratio\ratio-profile.json" LogicalName="BetterTranslator.Core.Verification.Checks.Ratio.ratio-profile.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />

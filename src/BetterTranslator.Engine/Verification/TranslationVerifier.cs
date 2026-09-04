@@ -1,3 +1,4 @@
+using BetterTranslator.Core.Verification.Checks;
 using BetterTranslator.Core.Verification;
 using BetterTranslator.Engine.Verification.Signals;
 
@@ -25,8 +26,12 @@ public sealed class TranslationVerifier
         _s = settings;
     }
 
-    public VerificationResult Verify(string sourceText, string targetText)
+    public VerificationResult Verify(string sourceText, string targetText) => Verify(sourceText, targetText, []);
+
+    public VerificationResult Verify(string sourceText, string targetText, IReadOnlyList<CheckFinding> ratioFindings)
     {
+        ArgumentNullException.ThrowIfNull(ratioFindings);
+
         if (!_s.Enabled)
         {
             return VerificationResult.Skipped("disabled by setting");
@@ -34,7 +39,7 @@ public sealed class TranslationVerifier
 
         try
         {
-            return VerifyCore(sourceText, targetText);
+            return VerifyCore(sourceText, targetText, ratioFindings);
         }
         catch (Exception ex)
         {
@@ -42,7 +47,7 @@ public sealed class TranslationVerifier
         }
     }
 
-    private VerificationResult VerifyCore(string sourceText, string targetText)
+    private VerificationResult VerifyCore(string sourceText, string targetText, IReadOnlyList<CheckFinding> ratioFindings)
     {
         var exemption = new SourceSpanExemption(sourceText);
         var spans = new List<VerificationSpan>();
@@ -156,6 +161,7 @@ public sealed class TranslationVerifier
         }
 
         ClassifyUntranslatedChunks(spans);
+        RatioScoring.Apply(spans, ratioFindings);
 
         foreach (var span in spans)
         {
