@@ -147,7 +147,7 @@ public sealed class DownloadManager(HttpClient httpClient, InstallPaths paths, M
         // artifact would move 138 MB to no purpose. The caller goes on to the
         // companions, which is what is actually absent.
         if (resolver?.Resolve(component) is
-            { Reason: PresenceReason.InstalledHere or PresenceReason.MissingDependencies } here)
+            { Reason: PresenceReason.InstalledHere or PresenceReason.MissingDependencies or PresenceReason.MissingSystemRuntime } here)
         {
             return Report(progress, Installed(component, here));
         }

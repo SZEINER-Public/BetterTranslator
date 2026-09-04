@@ -43,8 +43,34 @@ public static class RuntimeSupport
         : flavorFileName.Contains("Vulkan", StringComparison.OrdinalIgnoreCase) ? RuntimeBackend.Vulkan
         : RuntimeBackend.Cpu;
 
+    public const string VisualCppRedistributableUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe";
+
+    public static Func<string, bool> SystemProvides { get; set; } = LoadsFromSystem;
+
+    public static bool IsVisualCppModule(string module) =>
+        VisualCppModules.Contains(module, StringComparer.OrdinalIgnoreCase);
+
     public static IReadOnlyList<string> MissingBeside(string folder, string flavorFileName) =>
-        [.. RequiredBeside(flavorFileName).Where(module => !Present(folder, module) && !Present(CarriedFolder, module))];
+        [.. RequiredBeside(flavorFileName).Where(module => !Present(folder, module) && !Present(CarriedFolder, module) && !(IsVisualCppModule(module) && SystemProvides(module)))];
+
+    public static IReadOnlyList<string> MissingVisualCpp(string folder) =>
+        [.. VisualCppModules.Where(module => !Present(folder, module) && !Present(CarriedFolder, module) && !SystemProvides(module))];
+
+    public static string VisualCppAdvice(string module) =>
+        module + " is part of the Microsoft Visual C++ 2015-2022 Redistributable (x64), which is not on this machine. "
+        + "Install it from " + VisualCppRedistributableUrl + " and translate again; reinstalling the runtime does not add it. "
+        + "The four files can also be copied beside the runtime library.";
+
+    private static bool LoadsFromSystem(string module)
+    {
+        if (!NativeLibrary.TryLoad(module, out var handle))
+        {
+            return false;
+        }
+
+        NativeLibrary.Free(handle);
+        return true;
+    }
 
     public static int CarryInto(string folder)
     {
@@ -118,6 +144,9 @@ public static class RuntimeSupport
             "No translation runtime is installed. Looked in "
             + string.Join(" and ", probed)
             + ". Open Models and runtimes and install the CPU runtime.",
+
+        FlavorState.Incomplete when finding.MissingModule is { } module && IsVisualCppModule(module) =>
+            finding.Flavor + " is installed in " + finding.Folder + " but cannot start: " + VisualCppAdvice(module),
 
         FlavorState.Incomplete =>
             finding.Flavor + " is installed in " + finding.Folder + " but the set is incomplete: "

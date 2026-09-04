@@ -59,35 +59,35 @@ public sealed class ConfigStore(string folder)
     [
         new("languages",
             "Languages",
-            "The target-language registry: canonical codes, native names, scripts, text direction and aliases. Which of them a model was trained on is recorded separately, with the source it was read from.",
+            "",
             "languages.json",
             "BetterTranslator.Engine.Data.languages.json")
         { RequiredArray = "languages" },
 
         new("model-prompts",
             "Model prompts",
-            "How a given model wants to be asked. Only models trained on a specific prompt shape need an entry.",
+            "",
             "model-prompts.json",
             "BetterTranslator.Engine.Data.model-prompts.json")
         { RequiredArray = "models" },
 
         new("prompts",
             "App prompts",
-            "The wording BetterTranslator adds around the model's own instruction: the heading over retrieved memory, and the lead-in for the standing instruction from Advanced.",
+            "",
             "prompts.json",
             "BetterTranslator.Engine.Data.prompts.json")
         { RequiredArray = "fragments" },
 
         new("rag-defaults",
             "Terminology",
-            "Terms the translator must not turn into the target language. Strict terms are hidden from the model completely; declinable ones are sent and checked with a relaxed gate that accepts a case ending.",
+            "",
             "rag.defaults.json",
             "BetterTranslator.Engine.Data.rag.defaults.json")
         { RequiredArray = "types" },
 
         new("glossary-cs",
             "Czech glossary",
-            "Your project's own Czech terminology: English terms that must come back as a particular Czech word, and Czech words the translation may not introduce unless the source justifies them. Nothing is in force until you save a copy -- the shipped text is a worked example, because a glossary describes one project's vocabulary and not the language.",
+            "",
             "glossary-cs.md",
             "BetterTranslator.Engine.Data.glossary-cs.md")
         {

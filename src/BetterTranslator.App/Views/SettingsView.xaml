@@ -85,7 +85,7 @@
                                                    AutomationProperties.Name="Learn from my edits" />
                             <StackPanel MaxWidth="440">
                                 <TextBlock Text="Learn from my edits" Style="{StaticResource TextCardTitle}" />
-                                <TextBlock Text="When you swap a word by hand, memory keeps your version for next time."
+                                <TextBlock Text="Words you correct by hand are remembered."
                                            Style="{StaticResource TextMeta}"
                                            Foreground="{StaticResource BrushTextSecondary}"
                                            TextWrapping="Wrap"
@@ -160,11 +160,6 @@
                                 Value="{Binding UnsureThreshold, Mode=TwoWay}"
                                 Margin="0,10,0,0"
                                 AutomationProperties.Name="Mark a word unsure below" />
-                        <TextBlock Text="Anything the engine is less certain about than this gets a dotted underline and shows up under Unsure."
-                                   Style="{StaticResource TextMeta}"
-                                   Foreground="{StaticResource BrushTextSecondary}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,8,0,0" />
                     </StackPanel>
                 </ScrollViewer>
 
@@ -449,7 +444,7 @@
                                    Foreground="{StaticResource BrushTextSecondary}"
                                    TextWrapping="Wrap"
                                    Margin="0,3,0,12">
-                            <Run Text="{Binding HardwareLabel, Mode=OneWay}" /><Run Text=" found on this machine. A flavour your hardware cannot run stays unavailable." />
+                            <Run Text="{Binding HardwareLabel, Mode=OneWay}" /><Run Text=" found on this machine." />
                         </TextBlock>
 
                         <ItemsControl ItemsSource="{Binding Backends}" MaxWidth="470" HorizontalAlignment="Left">
@@ -524,7 +519,7 @@
                                 Margin="0,2,0,0"
                                 Visibility="{Binding NeedsRestart, Converter={StaticResource BoolToVisibility}}">
                             <StackPanel>
-                                <TextBlock Text="Restart BetterTranslator to use this. A runtime already loaded cannot be swapped while the app is open."
+                                <TextBlock Text="Takes effect after a restart."
                                            Style="{StaticResource TextMeta}"
                                            Foreground="{StaticResource BrushText}"
                                            TextWrapping="Wrap" />
@@ -546,7 +541,7 @@
                               Padding="22,14,22,18"
                               Visibility="{Binding IsDownloadsTab, Converter={StaticResource BoolToVisibility}}">
                     <StackPanel>
-                        <TextBlock Text="Everything this build supports. The download button in the title bar installs any of it."
+                        <TextBlock Text="Install any of these from the download button in the title bar."
                                    Style="{StaticResource TextProse}"
                                    Foreground="{StaticResource BrushTextSecondary}"
                                    TextWrapping="Wrap" />
@@ -558,7 +553,7 @@
                                                    AutomationProperties.Name="Restart after an install finishes" />
                             <StackPanel MaxWidth="440">
                                 <TextBlock Text="Restart after an install finishes" Style="{StaticResource TextCardTitle}" />
-                                <TextBlock Text="A runtime or a model written while the app is open is not the one the app is using. This closes the window and opens it again so the new files load. You are told before it happens and can put it off."
+                                <TextBlock Text="Reopens the window so newly installed files load. You are asked first."
                                            Style="{StaticResource TextMeta}"
                                            Foreground="{StaticResource BrushTextSecondary}"
                                            TextWrapping="Wrap"
@@ -672,7 +667,7 @@
                                                    AutomationProperties.Name="Let an AI agent use BetterTranslator" />
                             <StackPanel MaxWidth="440">
                                 <TextBlock Text="Let an AI agent use BetterTranslator" Style="{StaticResource TextCardTitle}" />
-                                <TextBlock Text="Opens a local endpoint an agent can call to translate. Nothing leaves this machine, and the switch takes effect at once."
+                                <TextBlock Text="Local endpoint for agents. Nothing leaves this machine."
                                            Style="{StaticResource TextMeta}"
                                            Foreground="{StaticResource BrushTextSecondary}"
                                            TextWrapping="Wrap"
@@ -717,7 +712,7 @@
                                  HorizontalAlignment="Left"
                                  Margin="0,4,0,0"
                                  AutomationProperties.Name="Token" />
-                        <TextBlock Text="Empty is fine while the host is 127.0.0.1. Any other host reaches this machine from the network, so a token is required and the server refuses to start without one."
+                        <TextBlock Text="Optional on 127.0.0.1, required for any other host."
                                    Style="{StaticResource TextMeta}"
                                    Foreground="{StaticResource BrushTextSecondary}"
                                    TextWrapping="Wrap"
@@ -730,7 +725,7 @@
                                    Margin="0,18,0,0" />
 
                         <TextBlock Text="Register it with the agent" Style="{StaticResource TextCardTitle}" Margin="0,18,0,0" />
-                        <TextBlock Text="Run this once where the agent runs. From then on it discovers everything it needs from the server itself."
+                        <TextBlock Text="Run once where the agent runs."
                                    Style="{StaticResource TextMeta}"
                                    Foreground="{StaticResource BrushTextSecondary}"
                                    TextWrapping="Wrap"
@@ -764,13 +759,6 @@
                         <TextBlock Text="No address at all"
                                    Style="{StaticResource TextCardTitle}"
                                    Margin="0,22,0,0" />
-                        <TextBlock Text="An agent that speaks over a pipe rather than over HTTP needs no host, no port and nothing switched on here. It starts the command line itself and talks to it directly."
-                                   Style="{StaticResource TextMeta}"
-                                   Foreground="{StaticResource BrushTextSecondary}"
-                                   TextWrapping="Wrap"
-                                   MaxWidth="440"
-                                   HorizontalAlignment="Left"
-                                   Margin="0,3,0,0" />
 
                         <Border Background="{StaticResource BrushSurfaceSunken}"
                                 BorderBrush="{StaticResource BrushBorderFaint}"
@@ -809,7 +797,7 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0"
-                               Text="The engine's own configuration. Edits are saved beside your data and take precedence over the files that ship with the app; changes load on the next start."
+                               Text="Engine configuration. Your edits override the shipped files on the next start."
                                Style="{StaticResource TextProse}"
                                Foreground="{StaticResource BrushTextSecondary}"
                                TextWrapping="Wrap" />
@@ -840,9 +828,18 @@
 
                         <StackPanel Grid.Row="0">
                             <TextBlock Text="{Binding Description}"
-                                       Style="{StaticResource TextMeta}"
                                        Foreground="{StaticResource BrushTextSecondary}"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource TextMeta}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Description}" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                             <TextBlock Text="{Binding Path}"
                                        Style="{StaticResource TextMonoSmall}"
                                        Foreground="{StaticResource BrushTextMuted}"
@@ -962,11 +959,6 @@
                                                    AutomationProperties.Name="Automatic updates" />
                             <StackPanel MaxWidth="440">
                                 <TextBlock Text="Automatic updates" Style="{StaticResource TextCardTitle}" />
-                                <TextBlock Text="Registers a Windows service that looks for a new release, checks it against its published checksum and installs it while the application is closed. Turning this on or off asks for administrator rights once. With it off, nothing runs in the background: the application asks GitHub once when it starts, tells you what it found, and downloads nothing until you ask it to."
-                                           Style="{StaticResource TextMeta}"
-                                           Foreground="{StaticResource BrushTextSecondary}"
-                                           TextWrapping="Wrap"
-                                           Margin="0,3,0,0" />
                             </StackPanel>
                         </StackPanel>
 
@@ -1050,7 +1042,7 @@
                             <StackPanel>
                                 <TextBlock Text="An update is downloaded and waiting"
                                            Style="{StaticResource TextCardTitle}" />
-                                <TextBlock Text="It goes in when this window closes. Restarting now saves your chats first and reopens on the new build."
+                                <TextBlock Text="Applied when the window closes. Restart now to apply it at once."
                                            Style="{StaticResource TextMeta}"
                                            Foreground="{StaticResource BrushTextSecondary}"
                                            TextWrapping="Wrap"

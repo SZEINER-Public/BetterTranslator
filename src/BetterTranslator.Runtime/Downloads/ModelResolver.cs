@@ -31,6 +31,8 @@ public enum PresenceReason
     /// re-fetch gigabytes that are already on disk.
     /// </summary>
     MissingDependencies,
+
+    MissingSystemRuntime,
 }
 
 /// <summary>
@@ -63,6 +65,8 @@ public sealed record Presence
         // the whole failure this prevents was one nobody could see.
         PresenceReason.MissingDependencies =>
             $"{name} is here but cannot load without {string.Join(" and ", Missing)}, so the rest will be downloaded.",
+        PresenceReason.MissingSystemRuntime =>
+            $"{name} is installed, but {Inference.RuntimeSupport.VisualCppAdvice(Missing.Count > 0 ? Missing[0] : "msvcp140.dll")}",
         // Names the folder, because the whole point of the mark is that the file
         // exists but not where this install would put it.
         PresenceReason.InstalledElsewhere =>
@@ -189,12 +193,28 @@ public sealed class ModelResolver(InstallPaths paths, ModelLibrary library)
 
         var missing = ComponentInstallState.MissingIn(folder, component);
 
-        return missing.Count == 0
-            ? found
-            : found with
+        if (missing.Count > 0)
+        {
+            return found with
             {
                 Reason = PresenceReason.MissingDependencies,
                 Missing = [.. missing.Select(m => m.FileName)],
+            };
+        }
+
+        if (component.Kind != ComponentKind.Runtime)
+        {
+            return found;
+        }
+
+        var system = Inference.RuntimeSupport.MissingVisualCpp(folder);
+
+        return system.Count == 0
+            ? found
+            : found with
+            {
+                Reason = PresenceReason.MissingSystemRuntime,
+                Missing = system,
             };
     }
 

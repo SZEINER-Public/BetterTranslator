@@ -65,7 +65,7 @@ public sealed partial class InstallItemViewModel(ModelComponent component) : Obs
     /// stay tickable so the install can be completed from the screen that shows
     /// the problem.
     /// </summary>
-    public bool IsIncomplete => Presence?.Reason == PresenceReason.MissingDependencies;
+    public bool IsIncomplete => Presence?.Reason is PresenceReason.MissingDependencies or PresenceReason.MissingSystemRuntime;
 
     public string? PresenceNote =>
         IsAlreadyHere || IsIncomplete ? Presence!.Explain(Name) : null;

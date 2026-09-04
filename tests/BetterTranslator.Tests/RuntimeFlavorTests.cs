@@ -47,10 +47,39 @@ public sealed class RuntimeFlavorTests : IDisposable
 {
     private readonly string _root = Path.Combine(Path.GetTempPath(), "bt-flavor", Guid.NewGuid().ToString("N"));
 
-    public RuntimeFlavorTests() => Directory.CreateDirectory(_root);
+    private readonly Func<string, bool> _systemProvides = RuntimeSupport.SystemProvides;
+
+    public RuntimeFlavorTests()
+    {
+        Directory.CreateDirectory(_root);
+        RuntimeSupport.SystemProvides = _ => false;
+    }
+
+    [Fact]
+    public void AVisualCppModuleTheSystemProvidesIsNotReportedMissingAndTheAdviceNamesTheRedistributable()
+    {
+        var folder = Flavor("bare", []);
+
+        RuntimeSupport.MissingBeside(folder, "BetterRuntimeCPU.dll").Should().Equal(RuntimeSupport.VisualCppModules);
+
+        RuntimeSupport.SystemProvides = _ => true;
+
+        RuntimeSupport.MissingBeside(folder, "BetterRuntimeCPU.dll").Should().BeEmpty("the redistributable installed on the machine satisfies the import");
+        RuntimeSupport.MissingVisualCpp(folder).Should().BeEmpty();
+
+        RuntimeSupport.SystemProvides = _ => false;
+
+        var finding = new FlavorFinding(FlavorState.Incomplete, "BetterRuntimeCPU", folder, null, "msvcp140.dll", 0);
+        var message = RuntimeSupport.Describe(finding, [folder]);
+
+        message.Should().Contain(RuntimeSupport.VisualCppRedistributableUrl).And.Contain("msvcp140.dll").And.Contain(folder);
+        message.Should().NotContain("Reinstall the runtime", "reinstalling cannot add a module the runtime archive never carried");
+    }
 
     public void Dispose()
     {
+        RuntimeSupport.SystemProvides = _systemProvides;
+
         try
         {
             Directory.Delete(_root, recursive: true);

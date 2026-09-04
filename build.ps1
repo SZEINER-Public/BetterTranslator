@@ -61,8 +61,40 @@ if (-not (Test-Path $solution)) {
 
 # --- build ----------------------------------------------------------------------
 
+Step 'Locating the Visual C++ runtime to carry beside the inference library'
+
+$runtimeSupport = Join-Path $root 'artifacts\runtime-support'
+$runtimeSupportModules = @('msvcp140.dll', 'vcruntime140.dll', 'vcruntime140_1.dll', 'vcomp140.dll')
+$runtimeSupportProperty = @()
+$vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+
+if (Test-Path $vswhere) {
+    $installation = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Redist.14.Latest -property installationPath
+    if ($installation) {
+        $redist = Get-ChildItem (Join-Path $installation 'VC\Redist\MSVC') -Directory -ErrorAction SilentlyContinue |
+            Where-Object { Test-Path (Join-Path $_.FullName 'x64') } |
+            Sort-Object Name -Descending |
+            Select-Object -First 1
+        if ($redist) {
+            New-Item -ItemType Directory -Force $runtimeSupport | Out-Null
+            foreach ($module in $runtimeSupportModules) {
+                $found = Get-ChildItem (Join-Path $redist.FullName 'x64') -Recurse -Filter $module -ErrorAction SilentlyContinue | Select-Object -First 1
+                if ($found) { Copy-Item $found.FullName (Join-Path $runtimeSupport $module) -Force }
+            }
+        }
+    }
+}
+
+$carried = $runtimeSupportModules | Where-Object { Test-Path (Join-Path $runtimeSupport $_) }
+if ($carried.Count -eq $runtimeSupportModules.Count) {
+    $runtimeSupportProperty = @("-p:RuntimeSupportDir=$runtimeSupport")
+    Write-Host "  carrying $($carried.Count) modules from $runtimeSupport" -ForegroundColor Green
+} else {
+    Write-Host '  Visual C++ redistributable not found beside Visual Studio; the executable will rely on the system copy' -ForegroundColor Yellow
+}
+
 Step "Building ($Configuration)"
-& dotnet build $solution -c $Configuration --nologo
+& dotnet build $solution -c $Configuration --nologo @runtimeSupportProperty
 if ($LASTEXITCODE -ne 0) { Fail "dotnet build exited $LASTEXITCODE" }
 
 # --- test -----------------------------------------------------------------------
@@ -126,7 +158,7 @@ if ($Publish) {
     Step 'Publishing the distributable executable'
 
     & dotnet publish (Join-Path $root 'src\BetterTranslator.App') -c Release -r win-x64 `
-        --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --nologo
+        --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --nologo @runtimeSupportProperty
     if ($LASTEXITCODE -ne 0) { Fail "dotnet publish exited $LASTEXITCODE" }
 
     $publish = Join-Path $root 'src\BetterTranslator.App\bin\Release\net10.0-windows10.0.19041.0\win-x64\publish'
