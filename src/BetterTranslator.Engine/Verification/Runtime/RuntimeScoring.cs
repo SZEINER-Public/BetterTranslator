@@ -9,6 +9,7 @@ public static class RuntimeScoring
     {
         ArgumentNullException.ThrowIfNull(spans);
         ArgumentNullException.ThrowIfNull(findings);
+        CheckInstrumentation.Hit("scoring/runtime");
 
         var ordered = findings
             .Where(f => f.CheckId.StartsWith(CheckId.Runtime.Category + "-", StringComparison.Ordinal))

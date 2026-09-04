@@ -56,6 +56,8 @@ public sealed class TranslationVerifier
 
     private VerificationResult VerifyCore(string sourceText, string targetText, IReadOnlyList<CheckFinding> checkFindings)
     {
+        Core.Verification.Checks.CheckInstrumentation.Hit("verifier/verify-core");
+        Core.Verification.Checks.CheckInstrumentation.Hit(checkFindings.Count == 0 ? "verifier/findings-empty" : "verifier/findings-present");
         var exemption = new SourceSpanExemption(sourceText);
         var spans = new List<VerificationSpan>();
 

@@ -321,9 +321,14 @@ public sealed class LocalTranslator : IDisposable
     /// the model is meant to remember has to arrive in Memory -- which is the
     /// composer's Memory chip, and only that.
     /// </summary>
+    public IInferenceSession? Session => _model;
+
+    public TranslationJob? LastJob { get; private set; }
+
     public async Task<TranslationOutcome> TranslateAsync(TranslationJob job, CancellationToken cancellationToken)
     {
         var clock = System.Diagnostics.Stopwatch.StartNew();
+        LastJob = job;
 
         // The verdict belongs to this send. Not clearing it let the runtime and
         // cancellation paths, which never write one, hand a caller the previous

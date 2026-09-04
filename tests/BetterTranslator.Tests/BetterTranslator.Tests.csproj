@@ -4,6 +4,7 @@
     <!-- net10.0-windows with WPF so the token dictionaries and the WPF-hosted
          map surface can be loaded and asserted against directly. -->
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <DefineConstants Condition="'$(BtInstrument)' == 'true'">$(DefineConstants);BT_INSTRUMENT</DefineConstants>
     <UseWPF>true</UseWPF>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>

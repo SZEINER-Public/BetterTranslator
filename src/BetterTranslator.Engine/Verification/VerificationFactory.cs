@@ -64,5 +64,21 @@ public static class VerificationFactory
         }
     }
 
+    public const string DefaultSourceLanguage = "en";
+
+    public static VerificationPipeline CreatePipeline(
+        VerificationSettings settings,
+        string? languageCode = null,
+        string? dataFolder = null,
+        string? sourceLanguageCode = DefaultSourceLanguage)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+
+        Core.Verification.Checks.Coverage.CoverageServices.Configure(
+            Coverage.CoverageEvidenceFactory.Create(sourceLanguageCode, dataFolder));
+
+        return new VerificationPipeline(Create(settings, languageCode, dataFolder), settings);
+    }
+
     private static bool Readable(string? path) => !string.IsNullOrWhiteSpace(path) && File.Exists(path);
 }

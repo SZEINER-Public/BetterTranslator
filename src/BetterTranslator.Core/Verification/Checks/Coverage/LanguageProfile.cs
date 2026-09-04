@@ -6,6 +6,8 @@ public sealed class LanguageProfile
 
     private const char Boundary = ' ';
 
+    public const double AlphabetCoverageFloor = 0.6;
+
     private readonly Dictionary<string, int> _counts = new(StringComparer.Ordinal);
 
     private readonly Dictionary<string, int> _contexts = new(StringComparer.Ordinal);
@@ -69,10 +71,18 @@ public sealed class LanguageProfile
         var sum = 0.0;
         var grams = 0;
         var vocabulary = Math.Max(_alphabet.Count + 1, 2);
+        var letters = 0;
+        var covered = 0;
 
         foreach (var word in Words(text))
         {
             var padded = Boundary + word + Boundary;
+
+            foreach (var c in word)
+            {
+                letters++;
+                covered += _alphabet.Contains(c) ? 1 : 0;
+            }
 
             for (var i = 0; i + Order <= padded.Length; i++)
             {
@@ -85,7 +95,7 @@ public sealed class LanguageProfile
             }
         }
 
-        return grams == 0 ? double.NegativeInfinity : sum / grams;
+        return grams == 0 || covered < letters * AlphabetCoverageFloor ? double.NegativeInfinity : sum / grams + Math.Log((double)covered / letters);
     }
 
     public static IEnumerable<string> Words(string text)
@@ -122,6 +132,8 @@ public sealed class CharNgramLanguageIdentifier
 
     private const double DecisionMargin = 0.08;
 
+    public const int SoleScriptConfidence = 85;
+
     private readonly IReadOnlyList<LanguageProfile> _profiles;
 
     public CharNgramLanguageIdentifier(IEnumerable<LanguageProfile> profiles)
@@ -134,7 +146,8 @@ public sealed class CharNgramLanguageIdentifier
     public IReadOnlyList<LanguageProfile> Profiles => _profiles;
 
     public LanguageProfile? Profile(string code) =>
-        _profiles.FirstOrDefault(p => string.Equals(p.Code, code, StringComparison.OrdinalIgnoreCase));
+        _profiles.FirstOrDefault(p => string.Equals(p.Code, code, StringComparison.OrdinalIgnoreCase))
+        ?? _profiles.FirstOrDefault(p => string.Equals(LanguageSeeds.Primary(p.Code), LanguageSeeds.Primary(code), StringComparison.OrdinalIgnoreCase));
 
     public bool Knows(string code) => Profile(code) is not null;
 
@@ -181,9 +194,14 @@ public sealed class CharNgramLanguageIdentifier
             .ThenBy(s => s.Code, StringComparer.Ordinal)
             .ToList();
 
-        if (scored.Count < 2)
+        if (scored.Count == 0)
         {
             return LanguageIdentification.Undetermined;
+        }
+
+        if (scored.Count == 1)
+        {
+            return new LanguageIdentification(scored[0].Code, SoleScriptConfidence);
         }
 
         var margin = scored[0].Score - scored[1].Score;

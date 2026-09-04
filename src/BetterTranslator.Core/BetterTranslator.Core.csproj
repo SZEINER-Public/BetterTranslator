@@ -1,11 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <DefineConstants Condition="'$(BtInstrument)' == 'true'">$(DefineConstants);BT_INSTRUMENT</DefineConstants>
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Verification\Checks\Ratio\ratio-profile.json" LogicalName="BetterTranslator.Core.Verification.Checks.Ratio.ratio-profile.json" />
+    <EmbeddedResource Include="Verification\Checks\Coverage\language-seeds.json" LogicalName="BetterTranslator.Core.Verification.Checks.Coverage.language-seeds.json" />
   </ItemGroup>
 
   <ItemGroup>

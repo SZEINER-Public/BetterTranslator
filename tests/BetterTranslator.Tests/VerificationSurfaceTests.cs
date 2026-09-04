@@ -44,10 +44,10 @@ public sealed class VerificationSurfaceTests : IAsyncLifetime
         _workspace.Translate = (ask, _) =>
             Task.FromResult(new TranslationOutcome("«" + ask.Text + "»", 3, TimeSpan.FromMilliseconds(40)));
 
-        _workspace.Verify = (source, result) =>
+        _workspace.Verify = (source, content, _) =>
         {
-            _asked.Add((source, result));
-            return Flagged(result);
+            _asked.Add((source, content.Text!));
+            return Flagged(content.Text!);
         };
     }
 
@@ -119,7 +119,7 @@ public sealed class VerificationSurfaceTests : IAsyncLifetime
     [Fact]
     public async Task A_clean_answer_still_renders_through_the_plain_box()
     {
-        _workspace.Verify = (_, _) => Clean();
+        _workspace.Verify = (_, _, _) => Clean();
 
         await SendAsync("The build failed.");
 

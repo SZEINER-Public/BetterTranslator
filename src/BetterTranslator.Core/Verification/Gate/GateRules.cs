@@ -8,6 +8,7 @@ public static class ExemptionFilterRule
 
     public static (IReadOnlyList<CheckFinding> Kept, int Exempt) Apply(CheckContext context, IEnumerable<CheckFinding> findings)
     {
+        CheckInstrumentation.Hit("gate/" + RuleId);
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(findings);
 
@@ -33,7 +34,7 @@ public static class ExemptionFilterRule
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(finding);
 
-        return context.Exemptions.Spans.Any(span => span.Range.Overlaps(finding.TargetRange));
+        return context.Exemptions.Spans.Any(span => span.Range.Contains(finding.TargetRange) || (span.Range.Overlaps(finding.TargetRange) && finding.Granularity == CheckGranularity.Word && !finding.TargetRange.Contains(span.Range)));
     }
 }
 
@@ -43,6 +44,7 @@ public static class RoutingPolicyRule
 
     public static IReadOnlyList<RoutedFinding> Apply(RoutingTable routing, StageTable stages, IEnumerable<CheckFinding> findings)
     {
+        CheckInstrumentation.Hit("gate/" + RuleId);
         ArgumentNullException.ThrowIfNull(routing);
         ArgumentNullException.ThrowIfNull(stages);
         ArgumentNullException.ThrowIfNull(findings);
@@ -95,6 +97,7 @@ public static class DeduplicationRule
 
     public static IReadOnlyList<RoutedFinding> Apply(IEnumerable<RoutedFinding> findings)
     {
+        CheckInstrumentation.Hit("gate/" + RuleId);
         ArgumentNullException.ThrowIfNull(findings);
 
         var merged = new List<RoutedFinding>();
@@ -149,8 +152,9 @@ public static class DeduplicationRule
         }
 
         var carrier = cluster
-            .OrderByDescending(f => f.Confidence)
+            .OrderBy(f => f.Action)
             .ThenBy(f => f.Severity)
+            .ThenByDescending(f => f.Confidence)
             .ThenBy(f => f.Stage)
             .ThenBy(f => f.CheckId, StringComparer.Ordinal)
             .First();
@@ -189,6 +193,7 @@ public static class CandidateOrderingRule
 
     public static IReadOnlyList<RoutedFinding> Apply(IEnumerable<RoutedFinding> findings)
     {
+        CheckInstrumentation.Hit("gate/" + RuleId);
         ArgumentNullException.ThrowIfNull(findings);
 
         var candidates = findings.Where(f => f.IsRepairCandidate).ToList();
@@ -226,6 +231,7 @@ public static class CapsRule
 
     public static IReadOnlyList<RoutedFinding> CapCandidates(IReadOnlyList<RoutedFinding> ordered, int cap)
     {
+        CheckInstrumentation.Hit("gate/" + RuleId);
         ArgumentNullException.ThrowIfNull(ordered);
 
         return cap <= 0 ? ordered : [.. ordered.Take(cap)];

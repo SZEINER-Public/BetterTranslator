@@ -48,12 +48,15 @@ public sealed class VerificationGate
 
     public GateSettings Settings => _settings;
 
+    public Action<CheckContext, IReadOnlyList<CheckFinding>>? BeforeEscalation { get; init; }
+
     public GateRunResult Run(CheckContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
         if (!_settings.Enabled)
         {
+            CheckInstrumentation.Hit("config/gate-disabled");
             return GateRunResult.Empty("gate disabled by setting");
         }
 
@@ -76,13 +79,21 @@ public sealed class VerificationGate
             .ToList();
 
         var skippedCategories = new List<string>();
+        var escalationOpened = false;
 
         foreach (var category in known)
         {
             var stage = stages.StageOf(category);
 
+            if (stage == GateStage.Escalation && !escalationOpened)
+            {
+                escalationOpened = true;
+                BeforeEscalation?.Invoke(context, ExemptionFilterRule.Apply(context, raw).Kept);
+            }
+
             if (!discovered.TryGetValue(category, out var checks))
             {
+                CheckInstrumentation.Hit("config/category-absent/" + category);
                 statuses.Add(new GateCheckStatus(category, category, stage, GateCheckState.Skipped, "no checks discovered for this category", 0));
                 skippedCategories.Add(category);
                 continue;
@@ -90,6 +101,7 @@ public sealed class VerificationGate
 
             if (!_settings.IsEnabled(category))
             {
+                CheckInstrumentation.Hit("config/category-disabled/" + category);
                 statuses.AddRange(checks.Select(c => new GateCheckStatus(category, c.CheckId, stage, GateCheckState.Skipped, "category disabled by setting", 0)));
                 skippedCategories.Add(category);
                 continue;
@@ -99,6 +111,7 @@ public sealed class VerificationGate
             {
                 if (context.Settings.DisabledChecks.Contains(check.CheckId))
                 {
+                    CheckInstrumentation.Hit("config/check-disabled/" + check.CheckId);
                     statuses.Add(new GateCheckStatus(category, check.CheckId, stage, GateCheckState.Skipped, "check disabled by run settings", 0));
                     continue;
                 }
@@ -107,6 +120,7 @@ public sealed class VerificationGate
 
                 try
                 {
+                    CheckInstrumentation.Hit("check/" + check.CheckId);
                     produced = check.Run(context);
                 }
                 catch (Exception ex) when (ex is not OutOfMemoryException)
@@ -131,6 +145,8 @@ public sealed class VerificationGate
             .Where(f => f.Action != CheckAction.Repair)
             .Select(f => new ScoreContribution(f.CheckId, f.Category, f.TargetRange, f.Confidence, f.Priority, f.Finding.Evidence))
             .ToList();
+
+        CheckInstrumentation.Hit("gate/" + GateRunResult.RuleId);
 
         return new GateRunResult(
             Completion(context),

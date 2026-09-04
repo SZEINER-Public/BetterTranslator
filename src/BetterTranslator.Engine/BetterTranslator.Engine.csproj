@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <DefineConstants Condition="'$(BtInstrument)' == 'true'">$(DefineConstants);BT_INSTRUMENT</DefineConstants>
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>BetterTranslator.Engine</RootNamespace>
   </PropertyGroup>

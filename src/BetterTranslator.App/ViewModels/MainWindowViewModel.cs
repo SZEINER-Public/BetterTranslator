@@ -156,7 +156,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
         // The verifier is asked once, by the chat, after the units have been
         // spliced back together. Null when no verifier was built, which is the
         // state on any machine without a dictionary configured.
-        Workspace.Verify = (sourceText, resultText) => _verifier?.Verify(sourceText, resultText);
+        Workspace.Verify = (sourceText, content, direction) =>
+            content.Text is null || _pipeline is null
+                ? null
+                : _pipeline.Verify(sourceText, content.Text, content.Segments, direction.Source.Code.Value, direction.Target.Code.Value);
 
         // D6: the model that just translated the first message names the chat.
         // The same resident model, so nothing is loaded and nothing is downloaded
@@ -432,10 +435,20 @@ public sealed partial class MainWindowViewModel : ObservableObject
         // resolved to a code here rather than left to the engine to guess.
         var paths = new AppPaths();
 
-        _verifier = VerificationFactory.Create(
-            _settings.Verification,
-            new Engine.Languages.LanguageRegistry().Resolve(_settings.TargetLanguage)?.Code,
-            paths.DictionariesFolder);
+        _pipeline = new VerificationPipeline(
+            VerificationFactory.Create(
+                _settings.Verification,
+                new Engine.Languages.LanguageRegistry().Resolve(_settings.TargetLanguage)?.Code,
+                paths.DictionariesFolder),
+            _settings.Verification)
+        {
+            Semantics = _ => _translator.Session is { IsAlive: true } session && _translator.LastJob is { } template
+                ? SemanticRuntime.Services(_installPaths, session, template)
+                : null,
+        };
+
+        Core.Verification.Checks.Coverage.CoverageServices.Configure(
+            Engine.Verification.Coverage.CoverageEvidenceFactory.Create(VerificationFactory.DefaultSourceLanguage, paths.DictionariesFolder));
 
         // A downloaded flavour lands in the models folder, so the loader has to
         // look there as well as beside the executable. Registered before the
@@ -482,7 +495,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     /// applied here: the composer sends one unit at a time, and the pair worth
     /// verifying is the assembled answer against the whole message.
     /// </summary>
-    private TranslationVerifier? _verifier;
+    private VerificationPipeline? _pipeline;
 
     private void ReportSamplerAdvisories(TranslationJob job)
     {

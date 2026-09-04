@@ -671,7 +671,7 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
     /// are gone by the time <see cref="Runtime.Inference.TranslationOutcome"/>
     /// is built.
     /// </summary>
-    public Func<string, string, Core.Verification.VerificationResult?>? Verify { get; set; }
+    public Func<string, ContentTranslationResult, Core.Languages.TranslationDirection, Core.Verification.VerificationResult?>? Verify { get; set; }
 
     /// <summary>
     /// D6: names a chat from its first message, with the model that just
@@ -1603,7 +1603,7 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
                 : new Runtime.Inference.TranslationOutcome(content.Text, tokens, elapsed)
                 {
                     Verification = content.Text is { Length: > 0 }
-                        ? Verify?.Invoke(entry.Source, content.Text)
+                        ? Verify?.Invoke(entry.Source, content, direction)
                         : null,
                 };
 

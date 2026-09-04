@@ -74,10 +74,98 @@ public static class LanguageSeeds
         der Wert, die Zeichenkette, der Zweig, die Ausgabe, die Fehlerbehebung, der Kern.
         """;
 
+    public const string ResourceName = "BetterTranslator.Core.Verification.Checks.Coverage.language-seeds.json";
+
+    private static readonly Lazy<IReadOnlyDictionary<string, string>> Samples = new(LoadSamples);
+
+    private static readonly Lazy<IReadOnlyDictionary<string, HashSet<string>>> WordsByCode = new(BuildWords);
+
+    public static IReadOnlyList<string> Codes => [.. Samples.Value.Keys.Order(StringComparer.OrdinalIgnoreCase)];
+
+    public static string? Sample(string code)
+    {
+        ArgumentNullException.ThrowIfNull(code);
+
+        return Samples.Value.TryGetValue(code, out var sample) ? sample : Samples.Value.TryGetValue(Primary(code), out var primary) ? primary : null;
+    }
+
     public static IReadOnlyList<LanguageProfile> Profiles() =>
     [
-        LanguageProfile.Train("en", English),
-        LanguageProfile.Train("cs", Czech),
-        LanguageProfile.Train("de", German),
+        .. Samples.Value
+            .OrderBy(p => p.Key, StringComparer.Ordinal)
+            .Select(p => LanguageProfile.Train(p.Key, p.Value)),
     ];
+
+    public static bool Knows(string code, string word)
+    {
+        ArgumentNullException.ThrowIfNull(code);
+        ArgumentNullException.ThrowIfNull(word);
+
+        var words = WordsByCode.Value;
+
+        if (words.TryGetValue(code, out var exact))
+        {
+            return exact.Contains(word);
+        }
+
+        var primary = Primary(code);
+
+        return words.Where(p => string.Equals(Primary(p.Key), primary, StringComparison.OrdinalIgnoreCase)).Any(p => p.Value.Contains(word));
+    }
+
+    public static string Primary(string code)
+    {
+        ArgumentNullException.ThrowIfNull(code);
+
+        return code.Split('-', '_')[0].ToLowerInvariant();
+    }
+
+    private static IEnumerable<string> Extra(string code) => code switch
+    {
+        "en" => [English],
+        "cs" => [Czech],
+        "de" => [German],
+        _ => [],
+    };
+
+    private static IReadOnlyDictionary<string, string> LoadSamples()
+    {
+        using var stream = typeof(LanguageSeeds).Assembly.GetManifestResourceStream(ResourceName)
+            ?? throw new InvalidOperationException("language seed resource missing: " + ResourceName);
+        using var document = System.Text.Json.JsonDocument.Parse(stream);
+
+        var samples = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var entry in document.RootElement.GetProperty("languages").EnumerateArray())
+        {
+            var code = entry.GetProperty("code").GetString();
+            var sample = entry.GetProperty("sample").GetString();
+
+            if (!string.IsNullOrWhiteSpace(code) && !string.IsNullOrWhiteSpace(sample))
+            {
+                samples[code] = sample;
+            }
+        }
+
+        return samples;
+    }
+
+    private static IReadOnlyDictionary<string, HashSet<string>> BuildWords()
+    {
+        var words = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (code, sample) in Samples.Value)
+        {
+            words[code] = Words(string.Join('\n', [.. Extra(code), sample]));
+        }
+
+        return words;
+    }
+
+    private static HashSet<string> Words(string seed) =>
+        new(
+            seed.Split([' ', '\n', '\r', '\t'], StringSplitOptions.RemoveEmptyEntries)
+                .Select(w => w.Trim('.', ',', ';', ':', '(', ')', '"', '\'', '!', '?', '。', '、', '،', '।').ToLowerInvariant())
+                .Where(w => w.Length > 0 && w.All(char.IsLetter)),
+            StringComparer.Ordinal);
 }

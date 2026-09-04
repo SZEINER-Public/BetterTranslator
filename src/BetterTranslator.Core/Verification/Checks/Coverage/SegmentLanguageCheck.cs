@@ -28,10 +28,17 @@ public sealed class SegmentLanguageCheck : CoverageCheck
             return LanguageIdentification.Undetermined;
         }
 
-        var visible = CoverageText.Visible(context.Target.Text, pair.TargetRange, pair.TargetHidden);
+        var hidden = pair.TargetHidden.Concat(context.Target.Invariants.Select(i => i.Range)).ToList();
+        var visible = CommandTokens.Replace(CoverageText.Visible(context.Target.Text, pair.TargetRange, hidden), m => new string(' ', m.Length));
 
-        return identifier.Identify(visible);
+        return visible.Count(char.IsLetter) < MinimumLetters
+            ? LanguageIdentification.Undetermined
+            : identifier.Identify(visible);
     }
+
+    public const int MinimumLetters = 15;
+
+    private static readonly System.Text.RegularExpressions.Regex CommandTokens = new(@"--?[\w-]+|<[^>\s]+>|[A-Za-z]#|\.[A-Z]{2,}\b", System.Text.RegularExpressions.RegexOptions.Compiled);
 
     protected override void Find(CheckContext context, CoverageAlignmentResult alignment, List<CheckFinding> findings)
     {

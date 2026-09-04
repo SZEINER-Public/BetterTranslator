@@ -12,6 +12,7 @@ public static class RatioScoring
         ArgumentNullException.ThrowIfNull(findings);
 
         profile ??= RatioProfile.Default;
+        CheckInstrumentation.Hit("scoring/ratio");
 
         var ordered = findings
             .Where(f => f.CheckId.StartsWith(CheckId.Ratio.Category + "-", StringComparison.Ordinal))

@@ -19,6 +19,11 @@ public sealed class SourceTokenSurvivalCheck : CoverageCheck
 
     private SourceLanguageEvidence Evidence => _evidence ?? CoverageServices.Default;
 
+    private static bool Bracketed(string text, CheckRange range) =>
+        range.Offset > 0
+        && range.End < text.Length
+        && ((text[range.Offset - 1] == '<' && text[range.End] == '>') || text[range.Offset - 1] == '-' || text[range.Offset - 1] == '{');
+
     protected override void Find(CheckContext context, CoverageAlignmentResult alignment, List<CheckFinding> findings)
     {
         var source = context.Settings.SourceLanguage;
@@ -54,6 +59,11 @@ public sealed class SourceTokenSurvivalCheck : CoverageCheck
                 }
 
                 if (pair.TargetHidden.Any(h => h.Contains(token.Range)) || ExemptionFilter.Shields(context, token.Range))
+                {
+                    continue;
+                }
+
+                if (LanguageSeeds.Knows(target, token.Key) || context.Target.Invariants.Any(i => i.Range.Contains(token.Range)) || Bracketed(context.Target.Text, token.Range))
                 {
                     continue;
                 }

@@ -273,7 +273,7 @@ public sealed class CoverageCheckTests
         pair.Confidence.Should().BeLessThan(CoverageAlignment.WordCeilingFloor);
         pair.Anchors.Where(a => a.Identical).Should().OnlyContain(a => a.Source.Key == a.Target.Key);
 
-        RunAll(context).Should().OnlyContain(f => f.Granularity != CheckGranularity.Word);
+        RunAll(context).Should().NotContain(f => f.Granularity == CheckGranularity.Word);
 
         string[] straight = ["Open the settings window and save the changes."];
         string[] straightTarget = ["Otevřete okno nastavení a uložte změny."];

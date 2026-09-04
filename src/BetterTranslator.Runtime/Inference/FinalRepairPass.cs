@@ -80,6 +80,7 @@ public sealed class FinalRepairPass(
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(lines);
 
+        Core.Verification.Checks.CheckInstrumentation.Hit("repair/run");
         var adjudicated = 0;
         var spaces = 0;
         var fragments = 0;
@@ -152,6 +153,7 @@ public sealed class FinalRepairPass(
                 if (InsertSpace(lines, i, defect.Text))
                 {
                     spaces++;
+                    Core.Verification.Checks.CheckInstrumentation.Hit("repair/space-inserted");
                 }
             }
 
@@ -177,6 +179,7 @@ public sealed class FinalRepairPass(
                 {
                     lines[i] = outcome.Text!;
                     whole++;
+                    Core.Verification.Checks.CheckInstrumentation.Hit("repair/line-retranslated");
                 }
 
                 continue;
@@ -204,6 +207,7 @@ public sealed class FinalRepairPass(
                 // next run of this pass, which re-detects what is left.
                 lines[i] = pattern.Replace(lines[i], outcome.Text!.Replace("$", "$$", StringComparison.Ordinal), 1);
                 fragments++;
+                Core.Verification.Checks.CheckInstrumentation.Hit("repair/fragment-repaired");
             }
         }
 

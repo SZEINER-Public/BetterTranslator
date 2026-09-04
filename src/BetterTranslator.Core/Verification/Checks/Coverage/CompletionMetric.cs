@@ -25,6 +25,7 @@ public static class CompletionMetric
 
         foreach (var check in CoverageChecks())
         {
+            CheckInstrumentation.Hit("completion/" + check.CheckId);
             foreach (var finding in check.Run(context))
             {
                 var copied = string.Equals(finding.CheckId, Checks.CheckId.Coverage.CopyThrough, StringComparison.Ordinal);

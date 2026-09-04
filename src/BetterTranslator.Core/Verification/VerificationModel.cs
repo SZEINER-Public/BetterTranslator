@@ -52,6 +52,8 @@ public sealed class VerificationResult
 
     public double UnanalyzableTokenRatePer1000 { get; init; }
 
+    public Gate.GateRunResult? Gate { get; set; }
+
     public bool HasFindings => Executed && Spans.Any(s => !s.Exempt && s.Tier != SeverityTier.Clean);
 
     public static VerificationResult Skipped(string reason) => new() { Executed = false, SkipReason = reason };
