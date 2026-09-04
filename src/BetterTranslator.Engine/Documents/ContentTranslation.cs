@@ -35,7 +35,10 @@ public sealed record ContentTranslationResult(
     ContentShape Shape,
     string? Note = null,
     string? Refusal = null,
-    bool Stopped = false);
+    bool Stopped = false)
+{
+    public IReadOnlyList<Verification.Structure.SegmentTrace> Segments { get; init; } = [];
+}
 
 /// <summary>
 /// How a piece of text is cut up and put back together, for every surface that
@@ -106,7 +109,10 @@ public static class ContentTranslation
     private static ContentTranslationResult Json(JsonTranslationResult document) =>
         document.Translated == 0
             ? new ContentTranslationResult(null, ContentShape.Json, Stopped: document.Stopped)
-            : new ContentTranslationResult(document.Text, ContentShape.Json, KeptValues(document), Stopped: document.Stopped);
+            : new ContentTranslationResult(document.Text, ContentShape.Json, KeptValues(document), Stopped: document.Stopped)
+            {
+                Segments = document.Segments,
+            };
 
     private static ContentTranslationResult Markdown(string source, MarkdownTranslationResult document)
     {
@@ -127,7 +133,10 @@ public static class ContentTranslation
             return new ContentTranslationResult(null, ContentShape.Markdown, Stopped: document.Stopped);
         }
 
-        return new ContentTranslationResult(document.Text, ContentShape.Markdown, Recovery(document), Stopped: document.Stopped);
+        return new ContentTranslationResult(document.Text, ContentShape.Markdown, Recovery(document), Stopped: document.Stopped)
+        {
+            Segments = document.Segments,
+        };
     }
 
     private static ContentTranslationResult Prose(MessageTranslationResult message)
@@ -147,7 +156,10 @@ public static class ContentTranslation
             _ => $"{message.Kept} lines kept their source",
         };
 
-        return new ContentTranslationResult(message.Text, ContentShape.Prose, note, Stopped: message.Stopped);
+        return new ContentTranslationResult(message.Text, ContentShape.Prose, note, Stopped: message.Stopped)
+        {
+            Segments = message.Segments,
+        };
     }
 
     /// <summary>

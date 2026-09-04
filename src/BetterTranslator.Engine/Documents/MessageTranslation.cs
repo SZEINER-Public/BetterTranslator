@@ -49,6 +49,8 @@ public sealed record MessageTranslationResult(
     bool Stopped = false)
 {
     public IEnumerable<MessageUnit> Failures => Units.Where(u => !u.FromModel);
+
+    public IReadOnlyList<Verification.Structure.SegmentTrace> Segments { get; init; } = [];
 }
 
 /// <summary>
@@ -146,7 +148,68 @@ public static class MessageTranslation
             offset += line.Length + 1;
         }
 
-        return new MessageTranslationResult(Splice(text, edits), translated, recovered, kept, units, stopped);
+        return new MessageTranslationResult(Splice(text, edits), translated, recovered, kept, units, stopped)
+        {
+            Segments = Segments(message, units, edits),
+        };
+    }
+
+    private static IReadOnlyList<Verification.Structure.SegmentTrace> Segments(
+        string message,
+        List<MessageUnit> units,
+        List<(int Start, int Length, string Text)> edits)
+    {
+        var ordered = edits.OrderBy(e => e.Start).ToList();
+        var traces = new List<Verification.Structure.SegmentTrace>();
+        var original = OriginalOffsets(message);
+
+        foreach (var unit in units)
+        {
+            var nested = !unit.FromModel
+                && units.Any(other => !ReferenceEquals(other, unit)
+                    && other.Start >= unit.Start
+                    && other.Start + other.Length <= unit.Start + unit.Length);
+
+            if (nested)
+            {
+                continue;
+            }
+
+            var delta = ordered.Where(e => e.Start < unit.Start).Sum(e => e.Text.Length - e.Length);
+            var targetLength = unit.FromModel ? unit.Delivered.Length : unit.Length;
+
+            traces.Add(new Verification.Structure.SegmentTrace(
+                original[unit.Start],
+                original[unit.Start + unit.Length] - original[unit.Start],
+                unit.FromModel ? Core.Verification.Checks.SegmentOutcome.Translated : Core.Verification.Checks.SegmentOutcome.Kept,
+                unit.FromModel ? unit.Delivered : null,
+                null,
+                unit.FromModel ? unit.Delivered : null,
+                unit.Start + delta,
+                targetLength));
+        }
+
+        return [.. traces.OrderBy(t => t.SourceStart)];
+    }
+
+    private static int[] OriginalOffsets(string message)
+    {
+        var normalizedLength = message.ReplaceLineEndings("\n").Length;
+        var map = new int[normalizedLength + 1];
+        var normalized = 0;
+
+        for (var i = 0; i < message.Length && normalized < normalizedLength; i++)
+        {
+            if (message[i] == '\r' && i + 1 < message.Length && message[i + 1] == '\n')
+            {
+                continue;
+            }
+
+            map[normalized++] = i;
+        }
+
+        map[normalizedLength] = message.Length;
+        return map;
     }
 
     private static async Task<bool> SentencesAsync(

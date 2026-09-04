@@ -211,13 +211,32 @@ public static class PlaceholderGuard
         });
     }
 
+    public sealed record SentinelResidue(int Index, int Length, string Text);
+
+    public static IReadOnlyList<SentinelResidue> Residue(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return [];
+        }
+
+        var found = new List<SentinelResidue>();
+
+        foreach (Match match in Drifted.Matches(text))
+        {
+            found.Add(new SentinelResidue(match.Index, match.Length, match.Value));
+        }
+
+        return found;
+    }
+
     /// <summary>Puts the originals back. Highest index first, so `[[1]]` does not match inside `[[10]]`.</summary>
     public static string Restore(string text, PlaceholderGuards guards)
     {
         ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(guards);
 
-        var output = text;
+        var output = guards.Any ? Normalize(text)! : text;
 
         for (var i = guards.Originals.Count - 1; i >= 0; i--)
         {

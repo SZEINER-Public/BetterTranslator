@@ -58,4 +58,6 @@ public sealed record MarkdownTranslationResult(
     bool Stopped = false)
 {
     public bool StructureHeld => StructureIssues.Count == 0;
+
+    public IReadOnlyList<Verification.Structure.SegmentTrace> Segments { get; init; } = [];
 }

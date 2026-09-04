@@ -1,5 +1,7 @@
 using System.Text;
+using BetterTranslator.Core.Verification.Checks;
 using BetterTranslator.Engine.Markup;
+using BetterTranslator.Engine.Verification.Structure;
 
 namespace BetterTranslator.Engine.Markdown;
 
@@ -93,14 +95,16 @@ public static class MarkdownTranslation
         var working = Config.PipelineOptions.RecoverEchoedUnits
             && answers.Any(candidate => candidate.Holds && !candidate.Echoed);
 
+        var traces = new List<SegmentTrace>();
+
         foreach (var (unit, answer, holds, echoed) in answers)
         {
             if (holds && !(echoed && working))
             {
-                edits.Add((
-                    unit.Start,
-                    unit.Length,
-                    RunBoundary.Preserve(unit.Text, MarkdownEcho.Restore(answer!, unit.Guards))));
+                var restored = RunBoundary.Preserve(unit.Text, MarkdownEcho.Restore(answer!, unit.Guards));
+
+                edits.Add((unit.Start, unit.Length, restored));
+                traces.Add(new SegmentTrace(unit.Start, unit.Length, SegmentOutcome.Translated, answer, Masks(unit), restored));
 
                 translated++;
 
@@ -122,11 +126,19 @@ public static class MarkdownTranslation
             if (edits.Count > before)
             {
                 recovered++;
+                var grown = edits.Skip(before).Sum(edit => edit.Text.Length - edit.Length);
+                traces.Add(new SegmentTrace(unit.Start, unit.Length, SegmentOutcome.Recovered, answer, TargetLength: unit.Length + grown));
             }
             else
             {
                 kept++;
+                traces.Add(new SegmentTrace(unit.Start, unit.Length, SegmentOutcome.Kept, answer));
             }
+        }
+
+        foreach (var unit in units.Skip(answers.Count))
+        {
+            traces.Add(new SegmentTrace(unit.Start, unit.Length, SegmentOutcome.Stopped));
         }
 
         var spliced = Splice(markdown, edits);
@@ -146,9 +158,20 @@ public static class MarkdownTranslation
         }
 
         return issues.Count == 0
-            ? new MarkdownTranslationResult(text, translated, recovered, kept, issues, unverified, stopped)
-            : new MarkdownTranslationResult(markdown, 0, 0, units.Count, issues, unverified, stopped);
+            ? new MarkdownTranslationResult(text, translated, recovered, kept, issues, unverified, stopped) { Segments = traces }
+            : new MarkdownTranslationResult(markdown, 0, 0, units.Count, issues, unverified, stopped) { Segments = KeptSegments(units) };
     }
+
+    private static IReadOnlyList<MaskTrace> Masks(MarkdownUnit unit) =>
+        [.. unit.Guards.Select(guard => new MaskTrace(guard.Sentinel, guard.Original, SegmentTrace.ReasonFor(guard.Original)))];
+
+    private static IReadOnlyList<SegmentTrace> KeptSegments(IReadOnlyList<MarkdownUnit> units) =>
+        [.. units.Select(unit => new SegmentTrace(
+            unit.Start,
+            unit.Length,
+            SegmentOutcome.Kept,
+            TargetStart: unit.Start,
+            TargetLength: unit.Length))];
 
     private static async Task<int> RunsAsync(
         MarkdownUnit unit,

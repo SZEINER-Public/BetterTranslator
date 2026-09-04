@@ -62,4 +62,7 @@ public sealed record JsonTranslationResult(
     int Translated,
     int Kept,
     IReadOnlyList<string> KeptPaths,
-    bool Stopped = false);
+    bool Stopped = false)
+{
+    public IReadOnlyList<Verification.Structure.SegmentTrace> Segments { get; init; } = [];
+}

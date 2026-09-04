@@ -63,12 +63,13 @@ public static partial class JsonTranslation
 
         var literalNonAscii = JsonSegmenter.PrefersLiteralNonAscii(json);
         var answers = new Dictionary<int, string>();
+        var raw = new Dictionary<int, (string Answer, IReadOnlyList<JsonGuard> Guards)>();
 
         var stopped = false;
 
         foreach (var batch in Batches(wanted))
         {
-            if (await RunAsync(batch, translate, answers, cancellationToken).ConfigureAwait(false))
+            if (await RunAsync(batch, translate, answers, raw, cancellationToken).ConfigureAwait(false))
             {
                 stopped = true;
                 break;
@@ -88,7 +89,66 @@ public static partial class JsonTranslation
             answers.Count,
             kept.Count,
             [.. kept.Select(s => s.KeyPath)],
-            stopped);
+            stopped)
+        {
+            Segments = Segments(json, text, wanted, answers, raw, literalNonAscii),
+        };
+    }
+
+    private static IReadOnlyList<Verification.Structure.SegmentTrace> Segments(
+        string json,
+        string text,
+        List<JsonScalar> wanted,
+        Dictionary<int, string> answers,
+        Dictionary<int, (string Answer, IReadOnlyList<JsonGuard> Guards)> raw,
+        bool literalNonAscii)
+    {
+        var sourceOffsets = Text.Utf8Offsets.Of(json);
+        var targetOffsets = Text.Utf8Offsets.Of(text);
+        var traces = new List<Verification.Structure.SegmentTrace>();
+        var delta = 0;
+
+        foreach (var scalar in wanted.OrderBy(s => s.Start))
+        {
+            var (sourceStart, sourceLength) = sourceOffsets.CharRange(scalar.Start, scalar.Length);
+            var targetByteStart = scalar.Start + delta;
+
+            if (answers.TryGetValue(scalar.Start, out var answer))
+            {
+                var escaped = JsonEscape.Content(answer, literalNonAscii);
+                var escapedBytes = Encoding.UTF8.GetByteCount(escaped);
+                var (targetStart, targetLength) = targetOffsets.CharRange(targetByteStart, escapedBytes);
+                var (rawAnswer, guards) = raw.TryGetValue(scalar.Start, out var recorded) ? recorded : (answer, []);
+
+                traces.Add(new Verification.Structure.SegmentTrace(
+                    sourceStart,
+                    sourceLength,
+                    Core.Verification.Checks.SegmentOutcome.Translated,
+                    rawAnswer,
+                    [.. guards.Select(g => new Verification.Structure.MaskTrace(
+                        g.Sentinel,
+                        JsonEscape.Content(g.Original, literalNonAscii),
+                        Verification.Structure.SegmentTrace.ReasonFor(g.Original)))],
+                    escaped,
+                    targetStart,
+                    targetLength));
+
+                delta += escapedBytes - scalar.Length;
+            }
+            else
+            {
+                var (targetStart, targetLength) = targetOffsets.CharRange(targetByteStart, scalar.Length);
+
+                traces.Add(new Verification.Structure.SegmentTrace(
+                    sourceStart,
+                    sourceLength,
+                    Core.Verification.Checks.SegmentOutcome.Kept,
+                    TargetStart: targetStart,
+                    TargetLength: targetLength));
+            }
+        }
+
+        return traces;
     }
 
     /// <summary>
@@ -138,6 +198,7 @@ public static partial class JsonTranslation
         List<JsonScalar> batch,
         Func<string, CancellationToken, Task<string?>> translate,
         Dictionary<int, string> answers,
+        Dictionary<int, (string Answer, IReadOnlyList<JsonGuard> Guards)> raw,
         CancellationToken cancellationToken)
     {
         if (batch.Count > 1)
@@ -151,7 +212,7 @@ public static partial class JsonTranslation
                 return true;
             }
 
-            if (TrySplit(answer, markers, guards, batch, answers))
+            if (TrySplit(answer, markers, guards, batch, answers, raw))
             {
                 return false;
             }
@@ -171,6 +232,7 @@ public static partial class JsonTranslation
             if (JsonValueGuard.Holds(answer, guards))
             {
                 answers[scalar.Start] = JsonValueGuard.Restore(answer!.Trim(), guards);
+                raw[scalar.Start] = (answer!.Trim(), guards);
             }
         }
 
@@ -229,7 +291,8 @@ public static partial class JsonTranslation
         List<string> markers,
         List<IReadOnlyList<JsonGuard>> guards,
         List<JsonScalar> batch,
-        Dictionary<int, string> answers)
+        Dictionary<int, string> answers,
+        Dictionary<int, (string Answer, IReadOnlyList<JsonGuard> Guards)> raw)
     {
         if (string.IsNullOrWhiteSpace(answer))
         {
@@ -259,6 +322,7 @@ public static partial class JsonTranslation
         }
 
         var staged = new Dictionary<int, string>();
+        var stagedRaw = new Dictionary<int, (string Answer, IReadOnlyList<JsonGuard> Guards)>();
 
         for (var i = 0; i < markers.Count; i++)
         {
@@ -273,6 +337,7 @@ public static partial class JsonTranslation
             }
 
             staged[batch[i].Start] = JsonValueGuard.Restore(value, guards[i]);
+            stagedRaw[batch[i].Start] = (value, guards[i]);
         }
 
         // Written only once the whole batch has validated, so a half-good answer
@@ -280,6 +345,7 @@ public static partial class JsonTranslation
         foreach (var (start, value) in staged)
         {
             answers[start] = value;
+            raw[start] = stagedRaw[start];
         }
 
         return true;
