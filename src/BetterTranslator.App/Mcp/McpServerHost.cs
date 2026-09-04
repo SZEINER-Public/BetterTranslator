@@ -37,7 +37,9 @@ public sealed class McpServerHost : IAsyncDisposable
     /// by opening a real gateway over the real data folder.
     /// </summary>
     internal static Func<Task<TranslationGateway>> DefaultGateway { get; } =
-        () => TranslationGateway.StartAsync(CancellationToken.None, AppOwnsRuntime);
+        () => TranslationGateway.StartAsync(CancellationToken.None, AppOwnsRuntime, PipelineProvider?.Invoke());
+
+    public static Func<Engine.Verification.VerificationPipeline?>? PipelineProvider { get; set; }
 
     /// <summary>
     /// False, and the reason is the whole of it: the window resolved the native

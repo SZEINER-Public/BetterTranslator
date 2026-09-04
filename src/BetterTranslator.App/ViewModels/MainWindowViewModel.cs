@@ -443,6 +443,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
                 ? SemanticRuntime.Services(_installPaths, session, template)
                 : null);
 
+        Mcp.McpServerHost.PipelineProvider = () => _pipeline;
+
         // A downloaded flavour lands in the models folder, so the loader has to
         // look there as well as beside the executable. Registered before the
         // first native call, because the flavour is resolved once and kept.

@@ -13,6 +13,10 @@ public sealed record ResultRow
     [JsonPropertyName("out")] public string? Out { get; init; }
 
     [JsonPropertyName("error")] public string? Error { get; init; }
+
+    [JsonPropertyName("verification")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Dictionary<string, object?>? Verification { get; init; }
 }
 
 public sealed record FailureDetail
@@ -31,8 +35,9 @@ public static class Envelope
         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
-    public static string Text(TextTranslation translation) => JsonSerializer.Serialize(
-        new Dictionary<string, object?>
+    public static string Text(TextTranslation translation, bool verify = false)
+    {
+        var envelope = new Dictionary<string, object?>
         {
             ["ok"] = true,
             ["from"] = translation.From,
@@ -40,10 +45,17 @@ public static class Envelope
             ["model"] = translation.Model,
             ["result"] = translation.Text,
             ["note"] = translation.Note,
-        },
-        Options);
+        };
 
-    public static string Files(IReadOnlyList<FileTranslation> results)
+        if (verify)
+        {
+            envelope["verification"] = translation.Verification.Envelope();
+        }
+
+        return JsonSerializer.Serialize(envelope, Options);
+    }
+
+    public static string Files(IReadOnlyList<FileTranslation> results, bool verify = false)
     {
         var failed = results.FirstOrDefault(r => r.Status != "ok");
 
@@ -56,6 +68,7 @@ public static class Envelope
                 Status = r.Status,
                 Out = r.Out,
                 Error = r.Error,
+                Verification = verify ? r.Verification.Envelope() : null,
             }).ToList(),
         };
 

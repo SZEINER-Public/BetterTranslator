@@ -48,7 +48,8 @@ public sealed class TranslationGateway : IDisposable
         SettingsStore settingsStore,
         InstallPaths installPaths,
         AppSettings settings,
-        ITranslationEngine engine)
+        ITranslationEngine engine,
+        VerificationPipeline? pipeline = null)
     {
         _database = database;
         _settingsStore = settingsStore;
@@ -60,7 +61,7 @@ public sealed class TranslationGateway : IDisposable
         // stored settings and finding its dictionary the same way. Null when
         // verification is switched off or no dictionary for the target language
         // is on this machine, which is not a failure.
-        _pipeline = VerificationFactory.CreatePipeline(
+        _pipeline = pipeline ?? VerificationFactory.CreatePipeline(
             settings.Verification,
             _registry.Resolve(settings.TargetLanguage)?.Code,
             new AppPaths().DictionariesFolder,
@@ -84,9 +85,12 @@ public sealed class TranslationGateway : IDisposable
     /// library loads -- and applying a newer setting here changed the window's
     /// runtime out from under it, without the restart it asks for.
     /// </summary>
+    public VerificationPipeline Pipeline => _pipeline;
+
     public static async Task<TranslationGateway> StartAsync(
         CancellationToken cancellationToken,
-        bool ownsRuntime = true)
+        bool ownsRuntime = true,
+        VerificationPipeline? pipeline = null)
     {
         var paths = new AppPaths();
         paths.EnsureCreated();
@@ -106,7 +110,7 @@ public sealed class TranslationGateway : IDisposable
 
         ApplyBackend(settings, ownsRuntime);
 
-        var gateway = new TranslationGateway(database, settingsStore, installPaths, settings, new LocalTranslationEngine());
+        var gateway = new TranslationGateway(database, settingsStore, installPaths, settings, new LocalTranslationEngine(), pipeline);
 
         // The same index the window's Memory screen reads, loaded the same way.
         // Failing to load it is not a reason to refuse to translate: an empty
@@ -369,6 +373,7 @@ public sealed class TranslationGateway : IDisposable
         {
             Note = run.Note,
             EntryId = entry?.Id.ToString(),
+            Verification = VerificationSummary.From(run.Verification),
         };
     }
 
@@ -465,7 +470,7 @@ public sealed class TranslationGateway : IDisposable
             return FileTranslation.Failed(full, new AgentError(AgentFault.TranslationFailed, ex.Message));
         }
 
-        return FileTranslation.Done(full, destination) with { Note = run.Note };
+        return FileTranslation.Done(full, destination) with { Note = run.Note, Verification = VerificationSummary.From(run.Verification) };
     }
 
     public IReadOnlyList<string> BatchFiles(string folder) =>

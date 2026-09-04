@@ -84,6 +84,8 @@ public static class Help
           --quiet           no progress on stderr
           --memory          translate against the indexed project and its
                             glossary, as the window does with its Memory chip
+          --verify          add the verification the window computes to the
+                            JSON envelope: completion, red spans, skipped checks
           --help            this text, or a command's own
           --version         print the version and exit
 

@@ -24,7 +24,9 @@ public static class McpPayload
         Content = [new TextContentBlock { Text = message }],
     };
 
-    public static JsonElement Schema(string json) => JsonDocument.Parse(json).RootElement.Clone();
+    public const string VerificationPlaceholder = "\"@@verification@@\"";
+
+    public static JsonElement Schema(string json) => JsonDocument.Parse(json.Replace(VerificationPlaceholder, VerificationSummary.SchemaObject, StringComparison.Ordinal)).RootElement.Clone();
 
     public static string Table(IReadOnlyList<string> headers, IEnumerable<IReadOnlyList<string>> rows)
     {

@@ -59,6 +59,8 @@ public sealed record TextTranslation(
     /// </summary>
     public string? EntryId { get; init; }
 
+    public VerificationSummary Verification { get; init; } = VerificationSummary.Unavailable(VerificationSummary.NoPipelineReason);
+
     public bool Ok => Error is null;
 
     public static TextTranslation Failed(string from, string to, string model, AgentError error) =>
@@ -74,6 +76,8 @@ public sealed record FileTranslation(
 {
     /// <inheritdoc cref="TextTranslation.Note"/>
     public string? Note { get; init; }
+
+    public VerificationSummary Verification { get; init; } = VerificationSummary.Unavailable(VerificationSummary.NoPipelineReason);
 
     public static FileTranslation Done(string file, string output) => new(file, "ok", output, null, null);
 
@@ -101,4 +105,7 @@ public sealed record EntrySummary(
     string CreatedAt,
     string? FileName,
     int? GeneratedTokens,
-    int? DurationMs);
+    int? DurationMs)
+{
+    public VerificationSummary Verification { get; init; } = VerificationSummary.Unavailable(VerificationSummary.NotRetainedReason);
+}

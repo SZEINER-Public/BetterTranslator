@@ -35,6 +35,8 @@ public sealed record ParsedCommand
     /// </summary>
     public bool Memory { get; init; }
 
+    public bool Verify { get; init; }
+
     public bool Json { get; init; }
 
     public bool Quiet { get; init; }
@@ -133,6 +135,10 @@ public static class CommandLine
 
                 case "--memory":
                     command = command with { Memory = true };
+                    continue;
+
+                case "--verify":
+                    command = command with { Verify = true };
                     continue;
             }
 

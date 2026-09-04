@@ -72,6 +72,7 @@ public static class BetterTranslatorTools
                     duration_ms = result.DurationMs,
                     note = result.Note,
                     entry_id = result.EntryId,
+                    verification = result.Verification.Payload(),
                 },
                 McpPayload.Pairs(
                 [
@@ -108,7 +109,8 @@ public static class BetterTranslatorTools
                     "generated_tokens": { "type": "integer", "description": "Tokens the model generated." },
                     "duration_ms": { "type": "integer", "description": "How long the translation took." },
                     "note": { "type": ["string", "null"], "description": "What the reader would otherwise have to spot by comparing the two texts: lines that kept their source, blocks retranslated phrase by phrase, spans the verifier flagged. Null when the run was uneventful." },
-                    "entry_id": { "type": ["string", "null"], "description": "The stored entry this translation became, in the application's own history. Pass it to get_entry to read it back, or to show_in_gui to reveal it in the window." }
+                    "entry_id": { "type": ["string", "null"], "description": "The stored entry this translation became, in the application's own history. Pass it to get_entry to read it back, or to show_in_gui to reveal it in the window." },
+                    "verification": "@@verification@@"
                   }
                 }
                 """),
@@ -265,6 +267,7 @@ public static class BetterTranslatorTools
                         status = r.Status,
                         @out = r.Out,
                         error = r.Error,
+                        verification = r.Verification.Payload(),
                     }).ToArray(),
                 },
                 McpPayload.Table(
@@ -307,7 +310,8 @@ public static class BetterTranslatorTools
                           "file": { "type": "string" },
                           "status": { "type": "string", "description": "ok or failed." },
                           "out": { "type": ["string", "null"], "description": "Path the translation was written to." },
-                          "error": { "type": ["string", "null"] }
+                          "error": { "type": ["string", "null"] },
+                          "verification": "@@verification@@"
                         }
                       }
                     }
@@ -605,6 +609,7 @@ public static class BetterTranslatorTools
                     file_name = entry.FileName,
                     generated_tokens = entry.GeneratedTokens,
                     duration_ms = entry.DurationMs,
+                    verification = entry.Verification.Payload(),
                 },
                 McpPayload.Pairs(
                 [
@@ -643,7 +648,8 @@ public static class BetterTranslatorTools
                     "created_at": { "type": "string", "description": "ISO 8601 timestamp." },
                     "file_name": { "type": ["string", "null"] },
                     "generated_tokens": { "type": ["integer", "null"] },
-                    "duration_ms": { "type": ["integer", "null"] }
+                    "duration_ms": { "type": ["integer", "null"] },
+                    "verification": "@@verification@@"
                   }
                 }
                 """),

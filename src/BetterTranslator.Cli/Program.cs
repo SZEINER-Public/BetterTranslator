@@ -72,7 +72,7 @@ async Task<int> TranslateAsync(TranslationGateway gateway, ParsedCommand parsed)
 
         if (parsed.Json)
         {
-            Console.Out.WriteLine(Envelope.Files(results));
+            Console.Out.WriteLine(Envelope.Files(results, parsed.Verify));
         }
         else
         {
@@ -109,7 +109,7 @@ async Task<int> TranslateAsync(TranslationGateway gateway, ParsedCommand parsed)
 
         if (parsed.Json)
         {
-            Console.Out.WriteLine(Envelope.Files([result]));
+            Console.Out.WriteLine(Envelope.Files([result], parsed.Verify));
         }
         else
         {
@@ -135,7 +135,7 @@ async Task<int> TranslateAsync(TranslationGateway gateway, ParsedCommand parsed)
 
     if (parsed.Json)
     {
-        Console.Out.WriteLine(Envelope.Text(translation));
+        Console.Out.WriteLine(Envelope.Text(translation, parsed.Verify));
     }
     else
     {
