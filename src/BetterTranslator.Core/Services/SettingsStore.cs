@@ -35,6 +35,12 @@ public sealed class SettingsStore(Database database)
     private const string VerifyNgramFloor = "verification_ngram_logprob_floor";
     private const string VerifyMinFrequency = "verification_min_frequency";
     private const string VerifyChunkRun = "verification_untranslated_chunk_min_run";
+    private const string GateEnabled = "verification_gate_enabled";
+    private const string GateRepairCap = "verification_gate_repair_candidate_cap";
+    private const string GateUnitCap = "verification_gate_findings_per_unit_cap";
+    private const string GateRouting = "verification_gate_routing";
+    private const string GateStages = "verification_gate_stages";
+    private const string GateDisabled = "verification_gate_disabled_categories";
     private const string RestartAfterInstallKey = "restart_after_install";
     private const string McpEnabledKey = "mcp_enabled";
     private const string McpHostKey = "mcp_host";
@@ -89,6 +95,15 @@ public sealed class SettingsStore(Database database)
                 NgramLogProbFloor = Double(stored, VerifyNgramFloor, settings.Verification.NgramLogProbFloor),
                 MinFrequency = Int(stored, VerifyMinFrequency, (int)settings.Verification.MinFrequency),
                 UntranslatedChunkMinRun = Int(stored, VerifyChunkRun, settings.Verification.UntranslatedChunkMinRun),
+                Gate = new Verification.Gate.GateSettings
+                {
+                    Enabled = Bool(stored, GateEnabled, settings.Verification.Gate.Enabled),
+                    RepairCandidateCap = Int(stored, GateRepairCap, settings.Verification.Gate.RepairCandidateCap),
+                    FindingsPerUnitCap = Int(stored, GateUnitCap, settings.Verification.Gate.FindingsPerUnitCap),
+                    RoutingText = stored.GetValueOrDefault(GateRouting, settings.Verification.Gate.RoutingText),
+                    StageText = stored.GetValueOrDefault(GateStages, settings.Verification.Gate.StageText),
+                    DisabledCategoriesText = stored.GetValueOrDefault(GateDisabled, settings.Verification.Gate.DisabledCategoriesText),
+                },
             },
         };
     }
@@ -122,6 +137,12 @@ public sealed class SettingsStore(Database database)
             [VerifyNgramFloor] = settings.Verification.NgramLogProbFloor.ToString(CultureInfo.InvariantCulture),
             [VerifyMinFrequency] = settings.Verification.MinFrequency.ToString(CultureInfo.InvariantCulture),
             [VerifyChunkRun] = settings.Verification.UntranslatedChunkMinRun.ToString(CultureInfo.InvariantCulture),
+            [GateEnabled] = settings.Verification.Gate.Enabled ? "1" : "0",
+            [GateRepairCap] = settings.Verification.Gate.RepairCandidateCap.ToString(CultureInfo.InvariantCulture),
+            [GateUnitCap] = settings.Verification.Gate.FindingsPerUnitCap.ToString(CultureInfo.InvariantCulture),
+            [GateRouting] = settings.Verification.Gate.RoutingText,
+            [GateStages] = settings.Verification.Gate.StageText,
+            [GateDisabled] = settings.Verification.Gate.DisabledCategoriesText,
             [RestartAfterInstallKey] = settings.RestartAfterInstall ? "1" : "0",
             [McpEnabledKey] = settings.McpEnabled ? "1" : "0",
             [McpHostKey] = settings.McpHost,

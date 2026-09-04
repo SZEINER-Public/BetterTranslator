@@ -89,4 +89,21 @@ public static class CheckId
 
         public const string RunConsistency = "TRM-103";
     }
+
+    public static class Gate
+    {
+        public const string Category = "GATE";
+
+        public const string ExemptionFilter = "GATE-101";
+
+        public const string RoutingPolicy = "GATE-102";
+
+        public const string Deduplication = "GATE-103";
+
+        public const string CandidateOrdering = "GATE-104";
+
+        public const string Caps = "GATE-105";
+
+        public const string RunResult = "GATE-106";
+    }
 }

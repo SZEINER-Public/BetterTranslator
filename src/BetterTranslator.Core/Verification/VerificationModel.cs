@@ -94,4 +94,6 @@ public sealed class VerificationSettings
     public int UntranslatedChunkScore { get; set; } = 10;
 
     public double RuntimeSignalWeight { get; set; } = 0.5;
+
+    public Gate.GateSettings Gate { get; set; } = new();
 }

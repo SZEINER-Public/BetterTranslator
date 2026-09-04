@@ -28,6 +28,13 @@ public sealed class TranslationVerifier
 
     public VerificationResult Verify(string sourceText, string targetText) => Verify(sourceText, targetText, []);
 
+    public VerificationResult Verify(string sourceText, string targetText, Core.Verification.Gate.GateRunResult gate)
+    {
+        ArgumentNullException.ThrowIfNull(gate);
+
+        return Verify(sourceText, targetText, gate.Findings);
+    }
+
     public VerificationResult Verify(string sourceText, string targetText, IReadOnlyList<CheckFinding> checkFindings)
     {
         ArgumentNullException.ThrowIfNull(checkFindings);
