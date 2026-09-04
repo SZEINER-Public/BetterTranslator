@@ -5,4 +5,5 @@ public enum CheckAction
     Repair,
     Mark,
     ScoreOnly,
+    Rewrite,
 }

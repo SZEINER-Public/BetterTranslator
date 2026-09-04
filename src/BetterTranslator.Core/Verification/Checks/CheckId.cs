@@ -106,4 +106,29 @@ public static class CheckId
 
         public const string RunResult = "GATE-106";
     }
+
+    public static class Naturalness
+    {
+        public const string Category = "NAT";
+
+        public const string AlignmentCrossing = "NAT-101";
+
+        public const string TagSequenceDivergence = "NAT-102";
+
+        public const string CliticPlacement = "NAT-103";
+
+        public const string PronounExplicitness = "NAT-104";
+
+        public const string NominalStyle = "NAT-105";
+
+        public const string PassiveCalque = "NAT-106";
+
+        public const string RegisterConsistency = "NAT-107";
+
+        public const string SentenceBoundaryFit = "NAT-108";
+
+        public const string TitleCaseAndQuotation = "NAT-109";
+
+        public const string PluralCategoryCoverage = "NAT-110";
+    }
 }

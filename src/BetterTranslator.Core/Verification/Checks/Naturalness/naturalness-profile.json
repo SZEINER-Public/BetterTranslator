@@ -1,0 +1,47 @@
+{
+  "source": "calibrated from the committed parallel fixture by NaturalnessCalibration",
+  "improvementMargin": 1,
+  "meaningTolerance": 0.05,
+  "pairs": [
+    {
+      "pair": "en-cs",
+      "unit": "sentence",
+      "crossing": {
+        "limit": 0,
+        "samples": 1,
+        "minimumTokens": 6
+      },
+      "tagDivergence": {
+        "limit": 0,
+        "samples": 0,
+        "minimumTokens": 6
+      },
+      "sentenceExcess": {
+        "limit": 0,
+        "samples": 38,
+        "minimumTokens": 1
+      },
+      "tagReference": {}
+    },
+    {
+      "pair": "en-cs",
+      "unit": "block",
+      "crossing": {
+        "limit": 0,
+        "samples": 0,
+        "minimumTokens": 6
+      },
+      "tagDivergence": {
+        "limit": 0,
+        "samples": 0,
+        "minimumTokens": 6
+      },
+      "sentenceExcess": {
+        "limit": 0,
+        "samples": 6,
+        "minimumTokens": 1
+      },
+      "tagReference": {}
+    }
+  ]
+}

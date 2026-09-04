@@ -1,0 +1,52 @@
+{
+  "language": "cs",
+  "name": "Czech",
+  "analyzer": "majka",
+  "proDrop": true,
+  "alphabet": "aábcčdďeéěfghiíjklmnňoópqrřsštťuúůvwxyýzž",
+  "foreignForms": ["sa", "som", "sme", "ste", "ju", "ich", "ta", "jej", "svoj", "by som", "by si", "by sme", "by ste"],
+  "cliticGroups": [
+    { "name": "conditional", "forms": ["bych", "bys", "by", "bychom", "byste"] },
+    { "name": "pastAuxiliary", "forms": ["jsem", "jsi", "jsme", "jste"] },
+    { "name": "reflexive", "forms": ["se", "si"] },
+    { "name": "dative", "forms": ["mi", "ti", "mu", "jí", "nám", "vám", "jim"] },
+    { "name": "accusative", "forms": ["mě", "tě", "ho", "ji", "je", "nás", "vás"] }
+  ],
+  "clauseBreakers": [",", ";", ":"],
+  "cliticHomographs": ["je", "se", "si"],
+  "subjectPronouns": ["já", "ty", "on", "ona", "ono", "my", "vy", "oni", "ony"],
+  "possessives": ["můj", "moje", "moji", "tvůj", "tvoje", "jeho", "její", "náš", "naše", "váš", "vaše", "jejich"],
+  "reflexivePossessive": "svůj",
+  "lightVerbs": ["provést", "provádět", "uskutečnit", "učinit", "vykonat", "realizovat", "zajistit", "dojít"],
+  "deverbalSuffixes": ["ání", "ení", "tí", "ování"],
+  "passiveAuxiliaries": ["je", "jsou", "byl", "byla", "bylo", "byli", "byly", "bude", "budou", "být"],
+  "quotationOpen": "„",
+  "quotationClose": "“",
+  "foreignQuotationPairs": [["“", "”"], ["\"", "\""]],
+  "pluralMarkers": ["(s)", "(es)"],
+  "tags": {
+    "verb": "k5",
+    "pronoun": "k3",
+    "noun": "k1",
+    "imperative": "mR",
+    "infinitive": "mF",
+    "passiveParticiple": "mN",
+    "person": "p",
+    "number": "n",
+    "secondPersonPlural": "p2nP",
+    "secondPersonSingular": "p2nS",
+    "tense": "m"
+  },
+  "rules": [
+    { "id": "NAT-101", "signal": "alignment", "severity": "Score", "decidable": true, "evidence": "target order mirrors the source: {crossings} crossings over {tokens} aligned tokens, band {limit}" },
+    { "id": "NAT-102", "signal": "tags", "severity": "Score", "decidable": true, "evidence": "tag sequence diverges from the Czech reference by {divergence}, band {limit}" },
+    { "id": "NAT-103", "signal": "inventory", "severity": "Score", "decidable": true, "evidence": "clitic '{form}' {position}" },
+    { "id": "NAT-104", "signal": "inventory+tags", "severity": "Score", "decidable": true, "evidence": "explicit subject pronoun '{form}' before a verb that already carries person" },
+    { "id": "NAT-105", "signal": "inventory+tags", "severity": "Score", "decidable": false, "evidence": "light verb '{form}' with a deverbal noun '{noun}'" },
+    { "id": "NAT-106", "signal": "inventory+tags", "severity": "Score", "decidable": false, "evidence": "be-passive calque '{form} {participle}'" },
+    { "id": "NAT-107", "signal": "tags", "severity": "Score", "decidable": true, "evidence": "segment register {segment} deviates from document register {document}" },
+    { "id": "NAT-108", "signal": "alignment", "severity": "Score", "decidable": true, "evidence": "sentence count {source} in source, {target} in target, band {limit}" },
+    { "id": "NAT-109", "signal": "inventory", "severity": "Score", "decidable": true, "evidence": "{kind}: '{form}'" },
+    { "id": "NAT-110", "signal": "inventory", "severity": "Advisory", "decidable": true, "evidence": "source carries one plural form '{form}' against the Czech categories one, two to four, five and above" }
+  ]
+}

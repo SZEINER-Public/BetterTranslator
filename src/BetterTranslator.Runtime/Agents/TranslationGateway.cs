@@ -22,7 +22,7 @@ public sealed class TranslationGateway : IDisposable
     private readonly InstallPaths _installPaths;
     private readonly ITranslationEngine _engine;
 
-    private readonly TranslationVerifier? _verifier;
+    private readonly VerificationPipeline _pipeline;
 
     private readonly ChatWriter _chats;
 
@@ -60,10 +60,13 @@ public sealed class TranslationGateway : IDisposable
         // stored settings and finding its dictionary the same way. Null when
         // verification is switched off or no dictionary for the target language
         // is on this machine, which is not a failure.
-        _verifier = VerificationFactory.Create(
+        _pipeline = VerificationFactory.CreatePipeline(
             settings.Verification,
             _registry.Resolve(settings.TargetLanguage)?.Code,
-            new AppPaths().DictionariesFolder);
+            new AppPaths().DictionariesFolder,
+            semantics: _ => (_engine as LocalTranslationEngine)?.Translator is { Session: { IsAlive: true } session, LastJob: { } template }
+                ? Verification.SemanticRuntime.Services(_installPaths, session, template)
+                : null);
         _chats = new ChatWriter(new ChatStore(database));
 
         Jobs = JobRegistry.Shared;
@@ -542,6 +545,8 @@ public sealed class TranslationGateway : IDisposable
         /// <summary>Spans the verifier flagged across every unit of this run.</summary>
         public int Flagged { get; init; }
 
+        public Core.Verification.VerificationResult? Verification { get; init; }
+
         public int DurationMs => (int)Elapsed.TotalMilliseconds;
 
         /// <summary>
@@ -617,9 +622,10 @@ public sealed class TranslationGateway : IDisposable
                 // window checks it: the verifier compares a source against its
                 // translation, and after reassembly there is no longer a pair to
                 // compare -- only a document beside a document.
-                if (_verifier is not null && answer.HasText)
+                if (_pipeline.HasVerifier && answer.HasText)
                 {
-                    var verified = _verifier.Verify(unit, answer.Text!);
+                    var trace = new Engine.Verification.Structure.SegmentTrace(0, unit.Length, Core.Verification.Checks.SegmentOutcome.Translated, answer.Text, null, answer.Text, 0, answer.Text!.Length);
+                    var verified = _pipeline.Verify(unit, answer.Text!, [trace], direction.Source.Code.Value, direction.Target.Code.Value);
 
                     if (verified.Executed)
                     {
@@ -638,7 +644,11 @@ public sealed class TranslationGateway : IDisposable
             cancellationToken)
             .ConfigureAwait(false);
 
-        return new ContentRun(content, tokens, elapsed) { Flagged = flagged };
+        var verification = content.Text is { Length: > 0 }
+            ? _pipeline.Verify(source, content.Text, content.Segments, direction.Source.Code.Value, direction.Target.Code.Value)
+            : null;
+
+        return new ContentRun(content, tokens, elapsed) { Flagged = flagged, Verification = verification };
     }
 
     /// <summary>

@@ -194,11 +194,11 @@ public sealed class VerificationGateTests
         var result = new VerificationGate(registry).Run(Context());
 
         result.Categories.Should().Equal("STR");
-        result.SkippedCategories.Should().Equal("COV", "TRM", "RUN", "RAT", "SEM");
+        result.SkippedCategories.Should().Equal("COV", "TRM", "RUN", "NAT", "RAT", "SEM");
         result.Checks.Where(c => c.State == GateCheckState.Skipped).Should().OnlyContain(c => c.Reason.Contains("no checks discovered"));
         result.Checks.Should().OnlyContain(c => c.State == GateCheckState.Skipped || c.CheckId == "STR-101");
         result.Ran.Should().Be(1);
-        result.Skipped.Should().Be(5);
+        result.Skipped.Should().Be(6);
         result.CompletionPercent.Should().Be(100.0);
         result.CompletionText.Should().Be("100.0");
         result.ExemptCount.Should().Be(0);
@@ -268,7 +268,7 @@ public sealed class VerificationGateTests
             text.Should().Contain("STR-101 [Deterministic] category disabled by setting");
             text.Should().Contain("COV [Deterministic] no checks discovered for this category");
             text.Should().Contain("RAT [Escalation] no checks discovered for this category");
-            text.Should().Contain("checks ran 0, skipped 6");
+            text.Should().Contain("checks ran 0, skipped 7");
         }
         finally
         {

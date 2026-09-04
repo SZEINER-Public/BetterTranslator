@@ -35,6 +35,8 @@ public sealed class LocalTranslationEngine : ITranslationEngine
 {
     private readonly LocalTranslator _translator = new();
 
+    public LocalTranslator Translator => _translator;
+
     public async Task<EngineAnswer> TranslateAsync(TranslationJob job, CancellationToken cancellationToken)
     {
         var outcome = await _translator.TranslateAsync(job, cancellationToken).ConfigureAwait(false);

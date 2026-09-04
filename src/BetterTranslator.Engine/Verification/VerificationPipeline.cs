@@ -1,6 +1,8 @@
 using BetterTranslator.Core.Verification;
 using BetterTranslator.Core.Verification.Checks;
+using BetterTranslator.Core.Verification.Checks.Naturalness;
 using BetterTranslator.Core.Verification.Checks.Semantics;
+using BetterTranslator.Core.Verification.Checks.Terminology;
 using BetterTranslator.Core.Verification.Gate;
 using BetterTranslator.Engine.Verification.Structure;
 
@@ -24,6 +26,12 @@ public sealed class VerificationPipeline
     }
 
     public Func<CheckContext, SemanticServices?>? Semantics { get; init; }
+
+    public Func<CheckContext, TerminologyServices?>? Terminology { get; init; }
+
+    public Func<CheckContext, NaturalnessServices?>? Naturalness { get; init; }
+
+    public VerificationSettings Settings => _settings;
 
     public bool HasVerifier => _verifier is not null;
 
@@ -50,38 +58,76 @@ public sealed class VerificationPipeline
         string target,
         IReadOnlyList<SegmentTrace> segments,
         string? sourceLanguage,
+        string? targetLanguage,
+        IReadOnlyList<CheckFinding>? escalate = null,
+        Action<CheckContext>? attach = null)
+    {
+        var context = BuildContext(source, target, segments, sourceLanguage, targetLanguage);
+
+        if (context is null)
+        {
+            return GateRunResult.Empty("check context could not be built");
+        }
+
+        attach?.Invoke(context);
+
+        return RunGate(context, escalate);
+    }
+
+    public GateRunResult RunGate(CheckContext context, IReadOnlyList<CheckFinding>? escalate = null)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        if (Semantics?.Invoke(context) is { } semantics)
+        {
+            SemanticPorts.Attach(context, semantics);
+        }
+
+        if (Terminology?.Invoke(context) is { } terminology)
+        {
+            TerminologyPorts.Attach(context, terminology);
+        }
+
+        if (Naturalness?.Invoke(context) is { } naturalness)
+        {
+            NaturalnessPorts.Attach(context, naturalness);
+        }
+
+        var gate = new VerificationGate(_registry, _settings.Gate)
+        {
+            BeforeEscalation = (ctx, findings) => EscalationGate.Admit(ctx, [.. findings, .. escalate ?? []], SemanticPorts.For(ctx).Settings.SpanCap),
+        };
+
+        return gate.Run(context);
+    }
+
+    public CheckContext? BuildContext(
+        string source,
+        string target,
+        IReadOnlyList<SegmentTrace> segments,
+        string? sourceLanguage,
         string? targetLanguage)
     {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(segments);
+
         var runSettings = new CheckRunSettings
         {
             SourceLanguage = Code(sourceLanguage),
             TargetLanguage = Code(targetLanguage),
         };
 
-        CheckContext context;
-
         try
         {
-            context = StructureContext.Build(source, target, null, segments, settings: runSettings);
+            return StructureContext.Build(source, target, null, segments, settings: runSettings);
         }
         catch (Exception ex) when (ex is not OutOfMemoryException)
         {
-            return GateRunResult.Empty("check context could not be built: " + ex.GetType().Name);
+            return null;
         }
-
-        if (Semantics?.Invoke(context) is { } services)
-        {
-            SemanticPorts.Attach(context, services);
-        }
-
-        var gate = new VerificationGate(_registry, _settings.Gate)
-        {
-            BeforeEscalation = (ctx, findings) => EscalationGate.Admit(ctx, findings, SemanticPorts.For(ctx).Settings.SpanCap),
-        };
-
-        return gate.Run(context);
     }
 
-    private static string Code(string? language) =>
+    public static string Code(string? language) =>
         string.IsNullOrWhiteSpace(language) ? string.Empty : language.Split('-', '_')[0].ToLowerInvariant();
 }

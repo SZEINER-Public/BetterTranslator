@@ -98,4 +98,27 @@ public sealed class VerificationSettings
     public double RuntimeSignalWeight { get; set; } = 0.5;
 
     public Gate.GateSettings Gate { get; set; } = new();
+
+    public RepairAutonomy Autonomy { get; set; } = RepairAutonomy.AutoRepair;
+
+    public NaturalnessSettings Naturalness { get; set; } = new();
+}
+
+public enum RepairAutonomy
+{
+    Off,
+    AskEveryTime,
+    AutoRepair,
+    RepairEverything,
+}
+
+public sealed class NaturalnessSettings
+{
+    public bool RewriteEnabled { get; set; }
+
+    public int CandidatesPerSentence { get; set; } = 1;
+
+    public int RewritesPerDocument { get; set; } = 8;
+
+    public int ImprovementMargin { get; set; } = 1;
 }

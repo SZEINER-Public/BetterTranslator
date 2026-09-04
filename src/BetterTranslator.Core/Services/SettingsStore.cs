@@ -41,6 +41,11 @@ public sealed class SettingsStore(Database database)
     private const string GateRouting = "verification_gate_routing";
     private const string GateStages = "verification_gate_stages";
     private const string GateDisabled = "verification_gate_disabled_categories";
+    private const string RepairAutonomyKey = "verification_repair_autonomy";
+    private const string NaturalnessRewrite = "verification_naturalness_rewrite_enabled";
+    private const string NaturalnessCandidates = "verification_naturalness_candidates_per_sentence";
+    private const string NaturalnessRewrites = "verification_naturalness_rewrites_per_document";
+    private const string NaturalnessMargin = "verification_naturalness_improvement_margin";
     private const string RestartAfterInstallKey = "restart_after_install";
     private const string McpEnabledKey = "mcp_enabled";
     private const string McpHostKey = "mcp_host";
@@ -104,6 +109,16 @@ public sealed class SettingsStore(Database database)
                     StageText = stored.GetValueOrDefault(GateStages, settings.Verification.Gate.StageText),
                     DisabledCategoriesText = stored.GetValueOrDefault(GateDisabled, settings.Verification.Gate.DisabledCategoriesText),
                 },
+                Autonomy = stored.TryGetValue(RepairAutonomyKey, out var autonomy) && Enum.TryParse<Verification.RepairAutonomy>(autonomy, out var autonomyParsed)
+                    ? autonomyParsed
+                    : settings.Verification.Autonomy,
+                Naturalness = new Verification.NaturalnessSettings
+                {
+                    RewriteEnabled = Bool(stored, NaturalnessRewrite, settings.Verification.Naturalness.RewriteEnabled),
+                    CandidatesPerSentence = Int(stored, NaturalnessCandidates, settings.Verification.Naturalness.CandidatesPerSentence),
+                    RewritesPerDocument = Int(stored, NaturalnessRewrites, settings.Verification.Naturalness.RewritesPerDocument),
+                    ImprovementMargin = Int(stored, NaturalnessMargin, settings.Verification.Naturalness.ImprovementMargin),
+                },
             },
         };
     }
@@ -143,6 +158,11 @@ public sealed class SettingsStore(Database database)
             [GateRouting] = settings.Verification.Gate.RoutingText,
             [GateStages] = settings.Verification.Gate.StageText,
             [GateDisabled] = settings.Verification.Gate.DisabledCategoriesText,
+            [RepairAutonomyKey] = settings.Verification.Autonomy.ToString(),
+            [NaturalnessRewrite] = settings.Verification.Naturalness.RewriteEnabled ? "1" : "0",
+            [NaturalnessCandidates] = settings.Verification.Naturalness.CandidatesPerSentence.ToString(CultureInfo.InvariantCulture),
+            [NaturalnessRewrites] = settings.Verification.Naturalness.RewritesPerDocument.ToString(CultureInfo.InvariantCulture),
+            [NaturalnessMargin] = settings.Verification.Naturalness.ImprovementMargin.ToString(CultureInfo.InvariantCulture),
             [RestartAfterInstallKey] = settings.RestartAfterInstall ? "1" : "0",
             [McpEnabledKey] = settings.McpEnabled ? "1" : "0",
             [McpHostKey] = settings.McpHost,

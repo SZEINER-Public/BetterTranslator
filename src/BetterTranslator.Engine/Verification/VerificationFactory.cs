@@ -70,14 +70,20 @@ public static class VerificationFactory
         VerificationSettings settings,
         string? languageCode = null,
         string? dataFolder = null,
-        string? sourceLanguageCode = DefaultSourceLanguage)
+        string? sourceLanguageCode = DefaultSourceLanguage,
+        Func<Core.Verification.Checks.CheckContext, Core.Verification.Checks.Semantics.SemanticServices?>? semantics = null)
     {
         ArgumentNullException.ThrowIfNull(settings);
 
         Core.Verification.Checks.Coverage.CoverageServices.Configure(
             Coverage.CoverageEvidenceFactory.Create(sourceLanguageCode, dataFolder));
 
-        return new VerificationPipeline(Create(settings, languageCode, dataFolder), settings);
+        return new VerificationPipeline(Create(settings, languageCode, dataFolder), settings)
+        {
+            Semantics = semantics,
+            Terminology = context => Terminology.TerminologyResolver.Resolve(settings, context.Settings.TargetLanguage),
+            Naturalness = context => Naturalness.NaturalnessResolver.Resolve(settings, context.Settings.TargetLanguage),
+        };
     }
 
     private static bool Readable(string? path) => !string.IsNullOrWhiteSpace(path) && File.Exists(path);

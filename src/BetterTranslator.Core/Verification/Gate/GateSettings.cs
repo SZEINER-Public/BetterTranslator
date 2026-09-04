@@ -46,7 +46,7 @@ public sealed class RoutingTable
     public const CheckAction FallbackAction = CheckAction.ScoreOnly;
 
     public const string DefaultText =
-        "STR:Defect=Repair;STR:*=Mark;COV:Defect=Repair;COV:*=Mark;TRM:Defect=Repair;TRM:*=Mark;TRM-103:*=Mark;RAT:*=ScoreOnly;SEM:*=ScoreOnly;RUN:*=ScoreOnly+Priority";
+        "STR:Defect=Repair;STR:*=Mark;COV:Defect=Repair;COV:*=Mark;TRM:Defect=Repair;TRM:*=Mark;TRM-103:*=Mark;RAT:*=ScoreOnly;SEM:*=ScoreOnly;RUN:*=ScoreOnly+Priority;NAT-101:Score=Rewrite;NAT-102:Score=Rewrite;NAT-103:Score=Rewrite;NAT-104:Score=Rewrite;NAT-105:Score=Rewrite;NAT-106:Score=Rewrite;NAT-107:Score=Rewrite;NAT-108:Score=Rewrite;NAT-109:Score=Rewrite;NAT-110:Advisory=Mark;NAT:*=Mark";
 
     private readonly List<RoutingRule> _rules;
 
@@ -156,7 +156,7 @@ public sealed class RoutingTable
 
 public sealed class StageTable
 {
-    public const string DefaultText = "Deterministic=STR,COV,TRM;Runtime=RUN;Escalation=RAT,SEM";
+    public const string DefaultText = "Deterministic=STR,COV,TRM;Runtime=RUN;Escalation=RAT,SEM,NAT";
 
     private readonly SortedDictionary<string, GateStage> _stages = new(StringComparer.Ordinal);
 

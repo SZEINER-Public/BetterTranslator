@@ -8,6 +8,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Verification\Checks\Ratio\ratio-profile.json" LogicalName="BetterTranslator.Core.Verification.Checks.Ratio.ratio-profile.json" />
     <EmbeddedResource Include="Verification\Checks\Coverage\language-seeds.json" LogicalName="BetterTranslator.Core.Verification.Checks.Coverage.language-seeds.json" />
+    <EmbeddedResource Include="Verification\Checks\Naturalness\Packs\nat-cs.json" LogicalName="BetterTranslator.Core.Verification.Checks.Naturalness.Packs.nat-cs.json" />
+    <EmbeddedResource Include="Verification\Checks\Naturalness\Packs\nat-sk.json" LogicalName="BetterTranslator.Core.Verification.Checks.Naturalness.Packs.nat-sk.json" />
+    <EmbeddedResource Include="Verification\Checks\Naturalness\coverage-matrix.json" LogicalName="BetterTranslator.Core.Verification.Checks.Naturalness.coverage-matrix.json" />
+    <EmbeddedResource Include="Verification\Checks\Naturalness\naturalness-profile.json" LogicalName="BetterTranslator.Core.Verification.Checks.Naturalness.naturalness-profile.json" />
   </ItemGroup>
 
   <ItemGroup>

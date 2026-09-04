@@ -4,11 +4,17 @@
 
     <SolidColorBrush x:Key="BtVerifyWarningUnderlineBrush" Color="#8A5A00" />
     <SolidColorBrush x:Key="BtVerifyErrorUnderlineBrush" Color="#B3261E" />
+    <SolidColorBrush x:Key="BtVerifyDefectUnderlineBrush" Color="#D91C0F" />
+    <SolidColorBrush x:Key="BtVerifySuggestionUnderlineBrush" Color="#1F6FB2" />
 
     <sys:Double x:Key="BtVerifyWarningUnderlineThickness">1.5</sys:Double>
     <sys:Double x:Key="BtVerifyErrorUnderlineThickness">2.5</sys:Double>
+    <sys:Double x:Key="BtVerifyDefectUnderlineThickness">3</sys:Double>
+    <sys:Double x:Key="BtVerifySuggestionUnderlineThickness">1.5</sys:Double>
 
     <DashStyle x:Key="BtVerifyWarningDashStyle" Dashes="2,2" />
     <DashStyle x:Key="BtVerifyErrorDashStyle" Dashes="" />
+    <DashStyle x:Key="BtVerifyDefectDashStyle" Dashes="" />
+    <DashStyle x:Key="BtVerifySuggestionDashStyle" Dashes="1,3" />
 
 </ResourceDictionary>

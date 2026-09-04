@@ -435,20 +435,13 @@ public sealed partial class MainWindowViewModel : ObservableObject
         // resolved to a code here rather than left to the engine to guess.
         var paths = new AppPaths();
 
-        _pipeline = new VerificationPipeline(
-            VerificationFactory.Create(
-                _settings.Verification,
-                new Engine.Languages.LanguageRegistry().Resolve(_settings.TargetLanguage)?.Code,
-                paths.DictionariesFolder),
-            _settings.Verification)
-        {
-            Semantics = _ => _translator.Session is { IsAlive: true } session && _translator.LastJob is { } template
+        _pipeline = VerificationFactory.CreatePipeline(
+            _settings.Verification,
+            new Engine.Languages.LanguageRegistry().Resolve(_settings.TargetLanguage)?.Code,
+            paths.DictionariesFolder,
+            semantics: _ => _translator.Session is { IsAlive: true } session && _translator.LastJob is { } template
                 ? SemanticRuntime.Services(_installPaths, session, template)
-                : null,
-        };
-
-        Core.Verification.Checks.Coverage.CoverageServices.Configure(
-            Engine.Verification.Coverage.CoverageEvidenceFactory.Create(VerificationFactory.DefaultSourceLanguage, paths.DictionariesFolder));
+                : null);
 
         // A downloaded flavour lands in the models folder, so the loader has to
         // look there as well as beside the executable. Registered before the
