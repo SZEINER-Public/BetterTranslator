@@ -78,4 +78,15 @@ public static class CheckId
 
         public const string ReverseComparison = "SEM-103";
     }
+
+    public static class Terminology
+    {
+        public const string Category = "TRM";
+
+        public const string AcceptedRendering = "TRM-101";
+
+        public const string RejectedRendering = "TRM-102";
+
+        public const string RunConsistency = "TRM-103";
+    }
 }
