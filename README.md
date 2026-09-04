@@ -28,6 +28,7 @@ workspace mode slider and a working composer.
 | Whole-file translation from the command line | run with a real model over four Markdown documents, audited before and after |
 | Whole-file translation from the window button | not yet run with a model behind it |
 | Vulkan and CUDA offload | built, measured and wired. Never run on real hardware |
+| Verification checks over every answer | works. The semantic checks need an optional model and stay skipped without it |
 | Source-language picker | not built. Input is assumed to be English |
 
 **The app translates.** Sending a message loads the chosen GGUF through the
@@ -166,6 +167,24 @@ alone produced a runtime that could not load. The loader fell back quietly, so
 the only symptom was that translation ran at processor speed. The two libraries
 are declared as companions of the CUDA row and are fetched with it, so
 installing CUDA now moves all three files or none. See DECISIONS.md B47.
+
+**Every flavor needs the Microsoft Visual C++ runtime.** The library imports
+`msvcp140.dll`, `vcruntime140.dll`, `vcruntime140_1.dll` and `vcomp140.dll`.
+Windows does not supply these four files. Most machines have them, because many
+applications install the redistributable. A machine without it loads no flavor
+at all, and CPU is no exception.
+
+The app looks for the four files in three places. It looks beside the runtime
+library, in the `runtime-support` folder beside the executable, and on the
+system search path. If all three fail, the app names the missing file and gives
+the address of the Microsoft Visual C++ 2015-2022 Redistributable (x64). It also
+says that a new install of the runtime does not add that file. That was the
+wrong conclusion the earlier message invited.
+
+`build.ps1` copies the four files out of the Visual Studio redistributable
+folder into `artifacts/runtime-support`. The build then carries them into
+`runtime-support` beside the executable. If the build machine has no
+redistributable, the build says so and the executable uses the system copy.
 
 The runtime panel names the flavor that **actually loaded**, not the one that
 was chosen, and says so when they differ.
@@ -394,6 +413,13 @@ and D13, both found by translating real pasted text rather than by reading the
 code, and both fixed by correcting what the guard measures rather than by moving
 a threshold.
 
+A third defect of the same shape came from one word. Some words are the same in
+English and in Czech, and `Test` is one of them. The guard compared the answer
+with the source, found them equal, and refused a correct translation. The chat
+then reported the whole message as untranslated. The rule now applies only to
+text of two words or more. A single word that comes back unchanged is a
+translation. A longer line that comes back unchanged is still a defect.
+
 `tests/BetterTranslator.Tests/Fixtures/SpecCorpus.cs` is the corpus that found
 them. It holds five families of the text people actually paste: a CLI
 specification full of `--flags` and `<placeholders>`, policy blocks with
@@ -617,7 +643,7 @@ unreachable, 5 translation failed. `bt --help` documents all of it.
 | `tools/BetterTranslator.Packer/` | The packer: reads a publish tree, writes the container, appends the `.btpay` section, patches the PE headers. Also the only managed reader of the container, which is what the round-trip tests use |
 | `build/` | `SingleFile.targets` (publish, native build, pack, sign), `FormatConstants.targets` (generates the C# view of `btpay_format.h`), `run-singlefile-checks.ps1` (the evidence run, on a desktop of its own), and `BetterTranslator.SingleFile.csproj`, the only project the **SingleFile** solution configuration builds: it runs the chain, and its launch profile starts the packed exe, so Build and F5 in Visual Studio give you the artifact and then run it |
 | `docs/build/single-exe.md` | Container format, cache layout, bootstrap flags, exit codes and the measured startup numbers |
-| `tests/BetterTranslator.Tests/` | 1033 tests across <<FILL: file count, verify against the current run>> files: tokens, time, readers, sentence splitting, casing restoration, translation verification, Markdown and JSON parsing, round-trip and fallback, preview, sizes, URLs, transfers, inference, runtime flavors and what may be offered, chunker, indexing, translation context, translation state and its loading placeholder, document translation, line and emphasis parity, quoted citations, the document audit, the app icon and its wiring, the ported engine's guards and stores, the fidelity checker and corpus harness under `Loop/`, plus thirteen skipped gated tests |
+| `tests/BetterTranslator.Tests/` | 1,746 tests across 164 files: tokens, time, readers, sentence splitting, casing restoration, translation verification, the verification gate and its semantic stage, the component installer, Markdown and JSON parsing, round-trip and fallback, preview, sizes, URLs, transfers, inference, runtime flavors and what may be offered, chunker, indexing, translation context, translation state and its loading placeholder, document translation, line and emphasis parity, quoted citations, the document audit, the app icon and its wiring, the ported engine's guards and stores, the fidelity checker and corpus harness under `Loop/`, plus 41 skipped gated tests |
 | `DECISIONS.md` | Open decisions, design-reference conflicts, build decisions |
 | `tools/icons/` | SVG to XAML icon converter, the app icon generator and their notes. Neither is in the solution |
 | `docs/app-icon.md` | Which surface draws the app icon, at which frame size, and how it is generated |
@@ -889,6 +915,35 @@ first and leaves them behind rather than copying them.
   to infer it. `Engine/Markup/TranslationAudit` computes it from the source and
   result alone, with no word list, and nothing is computed while Advanced is
   off.
+
+- **Checks on every answer.** A gate of checks reads each translation before the
+  window shows it. The checks look at structure, coverage, length ratios,
+  terminology and how natural the target language reads. A check that cannot run
+  gives its reason. It never reports a pass. The window draws the defects under
+  the words. An agent gets the same result as data.
+
+- **The semantic checks, and the model they need.** Three checks compare
+  meaning. The first measures how similar the source and the translation are.
+  The second translates the answer back into the source language. The third
+  compares that reverse translation with the source. Each call on a model costs
+  time, so these checks read only the spans that an earlier check marked. They
+  read at most 24 spans in one answer.
+
+  The checks need a sentence embedding model. It is
+  `intfloat/multilingual-e5-small`, published under the MIT license, and 465 MB
+  with its tokenizer. The model is optional. It is one row in the download list,
+  and no install selects it for you. Before the app puts the two files in place,
+  it compares their length and their SHA-256 with the catalog. A download that
+  fails that comparison leaves nothing behind. Until you install the model, the
+  three checks report `skipped` and give the reason.
+
+  Each reverse translation is one call on the model that is already loaded.
+  **Reverse translations per answer**, in Settings > Downloads, sets the limit.
+  The default is 24. Set it to 0 to stop the reverse translations. The
+  similarity check still runs, because it reads the embedding model and writes
+  no text. The tokens and the time of each reverse translation go into the
+  figures the entry already shows. There is no second number to add up. The
+  result carries a line such as `3 of 7 flagged spans re-checked, cap 24`.
 
 - **Runtime controls in the caption.** A status panel beside the download manager
   reports what the runtime is doing, with pause available while a generation is
