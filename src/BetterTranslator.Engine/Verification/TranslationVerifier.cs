@@ -28,9 +28,9 @@ public sealed class TranslationVerifier
 
     public VerificationResult Verify(string sourceText, string targetText) => Verify(sourceText, targetText, []);
 
-    public VerificationResult Verify(string sourceText, string targetText, IReadOnlyList<CheckFinding> ratioFindings)
+    public VerificationResult Verify(string sourceText, string targetText, IReadOnlyList<CheckFinding> checkFindings)
     {
-        ArgumentNullException.ThrowIfNull(ratioFindings);
+        ArgumentNullException.ThrowIfNull(checkFindings);
 
         if (!_s.Enabled)
         {
@@ -39,7 +39,7 @@ public sealed class TranslationVerifier
 
         try
         {
-            return VerifyCore(sourceText, targetText, ratioFindings);
+            return VerifyCore(sourceText, targetText, checkFindings);
         }
         catch (Exception ex)
         {
@@ -47,7 +47,7 @@ public sealed class TranslationVerifier
         }
     }
 
-    private VerificationResult VerifyCore(string sourceText, string targetText, IReadOnlyList<CheckFinding> ratioFindings)
+    private VerificationResult VerifyCore(string sourceText, string targetText, IReadOnlyList<CheckFinding> checkFindings)
     {
         var exemption = new SourceSpanExemption(sourceText);
         var spans = new List<VerificationSpan>();
@@ -161,7 +161,8 @@ public sealed class TranslationVerifier
         }
 
         ClassifyUntranslatedChunks(spans);
-        RatioScoring.Apply(spans, ratioFindings);
+        RatioScoring.Apply(spans, checkFindings);
+        RuntimeScoring.Apply(spans, checkFindings, _s.RuntimeSignalWeight);
 
         foreach (var span in spans)
         {

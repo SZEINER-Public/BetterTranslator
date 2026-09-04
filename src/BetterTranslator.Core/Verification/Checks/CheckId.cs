@@ -56,4 +56,15 @@ public static class CheckId
 
         public const string Insertion = "RAT-105";
     }
+
+    public static class Runtime
+    {
+        public const string Category = "RUN";
+
+        public const string SequenceConfidence = "RUN-101";
+
+        public const string SpanLocalization = "RUN-102";
+
+        public const string ForcedDecodeAdequacy = "RUN-103";
+    }
 }

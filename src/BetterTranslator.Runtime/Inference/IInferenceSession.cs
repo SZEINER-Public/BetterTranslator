@@ -21,7 +21,11 @@ namespace BetterTranslator.Runtime.Inference;
 /// raised -- the awaiting catch runs later, on resumption -- so a debugger
 /// stops on every one of them and calls it unhandled.
 /// </summary>
-public readonly record struct Completion(string Text, int Tokens, string? Fault)
+public readonly record struct Completion(
+    string Text,
+    int Tokens,
+    string? Fault,
+    IReadOnlyList<Core.Verification.Checks.Runtime.TokenProbability>? Probabilities = null)
 {
     public static Completion Failed(string fault) => new(string.Empty, 0, fault);
 

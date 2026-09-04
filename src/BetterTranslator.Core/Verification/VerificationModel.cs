@@ -92,4 +92,6 @@ public sealed class VerificationSettings
     public int ConfirmedMalformedScore { get; set; } = 5;
 
     public int UntranslatedChunkScore { get; set; } = 10;
+
+    public double RuntimeSignalWeight { get; set; } = 0.5;
 }

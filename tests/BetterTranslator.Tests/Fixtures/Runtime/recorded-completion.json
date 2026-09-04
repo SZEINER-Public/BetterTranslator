@@ -1,0 +1,55 @@
+{
+  "path": "hosted session over the named pipe, op complete, HostResponse text and token count",
+  "availability": {
+    "available": false,
+    "reason": "llmster host protocol returns text and token count only and the native runtime exports no per-token logits"
+  },
+  "recordedShape": "the token rows below are the shape the port would carry once the runtime exposes per-step logits; offsets are derived by concatenating token texts",
+  "segments": [
+    {
+      "segment": "line#0",
+      "source": "Open the settings window and save the changes.",
+      "answer": "Otevřete okno nastavení a uložte změny.",
+      "tokens": [
+        { "text": "Otev", "logProb": -0.05 },
+        { "text": "řete", "logProb": -0.02 },
+        { "text": " okno", "logProb": -0.3 },
+        { "text": " nastavení", "logProb": -0.1 },
+        { "text": " a", "logProb": -0.05 },
+        { "text": " ulož", "logProb": -0.04 },
+        { "text": "te", "logProb": -0.01 },
+        { "text": " změny", "logProb": -0.08 },
+        { "text": ".", "logProb": -0.01 }
+      ]
+    },
+    {
+      "segment": "line#1",
+      "source": "The file is on disk.",
+      "answer": "Soubor je na pilníku.",
+      "tokens": [
+        { "text": "Soubor", "logProb": -0.03 },
+        { "text": " je", "logProb": -0.02 },
+        { "text": " na", "logProb": -0.02 },
+        { "text": " piln", "logProb": -2.5 },
+        { "text": "íku", "logProb": -1.9 },
+        { "text": ".", "logProb": -0.01 }
+      ]
+    },
+    {
+      "segment": "line#2",
+      "source": "Save now.",
+      "answer": "Uložit nyní.",
+      "tokens": [
+        { "text": "Ulož", "logProb": -0.1 },
+        { "text": "it", "logProb": -0.05 },
+        { "text": " nyní", "logProb": -1.5 },
+        { "text": ".", "logProb": -0.02 }
+      ]
+    }
+  ],
+  "forcedDecode": [
+    { "segment": "line#0", "lengthNormalizedLogProb": -0.09, "scoredTokens": 9 },
+    { "segment": "line#1", "lengthNormalizedLogProb": -1.4, "scoredTokens": 6 },
+    { "segment": "line#2", "lengthNormalizedLogProb": -0.6, "scoredTokens": 4 }
+  ]
+}
