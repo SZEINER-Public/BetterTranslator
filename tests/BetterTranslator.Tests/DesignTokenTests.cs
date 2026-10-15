@@ -145,7 +145,7 @@ public sealed class DesignTokenTests
         "IconEyePreview", "IconFileGeneric", "IconFolder", "IconFolderLarge", "IconGear",
         "IconImagePlaceholder", "IconInfoCircle", "IconKeyEnter", "IconKeyShift",
         "IconLock", "IconLockSegment",
-        "IconMaximize", "IconMemoryGraph", "IconMemoryGraphSmall", "IconMinimize",
+        "IconMaximize", "IconMemoryGraph", "IconMemoryGraphSmall", "IconMicrophone", "IconMinimize",
         "IconMoreHorizontal", "IconPanelHide", "IconPanelLeft", "IconPanelRight",
         "IconPanelShow", "IconPause", "IconPin", "IconPlay", "IconPlus", "IconPlusSmall",
         "IconRefresh", "IconRename", "IconRepository", "IconRepositorySmall",

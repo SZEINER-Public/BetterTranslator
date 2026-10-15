@@ -379,6 +379,91 @@ bool ProbeWav(const std::string& path_utf8, WavInfo* info, std::string* error) {
     return ok;
 }
 
+WavStreamReader::~WavStreamReader() { Close(); }
+
+void WavStreamReader::Close() noexcept {
+    if (file_ != nullptr) {
+        std::fclose(file_);
+        file_ = nullptr;
+    }
+
+    remaining_frames_ = 0;
+}
+
+bool WavStreamReader::Open(const std::string& path_utf8, WavInfo* info, std::string* error) {
+    Close();
+
+    const auto path = PathFromUtf8(path_utf8);
+    uint64_t size = 0;
+
+    if (!FileSize(path, &size, error)) {
+        return false;
+    }
+
+    file_ = OpenFile(path, "rb");
+
+    if (file_ == nullptr) {
+        *error = "the file could not be opened";
+        return false;
+    }
+
+    Layout layout;
+
+    if (!ReadLayout(file_, size, &layout, error) || !Seek(file_, layout.data_offset)) {
+        if (error->empty()) {
+            *error = "seeking to the audio failed";
+        }
+
+        Close();
+        return false;
+    }
+
+    info_ = layout.info;
+    block_align_ = layout.block_align;
+    remaining_frames_ = static_cast<uint64_t>(layout.info.frames);
+    block_.assign(static_cast<size_t>(block_align_) * 1024, 0);
+    *info = info_;
+    return true;
+}
+
+bool WavStreamReader::Read(float* mono, size_t max_frames, size_t* frames, std::string* error) {
+    *frames = 0;
+
+    if (file_ == nullptr) {
+        *error = "the file is not open";
+        return false;
+    }
+
+    const int32_t bytes = info_.bits_per_sample / 8;
+
+    while (*frames < max_frames && remaining_frames_ > 0) {
+        const size_t take = static_cast<size_t>(
+            std::min<uint64_t>({1024, remaining_frames_, static_cast<uint64_t>(max_frames - *frames)}));
+        const size_t want = take * static_cast<size_t>(block_align_);
+
+        if (std::fread(block_.data(), 1, want, file_) != want) {
+            *error = "the audio could not be read";
+            return false;
+        }
+
+        for (size_t f = 0; f < take; ++f) {
+            float sum = 0.0f;
+            const uint8_t* frame = block_.data() + f * static_cast<size_t>(block_align_);
+
+            for (int32_t c = 0; c < info_.channels; ++c) {
+                sum += Sample(frame + static_cast<size_t>(c * bytes), info_.bits_per_sample, info_.is_float);
+            }
+
+            mono[*frames + f] = sum / static_cast<float>(info_.channels);
+        }
+
+        *frames += take;
+        remaining_frames_ -= take;
+    }
+
+    return true;
+}
+
 bool ReadWavMono(const std::string& path_utf8, int64_t max_frames, std::vector<float>* samples, WavInfo* info,
                  std::string* error) {
     const auto path = PathFromUtf8(path_utf8);

@@ -1,6 +1,7 @@
 using System.Text;
 using BetterTranslator.Cli;
 using BetterTranslator.Runtime.Agents;
+using BetterTranslator.Runtime.Speech;
 
 var utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
@@ -24,6 +25,11 @@ if (command.Verb == Verb.Version)
 {
     Console.Out.WriteLine(typeof(Program).Assembly.GetName().Version?.ToString(3) ?? "0.0.0");
     return ExitCode.Success;
+}
+
+if (command.Verb == Verb.Transcribe)
+{
+    return await TranscribeAsync(command);
 }
 
 if (command.Verb == Verb.Mcp)
@@ -216,6 +222,41 @@ async Task<int> ModelsAsync(TranslationGateway gateway, ParsedCommand parsed)
     }
 
     return ExitCode.Success;
+}
+
+static async Task<int> TranscribeAsync(ParsedCommand parsed)
+{
+    using var cancel = new CancellationTokenSource();
+    ConsoleCancelEventHandler stop = (_, e) =>
+    {
+        e.Cancel = true;
+        cancel.Cancel();
+    };
+
+    Console.CancelKeyPress += stop;
+
+    try
+    {
+        Note(parsed, $"transcribing {parsed.File}");
+
+        var result = await FileTranscriber.TranscribeAsync(
+            parsed.File!,
+            parsed.Language!,
+            parsed.CodeDictation ? DictationMode.Code : DictationMode.Prose,
+            cancellationToken: cancel.Token);
+
+        if (!result.Ok)
+        {
+            return Fail(ExitCode.For(result.Fault), result.Error ?? "The file was not transcribed.", parsed.Json);
+        }
+
+        Console.Out.WriteLine(parsed.Json ? Envelope.Transcription(result) : result.Text);
+        return ExitCode.Success;
+    }
+    finally
+    {
+        Console.CancelKeyPress -= stop;
+    }
 }
 
 static async Task<string> ReadStdinAsync()

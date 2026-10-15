@@ -10,6 +10,7 @@ public static class Help
           3  input file missing or unreadable
           4  model runtime unreachable
           5  translation failed or incomplete
+          6  transcription failed
         """;
 
     public static string For(Verb verb) => verb switch
@@ -18,6 +19,7 @@ public static class Help
         Verb.Languages => Languages,
         Verb.Models => Models,
         Verb.Mcp => Mcp,
+        Verb.Transcribe => Transcribe,
         _ => Root,
     };
 
@@ -32,7 +34,7 @@ public static class Help
         machines with no domain and nothing published: the agent starts this
         process and talks to it directly. No port is opened and nothing listens.
 
-        The same ten tools the in-app server exposes are served here, except that
+        The same eleven tools the in-app server exposes are served here, except that
         show_in_gui reports that there is no window when the application is not
         running.
 
@@ -76,6 +78,7 @@ public static class Help
           languages    list the languages the selected model can translate
           models       list installed models, or select one
           mcp          serve the agent tools over stdin and stdout
+          transcribe   turn a recorded .wav file into text, offline
 
         GLOBAL OPTIONS
           --from <lang>     source language code or name (default: en)
@@ -100,6 +103,7 @@ public static class Help
           bt translate --batch .\docs --to cs --out .\docs-cs
           bt languages --json
           bt models --select EuroLLM
+          bt transcribe --file notes.wav --language en --code-dictation
 
         {ExitCodes}
         """;
@@ -171,6 +175,38 @@ public static class Help
         EXAMPLES
           bt models
           bt models --select EuroLLM
+
+        {ExitCodes}
+        """;
+
+    public const string Transcribe =
+        $"""
+        bt transcribe: turn a recorded .wav file into text, offline.
+
+        USAGE
+          bt transcribe --file <path.wav> --language <code> [--code-dictation]
+
+        OPTIONS
+          --file <path>      the recording, a PCM or float .wav at any sample rate
+          --language <code>  the language spoken, as a code such as en or cs
+          --code-dictation   apply code dictation: case commands such as
+                             "camel case load model async", "dash dash amend",
+                             spelled letters, symbols and the technical
+                             vocabulary. Without it, only the casing of known
+                             terms changes
+          --json             one JSON envelope on stdout, with every segment and
+                             every substitution next to what was heard
+          --quiet            no progress on stderr
+
+        WHAT IT NEEDS
+          A speech recognition model attached to the speech engine. None can be
+          attached yet: BetterRuntime exports no audio entry points. Until one
+          can, this command exits 4 and says so. Nothing is sent anywhere, and
+          the audio is read in blocks and never copied to disk.
+
+        EXAMPLES
+          bt transcribe --file standup.wav --language en
+          bt transcribe --file commit.wav --language en --code-dictation --json
 
         {ExitCodes}
         """;

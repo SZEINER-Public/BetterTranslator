@@ -52,6 +52,13 @@ public sealed class SettingsStore(Database database)
     private const string McpHostKey = "mcp_host";
     private const string McpPortKey = "mcp_port";
     private const string McpTokenKey = "mcp_token";
+    private const string DictationLanguageKey = "dictation_language";
+    private const string DictationCodeModeKey = "dictation_code_mode";
+    private const string DictationMicrophoneKey = "dictation_microphone_id";
+    private const string DictationDoNotTranslateKey = "dictation_vocabulary_do_not_translate";
+    private const string DictationDomainTermsKey = "dictation_vocabulary_domain_terms";
+    private const string DictationAgentToolsKey = "dictation_vocabulary_agent_tools";
+    private const string DictationMemoryKey = "dictation_vocabulary_memory";
 
     public async Task<AppSettings> LoadAsync(CancellationToken cancellationToken)
     {
@@ -88,6 +95,13 @@ public sealed class SettingsStore(Database database)
             McpHost = stored.GetValueOrDefault(McpHostKey, settings.McpHost),
             McpPort = Int(stored, McpPortKey, settings.McpPort),
             McpToken = stored.GetValueOrDefault(McpTokenKey, settings.McpToken),
+            DictationLanguage = stored.GetValueOrDefault(DictationLanguageKey, settings.DictationLanguage),
+            DictationCodeMode = Bool(stored, DictationCodeModeKey, settings.DictationCodeMode),
+            DictationMicrophoneId = stored.GetValueOrDefault(DictationMicrophoneKey, settings.DictationMicrophoneId),
+            DictationVocabularyDoNotTranslate = Bool(stored, DictationDoNotTranslateKey, settings.DictationVocabularyDoNotTranslate),
+            DictationVocabularyDomainTerms = Bool(stored, DictationDomainTermsKey, settings.DictationVocabularyDomainTerms),
+            DictationVocabularyAgentTools = Bool(stored, DictationAgentToolsKey, settings.DictationVocabularyAgentTools),
+            DictationVocabularyMemory = Bool(stored, DictationMemoryKey, settings.DictationVocabularyMemory),
             Verification = new Verification.VerificationSettings
             {
                 Enabled = Bool(stored, VerifyEnabled, settings.Verification.Enabled),
@@ -171,6 +185,13 @@ public sealed class SettingsStore(Database database)
             [McpHostKey] = settings.McpHost,
             [McpPortKey] = settings.McpPort.ToString(CultureInfo.InvariantCulture),
             [McpTokenKey] = settings.McpToken,
+            [DictationLanguageKey] = settings.DictationLanguage,
+            [DictationCodeModeKey] = settings.DictationCodeMode ? "1" : "0",
+            [DictationMicrophoneKey] = settings.DictationMicrophoneId,
+            [DictationDoNotTranslateKey] = settings.DictationVocabularyDoNotTranslate ? "1" : "0",
+            [DictationDomainTermsKey] = settings.DictationVocabularyDomainTerms ? "1" : "0",
+            [DictationAgentToolsKey] = settings.DictationVocabularyAgentTools ? "1" : "0",
+            [DictationMemoryKey] = settings.DictationVocabularyMemory ? "1" : "0",
         };
 
         await using var connection = await database.OpenAsync(cancellationToken).ConfigureAwait(false);

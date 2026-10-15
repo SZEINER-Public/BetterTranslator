@@ -1,7 +1,8 @@
 <UserControl x:Class="BetterTranslator.App.Views.SettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:controls="clr-namespace:BetterTranslator.App.Controls">
+             xmlns:controls="clr-namespace:BetterTranslator.App.Controls"
+             xmlns:vm="clr-namespace:BetterTranslator.App.ViewModels">
 
     <!-- Sized in code-behind so the change to Config can be animated through
          MotionService, which is the one place that reads the reduced-motion
@@ -531,6 +532,107 @@
                                         AutomationProperties.Name="Restart now" />
                             </StackPanel>
                         </Border>
+
+                        <Rectangle Height="{StaticResource BorderWidth}"
+                                   Fill="{StaticResource BrushBorderFaint}"
+                                   Margin="0,20,0,0" />
+
+                        <TextBlock Text="Dictation" Style="{StaticResource TextCardTitle}" Margin="0,16,0,0" />
+                        <TextBlock Text="{Binding DictationAvailability}"
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="470"
+                                   HorizontalAlignment="Left"
+                                   Margin="0,3,0,0" />
+                        <TextBlock Text="{x:Static vm:SettingsViewModel.DictationStorageStatement}"
+                                   Style="{StaticResource TextMeta}"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="470"
+                                   HorizontalAlignment="Left"
+                                   Margin="0,6,0,0" />
+
+                        <TextBlock Text="Microphone" Style="{StaticResource TextCardTitle}" Margin="0,16,0,6" />
+                        <ItemsControl ItemsSource="{Binding Microphones}" MaxWidth="470" HorizontalAlignment="Left">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource ChoiceCard}"
+                                            Command="{Binding DataContext.ChooseMicrophoneCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}"
+                                            AutomationProperties.Name="{Binding Name}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Name}"
+                                                       Style="{StaticResource TextDefault}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="1"
+                                                       Text="In use"
+                                                       Style="{StaticResource TextMeta}"
+                                                       Foreground="{StaticResource BrushAccentDeep}"
+                                                       Margin="10,1,0,0"
+                                                       Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibility}}" />
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                            <TextBlock Text="Language spoken" Style="{StaticResource TextCardTitle}" VerticalAlignment="Center" />
+                            <TextBox Text="{Binding DictationLanguage, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     Width="72"
+                                     Margin="10,0,0,0"
+                                     AutomationProperties.Name="Language spoken, as a code such as en or cs" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <controls:ToggleSwitch IsOn="{Binding DictationCodeMode, Mode=TwoWay}"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,2,12,0"
+                                                   AutomationProperties.Name="Code dictation" />
+                            <StackPanel MaxWidth="440">
+                                <TextBlock Text="Code dictation" Style="{StaticResource TextCardTitle}" />
+                                <TextBlock Text="Turns spoken commands into code: camel case load model async becomes loadModelAsync, dash dash amend becomes --amend, G G U F becomes GGUF. Off, only the casing of known terms changes."
+                                           Style="{StaticResource TextMeta}"
+                                           Foreground="{StaticResource BrushTextSecondary}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,3,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <TextBlock Text="Vocabulary sources" Style="{StaticResource TextCardTitle}" Margin="0,16,0,0" />
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <controls:ToggleSwitch IsOn="{Binding DictationVocabularyDoNotTranslate, Mode=TwoWay}"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,2,12,0"
+                                                   AutomationProperties.Name="Do not translate lists" />
+                            <TextBlock Text="Do not translate lists" Style="{StaticResource TextDefault}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <controls:ToggleSwitch IsOn="{Binding DictationVocabularyDomainTerms, Mode=TwoWay}"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,2,12,0"
+                                                   AutomationProperties.Name="Software vocabulary" />
+                            <TextBlock Text="Software vocabulary" Style="{StaticResource TextDefault}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <controls:ToggleSwitch IsOn="{Binding DictationVocabularyAgentTools, Mode=TwoWay}"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,2,12,0"
+                                                   AutomationProperties.Name="Agent tool names" />
+                            <TextBlock Text="Agent tool names" Style="{StaticResource TextDefault}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <controls:ToggleSwitch IsOn="{Binding DictationVocabularyMemory, Mode=TwoWay}"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,2,12,0"
+                                                   AutomationProperties.Name="Identifiers from indexed memory" />
+                            <TextBlock Text="Identifiers from indexed memory" Style="{StaticResource TextDefault}" VerticalAlignment="Center" />
+                        </StackPanel>
 
                     </StackPanel>
                 </ScrollViewer>

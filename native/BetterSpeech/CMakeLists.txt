@@ -27,10 +27,17 @@ find_package(Threads REQUIRED)
 
 add_library(better_speech_objects OBJECT
     src/abi.cpp
+    src/abi_stt.cpp
+    src/capture_none.cpp
+    src/capture_wasapi.cpp
     src/dsp.cpp
     src/engine.cpp
+    src/lexicon.cpp
+    src/recognize.cpp
+    src/score.cpp
     src/text_plan.cpp
     src/utf8.cpp
+    src/vad.cpp
     src/wav.cpp)
 
 target_include_directories(better_speech_objects PUBLIC include src)
@@ -54,6 +61,10 @@ endif()
 
 target_link_libraries(better_speech_objects PUBLIC Threads::Threads)
 
+if(WIN32)
+    target_link_libraries(better_speech_objects PUBLIC ole32)
+endif()
+
 # Linking the object library carries its objects into each target, so the shared
 # library, the tests and the benchmark all build from one compilation.
 add_library(BetterSpeech SHARED)
@@ -67,7 +78,11 @@ if(BS_BUILD_TESTS)
         tests/test_text.cpp
         tests/test_dsp.cpp
         tests/test_wav.cpp
-        tests/test_job.cpp)
+        tests/test_job.cpp
+        tests/test_lexicon.cpp
+        tests/test_vad.cpp
+        tests/test_recognize.cpp
+        tests/test_alloc.cpp)
     target_link_libraries(better_speech_tests PRIVATE better_speech_objects)
     add_test(NAME better_speech_tests COMMAND better_speech_tests)
 endif()
@@ -75,4 +90,6 @@ endif()
 if(BS_BUILD_BENCH)
     add_executable(better_speech_bench bench/bench_main.cpp)
     target_link_libraries(better_speech_bench PRIVATE better_speech_objects)
+    add_executable(better_speech_stt_bench bench/bench_stt.cpp)
+    target_link_libraries(better_speech_stt_bench PRIVATE better_speech_objects)
 endif()

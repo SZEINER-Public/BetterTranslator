@@ -105,6 +105,7 @@ public partial class ChatView : UserControl
         if (_workspace is not null)
         {
             _workspace.ComposerFocusRequested -= FocusComposer;
+            _workspace.Dictation.InsertRequested -= InsertDictation;
         }
 
         _workspace = DataContext as ChatWorkspaceViewModel;
@@ -112,10 +113,23 @@ public partial class ChatView : UserControl
         if (_workspace is not null)
         {
             _workspace.ComposerFocusRequested += FocusComposer;
+            _workspace.Dictation.InsertRequested += InsertDictation;
         }
     }
 
     private void FocusComposer() => ComposerInput.Focus();
+
+    private void InsertDictation(object? sender, string text)
+    {
+        var insertion = DictationViewModel.Insert(
+            ComposerInput.Text,
+            ComposerInput.SelectionStart,
+            ComposerInput.SelectionLength,
+            text);
+
+        ComposerInput.Text = insertion.Draft;
+        ComposerInput.CaretIndex = insertion.Caret;
+    }
 
     /// <summary>Enter commits the rename, Escape cancels it.</summary>
     private void OnChatNameKeyDown(object sender, KeyEventArgs e)

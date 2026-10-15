@@ -95,4 +95,18 @@ public sealed class AppSettings
     public int McpPort { get; set; } = 8765;
 
     public string McpToken { get; set; } = string.Empty;
+
+    public string DictationLanguage { get; set; } = "en";
+
+    public bool DictationCodeMode { get; set; }
+
+    public string DictationMicrophoneId { get; set; } = string.Empty;
+
+    public bool DictationVocabularyDoNotTranslate { get; set; } = true;
+
+    public bool DictationVocabularyDomainTerms { get; set; } = true;
+
+    public bool DictationVocabularyAgentTools { get; set; } = true;
+
+    public bool DictationVocabularyMemory { get; set; } = true;
 }

@@ -17,6 +17,7 @@ using BetterTranslator.Indexing.Retrieval;
 using BetterTranslator.Runtime.Downloads;
 using BetterTranslator.Runtime.Inference;
 using BetterTranslator.Runtime.Models;
+using BetterTranslator.Runtime.Speech;
 using BetterTranslator.Runtime.Verification;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -96,6 +97,33 @@ public sealed partial class MainWindowViewModel : ObservableObject
         Workspace.LookupMemory = (phrase, threshold) =>
             Memory.Lookup.Lookup(phrase, queryVector: null, threshold);
         Workspace.MemoryLookupCompleted = lookup => Memory.Map.LogLookup(lookup);
+
+        Workspace.Dictation.Options = async cancellationToken =>
+        {
+            var settings = _settings;
+            IReadOnlyList<string> texts = [];
+
+            if (settings.DictationVocabularyMemory)
+            {
+                texts = await TechnicalVocabulary
+                    .IndexedTextsAsync(indexStore, cancellationToken: cancellationToken)
+                    .ConfigureAwait(true);
+            }
+
+            return new DictationOptions
+            {
+                Language = string.IsNullOrWhiteSpace(settings.DictationLanguage) ? "en" : settings.DictationLanguage,
+                Mode = settings.DictationCodeMode ? DictationMode.Code : DictationMode.Prose,
+                MicrophoneId = string.IsNullOrEmpty(settings.DictationMicrophoneId) ? null : settings.DictationMicrophoneId,
+                Vocabulary = new VocabularySources(
+                    settings.DictationVocabularyDoNotTranslate,
+                    settings.DictationVocabularyDomainTerms,
+                    settings.DictationVocabularyAgentTools,
+                    settings.DictationVocabularyMemory),
+                HarvestTexts = texts,
+                Threads = Math.Max(1, Environment.ProcessorCount / 2),
+            };
+        };
 
         // Only reached when the composer's Memory chip is attached. Everything
         // it returns -- this chat's earlier pairs, and the passages retrieval

@@ -1,4 +1,5 @@
 using BetterTranslator.Runtime.Agents;
+using BetterTranslator.Runtime.Speech;
 
 namespace BetterTranslator.Cli;
 
@@ -9,6 +10,7 @@ public static class ExitCode
     public const int InputMissing = 3;
     public const int RuntimeUnreachable = 4;
     public const int TranslationFailed = 5;
+    public const int TranscriptionFailed = 6;
 
     public static int For(AgentFault fault) => fault switch
     {
@@ -27,5 +29,14 @@ public static class ExitCode
         "model_missing" or "runtime_unreachable" => RuntimeUnreachable,
         "translation_failed" => TranslationFailed,
         _ => Usage,
+    };
+
+    public static int For(TranscriptionFault fault) => fault switch
+    {
+        TranscriptionFault.None => Success,
+        TranscriptionFault.InputMissing => InputMissing,
+        TranscriptionFault.Unavailable => RuntimeUnreachable,
+        TranscriptionFault.InvalidRequest => Usage,
+        _ => TranscriptionFailed,
     };
 }

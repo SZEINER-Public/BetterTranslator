@@ -6,6 +6,7 @@ using BetterTranslator.Core.Verification.Checks.Semantics;
 using BetterTranslator.Runtime.Downloads;
 using BetterTranslator.Runtime.Inference;
 using BetterTranslator.Runtime.Models;
+using BetterTranslator.Runtime.Speech;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -297,6 +298,16 @@ public sealed partial class ModelOptionViewModel(LocalModel model, Func<string, 
 /// byte formatter, so a model reads identically here and in the download
 /// manager.
 /// </summary>
+public sealed partial class MicrophoneOptionViewModel(string id, string name) : ObservableObject
+{
+    public string Id { get; } = id;
+
+    public string Name { get; } = name;
+
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
+}
+
 public sealed partial class SettingsViewModel : ObservableObject
 {
     private readonly SettingsStore _store;
@@ -501,6 +512,130 @@ public sealed partial class SettingsViewModel : ObservableObject
         });
     }
 
+    public const string DictationStorageStatement =
+        "Microphone audio is held in memory only while you dictate and is never written to disk. "
+        + "What the recognizer hears becomes text in the composer, and nothing is sent until you send it. "
+        + "The vocabulary is built on this machine from the sources below.";
+
+    public ObservableCollection<MicrophoneOptionViewModel> Microphones { get; } = [];
+
+    [ObservableProperty]
+    public partial string DictationLanguage { get; set; } = "en";
+
+    [ObservableProperty]
+    public partial bool DictationCodeMode { get; set; }
+
+    [ObservableProperty]
+    public partial bool DictationVocabularyDoNotTranslate { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool DictationVocabularyDomainTerms { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool DictationVocabularyAgentTools { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool DictationVocabularyMemory { get; set; } = true;
+
+    [ObservableProperty]
+    public partial string DictationAvailability { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool DictationAvailable { get; set; }
+
+    partial void OnDictationLanguageChanged(string value) => PersistDictation();
+
+    partial void OnDictationCodeModeChanged(bool value) => PersistDictation();
+
+    partial void OnDictationVocabularyDoNotTranslateChanged(bool value) => PersistDictation();
+
+    partial void OnDictationVocabularyDomainTermsChanged(bool value) => PersistDictation();
+
+    partial void OnDictationVocabularyAgentToolsChanged(bool value) => PersistDictation();
+
+    partial void OnDictationVocabularyMemoryChanged(bool value) => PersistDictation();
+
+    [RelayCommand]
+    private void ChooseMicrophone(MicrophoneOptionViewModel? option)
+    {
+        if (option is null)
+        {
+            return;
+        }
+
+        foreach (var microphone in Microphones)
+        {
+            microphone.IsSelected = ReferenceEquals(microphone, option);
+        }
+
+        PersistDictation();
+    }
+
+    private void LoadDictation(AppSettings settings)
+    {
+        var availability = SpeechSupport.ProbeRecognition();
+        DictationAvailable = availability.CanRecognize;
+        DictationAvailability = availability.CanRecognize
+            ? "Dictation is available."
+            : availability.Reason;
+
+        DictationLanguage = settings.DictationLanguage;
+        DictationCodeMode = settings.DictationCodeMode;
+        DictationVocabularyDoNotTranslate = settings.DictationVocabularyDoNotTranslate;
+        DictationVocabularyDomainTerms = settings.DictationVocabularyDomainTerms;
+        DictationVocabularyAgentTools = settings.DictationVocabularyAgentTools;
+        DictationVocabularyMemory = settings.DictationVocabularyMemory;
+
+        Microphones.Clear();
+        Microphones.Add(new MicrophoneOptionViewModel(string.Empty, "System default"));
+
+        if (availability.EngineLoaded)
+        {
+            foreach (var device in ListMicrophones())
+            {
+                Microphones.Add(new MicrophoneOptionViewModel(device.Id, device.Name));
+            }
+        }
+
+        var chosen = Microphones.FirstOrDefault(m => m.Id == settings.DictationMicrophoneId) ?? Microphones[0];
+        chosen.IsSelected = true;
+    }
+
+    private void PersistDictation()
+    {
+        if (_loading)
+        {
+            return;
+        }
+
+        var microphone = Microphones.FirstOrDefault(m => m.IsSelected)?.Id ?? string.Empty;
+        var language = string.IsNullOrWhiteSpace(DictationLanguage) ? "en" : DictationLanguage.Trim();
+
+        Write(settings =>
+        {
+            settings.DictationLanguage = language;
+            settings.DictationCodeMode = DictationCodeMode;
+            settings.DictationMicrophoneId = microphone;
+            settings.DictationVocabularyDoNotTranslate = DictationVocabularyDoNotTranslate;
+            settings.DictationVocabularyDomainTerms = DictationVocabularyDomainTerms;
+            settings.DictationVocabularyAgentTools = DictationVocabularyAgentTools;
+            settings.DictationVocabularyMemory = DictationVocabularyMemory;
+        });
+    }
+
+    private static IReadOnlyList<Microphone> ListMicrophones()
+    {
+        try
+        {
+            return MicrophoneCapture.List();
+        }
+        catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException
+                                       or BadImageFormatException or SpeechException)
+        {
+            return [];
+        }
+    }
+
     /// <summary>Backend cards, one per flavour, in speed order.</summary>
     public ObservableCollection<BackendOptionViewModel> Backends { get; } = [];
 
@@ -679,6 +814,7 @@ public sealed partial class SettingsViewModel : ObservableObject
             ?? (settings.McpEnabled ? $"Listening on http://{settings.McpHost}:{settings.McpPort}/mcp." : "Off.");
 
         LoadRuntimeTab(settings);
+        LoadDictation(settings);
 
         _loading = false;
 

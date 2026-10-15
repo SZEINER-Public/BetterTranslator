@@ -141,8 +141,8 @@ public sealed class VerificationSurfacesTests : IDisposable
         var schema = McpPayload.Schema("{ \"type\": \"object\", \"properties\": { \"verification\": " + McpPayload.VerificationPlaceholder + " } }");
 
         schema.GetProperty("properties").GetProperty("verification").GetProperty("properties").GetProperty("red_spans").GetProperty("type").GetString().Should().Be("array");
-        BetterTranslatorTools.Names.Should().HaveCount(10);
-        BetterTranslatorTools.Names.Should().Equal("translate_text", "translate_file", "translate_batch", "job_status", "job_cancel", "list_languages", "list_models", "select_model", "show_in_gui", "get_entry");
+        BetterTranslatorTools.Names.Should().HaveCount(11);
+        BetterTranslatorTools.Names.Should().Equal("translate_text", "translate_file", "translate_batch", "job_status", "job_cancel", "list_languages", "list_models", "select_model", "show_in_gui", "get_entry", "transcribe_file");
     }
 
     [Fact]

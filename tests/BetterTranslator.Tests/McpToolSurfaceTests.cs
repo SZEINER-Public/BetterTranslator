@@ -126,14 +126,14 @@ public sealed class McpToolSurfaceTests(ITestOutputHelper output) : IAsyncLifeti
     }
 
     [Fact]
-    public async Task ToolsListReturnsExactlyTheTenAllowlistedTools()
+    public async Task ToolsListReturnsExactlyTheElevenAllowlistedTools()
     {
         var tools = await _client!.ListToolsAsync();
 
         output.WriteLine(string.Join(", ", tools.Select(t => t.Name)));
 
         tools.Select(t => t.Name).Should().BeEquivalentTo(BetterTranslatorTools.Names);
-        tools.Should().HaveCount(10);
+        tools.Should().HaveCount(11);
     }
 
     [Fact]

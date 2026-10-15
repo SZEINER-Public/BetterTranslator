@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.IO;
+using BetterTranslator.Runtime.Speech;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 
@@ -19,6 +20,7 @@ public static class BetterTranslatorTools
         "select_model",
         "show_in_gui",
         "get_entry",
+        "transcribe_file",
     ];
 
     public static IReadOnlyList<McpServerTool> Create(TranslationGateway gateway, IGuiBridge gui) =>
@@ -33,6 +35,7 @@ public static class BetterTranslatorTools
         SelectModel(gateway, gui),
         ShowInGui(gui),
         GetEntry(gateway),
+        TranscribeFile(),
     ];
 
     private static McpServerTool Tool(Delegate handler, McpServerToolCreateOptions options)
@@ -353,6 +356,93 @@ public static class BetterTranslatorTools
                   "properties": {
                     "id": { "type": "string" },
                     "cancelled": { "type": "boolean", "description": "True when the job was found and asked to stop." }
+                  }
+                }
+                """),
+        });
+
+    private static McpServerTool TranscribeFile() => Tool(
+        async (
+            [Description("Absolute path of a .wav recording, PCM or float, at any sample rate. It is read locally in blocks and never copied or uploaded.")] string path,
+            [Description("Language spoken in the recording, as a code such as en or cs.")] string language,
+            [Description("Apply code dictation: case commands such as 'camel case load model async', 'dash dash amend', spelled letters, symbols and the technical vocabulary. False by default, which only fixes the casing of known terms such as GGUF or .NET.")] bool? code_dictation = null,
+            CancellationToken cancellationToken = default) =>
+        {
+            var result = await FileTranscriber.TranscribeAsync(
+                    path,
+                    language,
+                    code_dictation == true ? DictationMode.Code : DictationMode.Prose,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            if (!result.Ok)
+            {
+                return McpPayload.Error(result.Error ?? "The recording was not transcribed.");
+            }
+
+            return McpPayload.Ok(
+                new
+                {
+                    ok = true,
+                    file = result.Path,
+                    language = result.Language,
+                    mode = result.Mode == DictationMode.Code ? "code" : "prose",
+                    result = result.Text,
+                    segments = result.Segments.Select(s => new
+                    {
+                        segment = s.Segment,
+                        start_ms = (long)s.Start.TotalMilliseconds,
+                        end_ms = (long)s.End.TotalMilliseconds,
+                        text = s.Text,
+                        raw = s.Raw,
+                        min_confidence = s.MinConfidence,
+                    }).ToArray(),
+                },
+                McpPayload.Pairs(
+                [
+                    ("file", result.Path),
+                    ("language", result.Language),
+                    ("result", result.Text),
+                ]));
+        },
+        new McpServerToolCreateOptions
+        {
+            Name = "transcribe_file",
+            Title = "Transcribe a recording",
+            Description =
+                "Turn a recorded .wav file into text with the local speech engine, offline. "
+                + "Returns the text with each segment and what was heard before code dictation rewrote it. "
+                + "Reports an error naming the missing piece when no speech recognition model is attached.",
+            ReadOnly = true,
+            Destructive = false,
+            Idempotent = true,
+            OpenWorld = false,
+            OutputSchema = McpPayload.Schema(
+                """
+                {
+                  "type": "object",
+                  "required": ["ok", "file", "language", "mode", "result", "segments"],
+                  "properties": {
+                    "ok": { "type": "boolean", "description": "True when a transcript came back." },
+                    "file": { "type": "string", "description": "Absolute path of the recording that was read." },
+                    "language": { "type": "string", "description": "Language code the model transcribed with." },
+                    "mode": { "type": "string", "description": "prose or code, the dictation applied." },
+                    "result": { "type": "string", "description": "The transcript, one line per segment of speech." },
+                    "segments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["segment", "start_ms", "end_ms", "text", "raw", "min_confidence"],
+                        "properties": {
+                          "segment": { "type": "integer", "description": "Index of the stretch of speech between pauses." },
+                          "start_ms": { "type": "integer", "description": "Where the segment starts in the recording." },
+                          "end_ms": { "type": "integer", "description": "Where the segment ends in the recording." },
+                          "text": { "type": "string", "description": "The segment after dictation." },
+                          "raw": { "type": "string", "description": "The words the model heard, before dictation." },
+                          "min_confidence": { "type": "number", "description": "The lowest word confidence in the segment." }
+                        }
+                      }
+                    }
                   }
                 }
                 """),

@@ -79,6 +79,8 @@ public sealed partial class ChatWorkspaceViewModel : ObservableObject
 
     public FilePreviewViewModel Preview { get; } = new();
 
+    public DictationViewModel Dictation { get; } = new();
+
     /// <summary>
     /// The whole registry as the model in force sees it: every language, each
     /// carrying whether that model supports it. Filled by the shell, so it

@@ -31,6 +31,7 @@ workspace mode slider and a working composer.
 | Verification checks over every answer | works. The semantic checks need an optional model and stay skipped without it |
 | Source-language picker | not built. Input is assumed to be English |
 | Speech engine (BetterSpeech) | built and tested natively: event grammar, chunking, voice controls, streaming, WAV export. Cannot speak: no acoustic model can be attached yet. See [Speech](#speech) |
+| Speech recognition (BetterSpeech) | built and tested natively: capture ring, resampling, voice activity, windowed decoding with stable partials, technical vocabulary, code dictation, file transcription. Cannot recognize: no recognition model can be attached yet. The C# side and Windows capture are uncompiled. See [Speech recognition](#speech-recognition) |
 
 **The app translates.** Sending a message loads the chosen GGUF through the
 BetterRuntime CPU library and writes the result back. **Fast and Thinking in the
@@ -354,13 +355,15 @@ cmake -S native/BetterSpeech -B out/speech -DCMAKE_BUILD_TYPE=Release
 cmake --build out/speech
 out/speech/better_speech_tests
 out/speech/better_speech_bench
+out/speech/better_speech_stt_bench
 ```
 
 ```text
-64 passed, 0 failed
+106 passed, 0 failed
 ```
 
-The same 64 pass under `-DBS_SANITIZE=address,undefined` and `-DBS_SANITIZE=thread`.
+The same 106 pass under `-DBS_SANITIZE=address,undefined` and `-DBS_SANITIZE=thread`.
+64 of them cover synthesis and 42 cover [recognition](#speech-recognition).
 The tests drive the engine with a tone source compiled into the test runner and
 nowhere else. It makes tones, not speech, so ordering and loss are audible in the
 output.
@@ -382,6 +385,108 @@ taking 0.7 s per second of audio, with 300 ms of prefill per chunk, left 500 ms
 of silence with no prebuffer and none with 0.25 s. Real figures for first audible
 speech, real-time factor and thread count need the model and have not been
 measured.
+
+## Speech recognition
+
+The same library turns speech into text. You speak, and the text lands in the
+composer at the caret, or in a file, a script or an agent. Nothing leaves the
+machine, and nothing is sent until you send it. The engine API is
+`include/better_speech_stt.h`. The model plugs in as a `bs_recognizer_v1` table,
+specified in `include/better_speech_recognizer.h`.
+
+- **Capture.** A microphone pushes into a single-producer ring that never blocks
+  and never allocates. A full ring drops the newest audio and counts it as
+  overrun, so a slow model shows up as a number instead of a stalled device.
+  Capture is WASAPI shared mode on Windows. Other platforms report it as
+  unavailable.
+- **Front end.** Any input rate from 8 kHz to 192 kHz and up to 8 channels is
+  downmixed and resampled to the model's rate. Voice activity detection uses an
+  energy threshold over a noise floor that tracks the quietest stretch of the
+  last 3 s, so a steady fan stops reading as speech within 5 s. A recording
+  of your own room can calibrate it with `bs_vad_calibrate`.
+- **Windows and partials.** An utterance is decoded in windows no longer than the
+  model accepts, with an overlap at each cut. Partial results are stabilized by
+  agreement: a word becomes stable once two decodes in a row agree on it, and a
+  stable word is never revised. With word timestamps the cut falls between words.
+  Without them the overlap is removed by matching the words already committed.
+- **Vocabulary.** A lexicon is built on this machine from the do-not-translate
+  lists, the software vocabulary, the agent tool names and the identifiers in
+  indexed memory. Each term gets its spoken forms: `GGUF` as "gguf" and
+  "g g u f", `i18n.json` as "i eighteen n dot json", `--amend` as
+  "dash dash amend". The most important terms are handed to the model as bias
+  where the model accepts it.
+- **Dictation.** Prose mode only fixes the casing of known terms: "gguf" becomes
+  `GGUF` and ".net" becomes `.NET`. Code mode also applies case commands, flags,
+  spelled letters, symbols and numbers. Every change keeps the words it came
+  from, and a change whose words fall under the confidence floor is offered as an
+  alternative instead of applied.
+
+| You say, in code mode | You get |
+|---|---|
+| dash dash amend | `--amend` |
+| dot net | `.NET` |
+| llama dot cpp | `llama.cpp` |
+| i eighteen n dot json | `i18n.json` |
+| camel case load model async | `loadModelAsync` |
+| snake case max new tokens | `max_new_tokens` |
+| open paren close paren | `()` |
+| G G U F | `GGUF` |
+
+In prose mode none of these change.
+
+Recognition reaches you in four places. The microphone button in the composer
+shows what is heard so far in secondary text and inserts the final text at the
+caret. `bt transcribe --file <path.wav> --language <code>` and the agent tool
+`transcribe_file` read a recording. Settings > Runtime > Dictation picks the
+microphone, the language, the mode and the vocabulary sources. Microphone audio
+is held in memory only while you dictate and is never written to disk.
+
+**Nothing provides a recognizer yet, so all four report why instead of
+recognizing.** The button is disabled with the reason as its tooltip, and
+`bt transcribe` exits 4 with it. Six things stand between this build and
+recognition:
+
+1. **An audio ABI in BetterRuntime.** Its 18 exports are text in, text out. The
+   fork needs exports that fill a `bs_recognizer_v1`. Upstream llama.cpp accepts
+   audio input through libmtmd as audio chunks. Whether the fork's llama.cpp
+   includes it is unknown, because its source is not in this repository.
+2. **A recognition model.** None is installed, approved or in the catalog, so no
+   word error rate on real speech has been measured.
+3. **Windows capture is uncompiled.** The WASAPI code builds only against the
+   Windows SDK, which this build environment does not have.
+4. **The C# side is uncompiled.** The bindings, `bt transcribe`, the agent tool,
+   the composer button and the settings were written without a .NET SDK to build
+   them, so their tests have not run.
+5. **The Host process carries no audio.** Its pipe protocol is text lines, so
+   recognition runs in the application process.
+6. **The CPU is shared, not budgeted.** Translation fixes its thread count when
+   its model loads. Dictation asks for half the cores and cannot take threads
+   back from a translation already running.
+
+Build and run the tests exactly as for synthesis. The tests drive the engine with
+a tone recognizer compiled into the test runner and nowhere else: each word is a
+tone at its own frequency, so a dropped or repeated word at a window join is
+visible in the text.
+
+The engine's own cost, measured on the same 4-thread 2.8 GHz Xeon, range over 4
+runs. The first two rows subtract the stand-in model's time, so they are the
+floor any model adds to:
+
+| What | Measured |
+|---|---|
+| capture, resampling, voice activity and windowing, 16 kHz stereo input | 0.11 to 0.12 ms per audio second |
+| the same, 48 kHz stereo input | 2.2 to 2.5 ms per audio second |
+| last voiced frame to final text, audio pushed faster than real time, tone stand-in as the model | 7.0 to 8.1 ms median |
+| cancel during a model call to session finished | 0.66 to 0.80 ms median, 10 runs each |
+| code dictation of one phrase against 8,003 terms | 21.8 us median, 41 us p90 |
+| lexicon build, 8,003 terms | 71 to 118 ms |
+| resident memory growth while transcribing a 15 s file, and a 257 s file | 16 KiB, and 0 KiB |
+| one push of 100 ms of audio into a full ring | 16 to 31 us, 0 allocations |
+
+Live dictation adds the 450 ms the voice activity detector waits before it ends
+an utterance, and whatever the model takes to decode. First partial, end of
+speech to final text, real-time factor and word error rate with a real model
+have not been measured.
 
 ## Translation engine
 
@@ -659,14 +764,14 @@ to stderr: it names the version, the build time and the path of the executable
 that answered. A build time older than the last change to this repository means
 the agent is running a stale copy.
 
-`bt mcp` serves the same ten tools on stdin and stdout. `show_in_gui` is the one
+`bt mcp` serves the same eleven tools on stdin and stdout. `show_in_gui` is the one
 that differs. With no window running it reports that it is unavailable rather
 than pretending. Settings > Agent shows both registration commands with a copy
 button.
 
-Ten tools are exposed and no others: `translate_text`, `translate_file`,
+Eleven tools are exposed and no others: `translate_text`, `translate_file`,
 `translate_batch`, `job_status`, `job_cancel`, `list_languages`, `list_models`,
-`select_model`, `show_in_gui`, `get_entry`. Each carries a description, an input
+`select_model`, `show_in_gui`, `get_entry`, `transcribe_file`. Each carries a description, an input
 schema with per-parameter descriptions, an output schema and its annotations. An
 agent needs no documentation beyond `tools/list`.
 
@@ -709,11 +814,13 @@ bt translate "The build is green." --to cs --memory
 bt languages --json
 bt mcp
 bt models --select EuroLLM
+bt transcribe --file standup.wav --language en --code-dictation
 ```
 
 stdout carries the translation or the JSON envelope and nothing else. Progress
 goes to stderr. Exit codes are 0 success, 2 usage, 3 input missing, 4 runtime
-unreachable, 5 translation failed. `bt --help` documents all of it.
+unreachable, 5 translation failed, 6 transcription failed. `bt --help` documents
+all of it.
 
 ## Repository layout
 

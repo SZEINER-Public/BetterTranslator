@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BetterTranslator.Runtime.Agents;
+using BetterTranslator.Runtime.Speech;
 
 namespace BetterTranslator.Cli;
 
@@ -34,6 +35,38 @@ public static class Envelope
         WriteIndented = false,
         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
+
+    public static string Transcription(Transcription transcription)
+    {
+        var envelope = new Dictionary<string, object?>
+        {
+            ["ok"] = true,
+            ["file"] = transcription.Path,
+            ["language"] = transcription.Language,
+            ["mode"] = transcription.Mode == DictationMode.Code ? "code" : "prose",
+            ["result"] = transcription.Text,
+            ["segments"] = transcription.Segments.Select(s => new Dictionary<string, object?>
+            {
+                ["segment"] = s.Segment,
+                ["start_ms"] = (long)s.Start.TotalMilliseconds,
+                ["end_ms"] = (long)s.End.TotalMilliseconds,
+                ["text"] = s.Text,
+                ["raw"] = s.Raw,
+                ["min_confidence"] = s.MinConfidence,
+                ["substitutions"] = s.Substitutions.Select(x => new Dictionary<string, object?>
+                {
+                    ["kind"] = x.Kind.ToString().ToLowerInvariant(),
+                    ["applied"] = x.Applied,
+                    ["confidence"] = x.Confidence,
+                    ["text_start"] = x.TextStart,
+                    ["text_length"] = x.TextLength,
+                    ["replacement"] = x.Replacement,
+                }).ToArray(),
+            }).ToArray(),
+        };
+
+        return JsonSerializer.Serialize(envelope, Options);
+    }
 
     public static string Text(TextTranslation translation, bool verify = false)
     {

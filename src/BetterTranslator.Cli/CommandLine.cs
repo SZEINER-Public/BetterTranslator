@@ -7,6 +7,7 @@ public enum Verb
     Languages,
     Models,
     Mcp,
+    Transcribe,
     Help,
     Version,
 }
@@ -28,6 +29,10 @@ public sealed record ParsedCommand
     public string? To { get; init; }
 
     public string? Select { get; init; }
+
+    public string? Language { get; init; }
+
+    public bool CodeDictation { get; init; }
 
     /// <summary>
     /// Translate against the indexed project and its glossary, as the window
@@ -52,10 +57,10 @@ public sealed record ParsedCommand
 
 public static class CommandLine
 {
-    private static readonly string[] Verbs = ["translate", "languages", "models", "mcp"];
+    private static readonly string[] Verbs = ["translate", "languages", "models", "mcp", "transcribe"];
 
     private static readonly string[] Valued =
-        ["--from", "--to", "--file", "--batch", "--out", "--select"];
+        ["--from", "--to", "--file", "--batch", "--out", "--select", "--language"];
 
     /// <summary>
     /// Options this command line knows the name of and cannot honour. Listed
@@ -106,6 +111,7 @@ public static class CommandLine
             "translate" => Verb.Translate,
             "languages" => Verb.Languages,
             "mcp" => Verb.Mcp,
+            "transcribe" => Verb.Transcribe,
             _ => Verb.Models,
         };
 
@@ -139,6 +145,10 @@ public static class CommandLine
 
                 case "--verify":
                     command = command with { Verify = true };
+                    continue;
+
+                case "--code-dictation":
+                    command = command with { CodeDictation = true };
                     continue;
             }
 
@@ -187,6 +197,7 @@ public static class CommandLine
                     "--batch" => command with { Batch = value },
                     "--out" => command with { Out = value },
                     "--select" => command with { Select = value },
+                    "--language" => command with { Language = value },
                     _ => command with { Error = $"{name} is not an option. Run bt {first} --help." },
                 };
 
@@ -237,6 +248,33 @@ public static class CommandLine
         if (command.Verb == Verb.Languages && (command.File is not null || command.Batch is not null))
         {
             return command with { Error = "bt languages takes no --file or --batch." };
+        }
+
+        if (command.Verb == Verb.Transcribe)
+        {
+            if (command.From is not null || command.To is not null || command.Batch is not null
+                || command.Out is not null || command.Select is not null || command.Memory || command.Verify
+                || command.Overwrite)
+            {
+                return command with
+                {
+                    Error = "bt transcribe takes --file, --language, --code-dictation, --json and --quiet only.",
+                };
+            }
+
+            if (command.File is null)
+            {
+                return command with { Error = "--file is required: the .wav file to transcribe." };
+            }
+
+            if (string.IsNullOrWhiteSpace(command.Language))
+            {
+                return command with { Error = "--language is required, as a code such as en or cs." };
+            }
+        }
+        else if (command.Language is not null || command.CodeDictation)
+        {
+            return command with { Error = "--language and --code-dictation belong to bt transcribe." };
         }
 
         if (command.Verb == Verb.Mcp && command.Json)

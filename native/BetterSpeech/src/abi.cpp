@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "abi_common.h"
 #include "better_speech.h"
 #include "engine.h"
 #include "text_plan.h"
@@ -33,52 +34,9 @@ struct bs_job {
     std::unique_ptr<bspeech::Job> job;
 };
 
-namespace {
-
-thread_local std::string g_error;
-thread_local int64_t g_error_offset = -1;
-
-int32_t Fail(int32_t status, std::string message, int64_t offset = -1) {
-    g_error = std::move(message);
-    g_error_offset = offset;
-    return status;
-}
-
-int32_t Fail(const bspeech::Failure& failure) { return Fail(failure.status, failure.message, failure.offset); }
-
-template <class F>
-int32_t Guard(F&& body) noexcept {
-    try {
-        return body();
-    } catch (const std::bad_alloc&) {
-        return Fail(BS_OUT_OF_MEMORY, "out of memory");
-    } catch (const std::exception& e) {
-        return Fail(BS_INTERNAL, e.what());
-    } catch (...) {
-        return Fail(BS_INTERNAL, "internal error");
-    }
-}
-
-int32_t CopyOut(const std::string& text, char* buf, int32_t cap, int32_t* out_len) {
-    if (out_len == nullptr) {
-        return Fail(BS_INVALID_ARG, "out_len is null");
-    }
-
-    *out_len = static_cast<int32_t>(text.size());
-
-    if (text.empty()) {
-        return BS_OK;
-    }
-
-    if (buf == nullptr || cap < static_cast<int32_t>(text.size())) {
-        return Fail(BS_BUFFER_TOO_SMALL, "the buffer is smaller than the text");
-    }
-
-    std::memcpy(buf, text.data(), text.size());
-    return BS_OK;
-}
-
-}  // namespace
+using bspeech::abi::CopyOut;
+using bspeech::abi::Fail;
+using bspeech::abi::Guard;
 
 extern "C" {
 
@@ -86,9 +44,9 @@ BS_API int32_t bs_abi_version(void) { return BS_ABI_VERSION; }
 
 BS_API const char* bs_version(void) { return "BetterSpeech 0.1.0 (ABI 1, source ABI 1)"; }
 
-BS_API const char* bs_last_error(void) { return g_error.c_str(); }
+BS_API const char* bs_last_error(void) { return bspeech::abi::last_error.c_str(); }
 
-BS_API int64_t bs_last_error_offset(void) { return g_error_offset; }
+BS_API int64_t bs_last_error_offset(void) { return bspeech::abi::last_error_offset; }
 
 BS_API int32_t bs_plan_create(const char* text, size_t text_len, const bs_plan_options* options,
                               bs_plan** out_plan) {

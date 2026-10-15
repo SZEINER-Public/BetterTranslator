@@ -54,4 +54,23 @@ private:
 
 [[nodiscard]] bool ProbeWav(const std::string& path_utf8, WavInfo* info, std::string* error);
 
+class WavStreamReader {
+public:
+    WavStreamReader() = default;
+    WavStreamReader(const WavStreamReader&) = delete;
+    WavStreamReader& operator=(const WavStreamReader&) = delete;
+    ~WavStreamReader();
+
+    [[nodiscard]] bool Open(const std::string& path_utf8, WavInfo* info, std::string* error);
+    [[nodiscard]] bool Read(float* mono, size_t max_frames, size_t* frames, std::string* error);
+    void Close() noexcept;
+
+private:
+    std::FILE* file_ = nullptr;
+    WavInfo info_;
+    int32_t block_align_ = 0;
+    uint64_t remaining_frames_ = 0;
+    std::vector<uint8_t> block_;
+};
+
 }  // namespace bspeech
