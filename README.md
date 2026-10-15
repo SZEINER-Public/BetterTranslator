@@ -30,6 +30,7 @@ workspace mode slider and a working composer.
 | Vulkan and CUDA offload | built, measured and wired. Never run on real hardware |
 | Verification checks over every answer | works. The semantic checks need an optional model and stay skipped without it |
 | Source-language picker | not built. Input is assumed to be English |
+| Speech engine (BetterSpeech) | built and tested natively: event grammar, chunking, voice controls, streaming, WAV export. Cannot speak: no acoustic model can be attached yet. See [Speech](#speech) |
 
 **The app translates.** Sending a message loads the chosen GGUF through the
 BetterRuntime CPU library and writes the result back. **Fast and Thinking in the
@@ -293,6 +294,94 @@ using it. See [DECISIONS.md](DECISIONS.md) B20-B23.
 
 The backend in force comes from Settings > Runtime. See the status table at the
 top for what is and is not built.
+
+## Speech
+
+`native/BetterSpeech/` is the speech engine: a C++20 library with a flat C ABI in
+`include/better_speech.h`, bound from C# in `src/BetterTranslator.Runtime/Speech/`.
+It owns everything between text and PCM except the model:
+
+- **Events.** `[Laugh]`, `[Laughs]` and `[Laughter]`, in any case, become an event
+  between the speech around them. `\[`, `\]` and `\\` are literal. An unknown
+  `[Tag]` fails with its byte offset unless the caller asks for it to be read as
+  text, so a typo is never read aloud and never guessed to be laughter.
+- **Chunking.** Sentence boundaries with English, Czech and German abbreviation
+  rules and CJK terminators. Chunks are packed against the model's own measure,
+  its token count, never a character estimate. A sentence too long for one chunk
+  is cut at a clause, then a word, then a codepoint. The first chunk can be given a
+  smaller budget so the first audio is asked for sooner.
+- **Voice.** Speaking rate and pitch are independent of each other: a WSOLA time
+  stretch followed by a windowed-sinc resampler. Gain runs into a peak limiter, so
+  a boost turns the voice down at its peaks rather than clipping. Joins where the
+  audio is discontinuous get a short fade. A control the model implements itself
+  is handed to the model instead, and capabilities report which is which.
+- **Output.** A bounded ring for playback whose read never blocks or allocates,
+  and a streaming WAV export written as `<path>.partial` and renamed only when the
+  job succeeds. A five-minute job through both paths raised the process peak
+  memory 0 KiB above a five-second one.
+- **Jobs.** One job per engine, cancellation from any thread, and timings for
+  first model PCM, first audible PCM, prebuffer reached, and the first audible
+  sample handed to the reader. That last one is a device-submission proxy, not
+  sound leaving a speaker.
+
+The model plugs in as a `bs_source_v1` table of C function pointers, specified in
+`include/better_speech_source.h`. **Nothing provides one yet, so the app cannot
+speak.** `SpeechSupport.Probe()` says so rather than offering a button that does
+nothing. Three things are missing:
+
+1. **A speech ABI in BetterRuntime.** Its 18 exports are text in, text out: no
+   tokenizer, no embeddings, no audio. The fork needs `br_tts_*` exports that fill
+   a `bs_source_v1`. Upstream llama.cpp now generates audio through libmtmd, where
+   `mtmd_gen_audio_process` produces codes a frame at a time and PCM a window at a
+   time with the decoder state carried between windows, which is what streaming
+   needs. Whether the fork's llama.cpp includes it is unknown: its source is not in
+   this repository.
+2. **A speech model.** None is installed or in the catalog. Upstream's pipelines
+   are Qwen3-TTS and Kyutai Pocket TTS, each a GGUF plus an mmproj. The languages
+   upstream lists for Qwen3-TTS are zh, en, de, it, pt, es, ja, ko, fr and ru. Czech is not
+   one of them.
+3. **A laughter clip.** None ships. A job containing `[Laugh]` is refused before it
+   starts unless the model renders laughter itself or a licensed local clip is
+   configured. A clip is a recording, not the model's voice, and capabilities say
+   which one a job used.
+
+Build and test from the repository root. Visual Studio opens `native/BetterSpeech`
+as a CMake folder and produces `BetterSpeech.dll`, which the app build picks up
+with `-p:BetterSpeechDir=<folder>`, the way it picks up BetterRuntime.
+
+```bash
+cmake -S native/BetterSpeech -B out/speech -DCMAKE_BUILD_TYPE=Release
+cmake --build out/speech
+out/speech/better_speech_tests
+out/speech/better_speech_bench
+```
+
+```text
+64 passed, 0 failed
+```
+
+The same 64 pass under `-DBS_SANITIZE=address,undefined` and `-DBS_SANITIZE=thread`.
+The tests drive the engine with a tone source compiled into the test runner and
+nowhere else. It makes tones, not speech, so ordering and loss are audible in the
+output.
+
+The engine's own cost, per second of 24 kHz audio, measured on a 4-thread 2.8 GHz
+Xeon under Linux, median of 9 runs, range over 4 repeats:
+
+| Path | ms per audio second |
+|---|---|
+| plain pipeline, export and playback ring | 0.9 to 1.1 |
+| rate 0.8 | 6.4 to 7.4 |
+| pitch +3 semitones | 7.6 to 11.3 |
+| rate 1.2 with pitch +2 semitones | 5.7 to 7.0 |
+| clip conversion, 48 kHz to 24 kHz | 2.0 to 2.8 |
+
+Any model will cost far more than this. The benchmark's pacing simulation
+(a sleeping tone source, not a model) shows where gaps come from: a source
+taking 0.7 s per second of audio, with 300 ms of prefill per chunk, left 500 ms
+of silence with no prebuffer and none with 0.25 s. Real figures for first audible
+speech, real-time factor and thread count need the model and have not been
+measured.
 
 ## Translation engine
 

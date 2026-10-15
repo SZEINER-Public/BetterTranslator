@@ -17,6 +17,14 @@
     <None Include="$(BetterRuntimeDir)\BetterRuntimeCPU.dll" Condition="Exists('$(BetterRuntimeDir)\BetterRuntimeCPU.dll')" Link="BetterRuntimeCPU.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
   </ItemGroup>
 
+  <!-- The speech engine is built from native/BetterSpeech with CMake, outside the
+       solution like the bootstrap, and copied in the same guarded way: pass
+       -p:BetterSpeechDir=<folder holding BetterSpeech.dll>. Without it the app
+       builds and reports speech as unavailable. -->
+  <ItemGroup Condition="'$(BetterSpeechDir)' != ''">
+    <None Include="$(BetterSpeechDir)\BetterSpeech.dll" Condition="Exists('$(BetterSpeechDir)\BetterSpeech.dll')" Link="BetterSpeech.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+  </ItemGroup>
+
   <ItemGroup>
     <!-- The smoke test drives br_gen_next and br_shutdown directly to prove the
          raw ABI contracts, which the managed wrapper deliberately hides. -->
