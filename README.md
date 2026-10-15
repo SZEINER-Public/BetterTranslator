@@ -30,8 +30,8 @@ workspace mode slider and a working composer.
 | Vulkan and CUDA offload | built, measured and wired. Never run on real hardware |
 | Verification checks over every answer | works. The semantic checks need an optional model and stay skipped without it |
 | Source-language picker | not built. Input is assumed to be English |
-| Speech engine (BetterSpeech) | built and tested natively: event grammar, chunking, voice controls, streaming, WAV export. Cannot speak: no acoustic model can be attached yet. See [Speech](#speech) |
-| Speech recognition (BetterSpeech) | built and tested natively: capture ring, resampling, voice activity, windowed decoding with stable partials, technical vocabulary, code dictation, file transcription. Cannot recognize: no recognition model can be attached yet. The C# side and Windows capture are uncompiled. See [Speech recognition](#speech-recognition) |
+| Text to speech (BetterSpeech) | built and tested natively: event grammar, chunking, voice controls, streaming, WAV export. Cannot speak: no speech model can be attached yet. See [How text to speech works](#how-text-to-speech-works) |
+| Speech to text (BetterSpeech) | built and tested natively: capture ring, resampling, voice activity, windowed decoding with stable partials, technical vocabulary, code dictation, file transcription. Cannot recognize: no recognition model can be attached yet. The C# side and Windows capture have not been compiled. See [How speech to text works](#how-speech-to-text-works) |
 
 **The app translates.** Sending a message loads the chosen GGUF through the
 BetterRuntime CPU library and writes the result back. **Fast and Thinking in the
@@ -89,6 +89,10 @@ dotnet --list-sdks
 ```
 
 Any `10.x` entry works.
+
+The speech engine in `native/BetterSpeech/` is optional and builds on its own
+with CMake 3.20 or newer and a C++20 compiler. See [Build and test the speech
+engine](#build-and-test-the-speech-engine).
 
 ## Build, test and run
 
@@ -298,128 +302,112 @@ top for what is and is not built.
 
 ## Speech
 
-`native/BetterSpeech/` is the speech engine: a C++20 library with a flat C ABI in
-`include/better_speech.h`, bound from C# in `src/BetterTranslator.Runtime/Speech/`.
-It owns everything between text and PCM except the model:
-
-- **Events.** `[Laugh]`, `[Laughs]` and `[Laughter]`, in any case, become an event
-  between the speech around them. `\[`, `\]` and `\\` are literal. An unknown
-  `[Tag]` fails with its byte offset unless the caller asks for it to be read as
-  text, so a typo is never read aloud and never guessed to be laughter.
-- **Chunking.** Sentence boundaries with English, Czech and German abbreviation
-  rules and CJK terminators. Chunks are packed against the model's own measure,
-  its token count, never a character estimate. A sentence too long for one chunk
-  is cut at a clause, then a word, then a codepoint. The first chunk can be given a
-  smaller budget so the first audio is asked for sooner.
-- **Voice.** Speaking rate and pitch are independent of each other: a WSOLA time
-  stretch followed by a windowed-sinc resampler. Gain runs into a peak limiter, so
-  a boost turns the voice down at its peaks rather than clipping. Joins where the
-  audio is discontinuous get a short fade. A control the model implements itself
-  is handed to the model instead, and capabilities report which is which.
-- **Output.** A bounded ring for playback whose read never blocks or allocates,
-  and a streaming WAV export written as `<path>.partial` and renamed only when the
-  job succeeds. A five-minute job through both paths raised the process peak
-  memory 0 KiB above a five-second one.
-- **Jobs.** One job per engine, cancellation from any thread, and timings for
-  first model PCM, first audible PCM, prebuffer reached, and the first audible
-  sample handed to the reader. That last one is a device-submission proxy, not
-  sound leaving a speaker.
-
-The model plugs in as a `bs_source_v1` table of C function pointers, specified in
-`include/better_speech_source.h`. **Nothing provides one yet, so the app cannot
-speak.** `SpeechSupport.Probe()` says so rather than offering a button that does
-nothing. Three things are missing:
-
-1. **A speech ABI in BetterRuntime.** Its 18 exports are text in, text out: no
-   tokenizer, no embeddings, no audio. The fork needs `br_tts_*` exports that fill
-   a `bs_source_v1`. Upstream llama.cpp now generates audio through libmtmd, where
-   `mtmd_gen_audio_process` produces codes a frame at a time and PCM a window at a
-   time with the decoder state carried between windows, which is what streaming
-   needs. Whether the fork's llama.cpp includes it is unknown: its source is not in
-   this repository.
-2. **A speech model.** None is installed or in the catalog. Upstream's pipelines
-   are Qwen3-TTS and Kyutai Pocket TTS, each a GGUF plus an mmproj. The languages
-   upstream lists for Qwen3-TTS are zh, en, de, it, pt, es, ja, ko, fr and ru. Czech is not
-   one of them.
-3. **A laughter clip.** None ships. A job containing `[Laugh]` is refused before it
-   starts unless the model renders laughter itself or a licensed local clip is
-   configured. A clip is a recording, not the model's voice, and capabilities say
-   which one a job used.
-
-Build and test from the repository root. Visual Studio opens `native/BetterSpeech`
-as a CMake folder and produces `BetterSpeech.dll`, which the app build picks up
-with `-p:BetterSpeechDir=<folder>`, the way it picks up BetterRuntime.
-
-```bash
-cmake -S native/BetterSpeech -B out/speech -DCMAKE_BUILD_TYPE=Release
-cmake --build out/speech
-out/speech/better_speech_tests
-out/speech/better_speech_bench
-out/speech/better_speech_stt_bench
-```
-
-```text
-106 passed, 0 failed
-```
-
-The same 106 pass under `-DBS_SANITIZE=address,undefined` and `-DBS_SANITIZE=thread`.
-64 of them cover synthesis and 42 cover [recognition](#speech-recognition).
-The tests drive the engine with a tone source compiled into the test runner and
-nowhere else. It makes tones, not speech, so ordering and loss are audible in the
-output.
-
-The engine's own cost, per second of 24 kHz audio, measured on a 4-thread 2.8 GHz
-Xeon under Linux, median of 9 runs, range over 4 repeats:
-
-| Path | ms per audio second |
-|---|---|
-| plain pipeline, export and playback ring | 0.9 to 1.1 |
-| rate 0.8 | 6.4 to 7.4 |
-| pitch +3 semitones | 7.6 to 11.3 |
-| rate 1.2 with pitch +2 semitones | 5.7 to 7.0 |
-| clip conversion, 48 kHz to 24 kHz | 2.0 to 2.8 |
-
-Any model will cost far more than this. The benchmark's pacing simulation
-(a sleeping tone source, not a model) shows where gaps come from: a source
-taking 0.7 s per second of audio, with 300 ms of prefill per chunk, left 500 ms
-of silence with no prebuffer and none with 0.25 s. Real figures for first audible
-speech, real-time factor and thread count need the model and have not been
-measured.
-
-## Speech recognition
-
-The same library turns speech into text. You speak, and the text lands in the
-composer at the caret, or in a file, a script or an agent. Nothing leaves the
-machine, and nothing is sent until you send it. The engine API is
-`include/better_speech_stt.h`. The model plugs in as a `bs_recognizer_v1` table,
+`native/BetterSpeech/` is one C++20 library that works in both directions: text
+to speech and speech to text. It has a flat C ABI and is bound from C# in
+`src/BetterTranslator.Runtime/Speech/`. The library owns everything around the
+model. The model itself plugs in as a table of C function pointers that a model
+runtime fills: `bs_source_v1` for speech out, specified in
+`include/better_speech_source.h`, and `bs_recognizer_v1` for speech in,
 specified in `include/better_speech_recognizer.h`.
 
-- **Capture.** A microphone pushes into a single-producer ring that never blocks
-  and never allocates. A full ring drops the newest audio and counts it as
-  overrun, so a slow model shows up as a number instead of a stalled device.
-  Capture is WASAPI shared mode on Windows. Other platforms report it as
-  unavailable.
-- **Front end.** Any input rate from 8 kHz to 192 kHz and up to 8 channels is
-  downmixed and resampled to the model's rate. Voice activity detection uses an
-  energy threshold over a noise floor that tracks the quietest stretch of the
-  last 3 s, so a steady fan stops reading as speech within 5 s. A recording
-  of your own room can calibrate it with `bs_vad_calibrate`.
-- **Windows and partials.** An utterance is decoded in windows no longer than the
-  model accepts, with an overlap at each cut. Partial results are stabilized by
-  agreement: a word becomes stable once two decodes in a row agree on it, and a
-  stable word is never revised. With word timestamps the cut falls between words.
-  Without them the overlap is removed by matching the words already committed.
-- **Vocabulary.** A lexicon is built on this machine from the do-not-translate
-  lists, the software vocabulary, the agent tool names and the identifiers in
-  indexed memory. Each term gets its spoken forms: `GGUF` as "gguf" and
-  "g g u f", `i18n.json` as "i eighteen n dot json", `--amend` as
-  "dash dash amend". The most important terms are handed to the model as bias
-  where the model accepts it.
-- **Dictation.** Prose mode only fixes the casing of known terms: "gguf" becomes
-  `GGUF` and ".net" becomes `.NET`. Code mode also applies case commands, flags,
-  spelled letters, symbols and numbers. Every change keeps the words it came
-  from, and a change whose words fall under the confidence floor is offered as an
-  alternative instead of applied.
+**Nothing fills either table yet.** The library builds and passes its tests,
+and every surface that would use it reports why it cannot speak or recognize
+instead of offering a control that does nothing. [What is
+missing](#what-is-missing) lists each blocker.
+
+```text
+Text to speech
+  text -> events and chunks -> model (bs_source_v1) -> rate, pitch, gain -> playback ring -> speaker
+                                                                         -> WAV export
+
+Speech to text
+  microphone or WAV -> ring -> resample -> voice activity -> windows -> model (bs_recognizer_v1)
+    -> stable partials and final text -> dictation -> composer, bt transcribe, agent tool
+```
+
+### How text to speech works
+
+1. **Planning.** The text is read for events first. `[Laugh]`, `[Laughs]` and
+   `[Laughter]`, in any case, become an event between the speech around them.
+   `\[`, `\]` and `\\` are literal. An unknown `[Tag]` fails with its byte offset
+   unless you ask for it to be read as text, so a typo is never read aloud and
+   never guessed to be laughter. Each run of text between events is split into
+   sentences, with English, Czech and German abbreviation rules and CJK
+   terminators. Sentences are packed into chunks measured by the model's own
+   unit, its token count, never a character estimate. A sentence too long for one
+   chunk is cut at a clause, then a word, then a codepoint. The first chunk can
+   get a smaller budget, so the first audio is asked for sooner.
+2. **Generation.** A job thread hands the model one chunk at a time and pulls
+   PCM until the chunk is done. A streaming model returns PCM as its windows
+   decode. An event is rendered by the model when the model claims it can.
+   Otherwise a licensed local recording is inserted. With neither, a job
+   containing the event is refused before it starts. The recording is not the
+   model's voice, and the job reports which one it used.
+3. **Voice.** Speaking rate and pitch are independent of each other: a WSOLA time
+   stretch followed by a windowed-sinc resampler. A control the model implements
+   itself is handed to the model instead, and the capabilities report which is
+   which. Gain runs into a peak limiter, so a boost turns the voice down at its
+   peaks rather than clipping. Joins where the audio is discontinuous get a
+   short fade.
+4. **Output.** Audio goes to a bounded playback ring, a streaming WAV export, or
+   both. When the ring is full the job thread waits, so memory stays bounded
+   however long the text is. The audio callback that reads the ring never blocks
+   and never allocates. Playback starts once the prebuffer fills. When
+   generation falls behind, the reader gets silence and the job counts an
+   underrun. The export is written as `<path>.partial` and renamed only when the
+   job succeeds.
+5. **Control.** One job runs per engine. Cancellation works from any thread: the
+   model is asked to stop at its next frame and buffered audio is dropped. Each
+   job records when the model produced its first PCM, when the first audible
+   sample was produced, when the prebuffer filled, and when the first audible
+   sample reached the reader. That last one is a device-submission proxy, not
+   sound leaving a speaker.
+
+Nothing in the app or on the command line speaks yet. `SpeechEngine`,
+`SpeechPlan` and `SpeechSupport.Probe()` are the C# entry points, and the probe
+names the first missing piece.
+
+### How speech to text works
+
+1. **Input.** A microphone or a recording. The microphone is opened through
+   WASAPI shared mode on Windows. Its capture thread pushes into a
+   single-producer ring that never blocks and never allocates. A full ring drops
+   the newest audio and counts it as overrun, so a model that cannot keep up
+   shows as a number instead of a stalled device. Other platforms report capture
+   as unavailable. A recording is a 16, 24 or 32-bit PCM or 32-bit float WAV,
+   read in blocks and never loaded whole.
+2. **Front end.** Any input from 8 kHz to 192 kHz with up to 8 channels is
+   downmixed and resampled to the model's rate. Voice activity is decided every
+   10 ms: a frame is speech when its energy is 12 dB over the noise floor and over
+   an absolute floor of -50 dBFS. The noise floor rises toward the quietest
+   frame of the last 3 s, so a steady fan stops reading as speech within 5 s. An
+   utterance starts after 100 ms of speech, keeps the last 200 ms of audio so the
+   first syllable is not cut, and ends after 450 ms of silence.
+   `bs_vad_calibrate` sets the thresholds from a recording of your own room.
+3. **Decoding.** The utterance is fed to the model in windows no longer than the
+   model accepts. After every 500 ms of audio the engine asks for a partial
+   result. A word becomes stable once two partials in a row agree on it, and a
+   stable word is never revised. The words after it are shown as unstable until
+   they settle. When a window fills, the engine asks for its final result and
+   starts the next window inside the last 1 s of the old one, so a word cut at
+   the edge is heard whole. With word timestamps, words that end before that
+   last second are committed and the next window starts at the first word that
+   did not. Without timestamps, all words are committed and the ones heard again
+   are removed by matching them against the end of the committed text.
+   Each new window gets the last 200 characters of committed text as context,
+   and the most important vocabulary terms as bias, when the model accepts them.
+4. **Vocabulary.** A lexicon is built on this machine from the do-not-translate
+   lists, the software vocabulary, the agent tool names and the identifiers in
+   indexed memory. Each term gets its spoken forms: `GGUF` as "gguf" and
+   "g g u f", `i18n.json` as "i eighteen n dot json", `--amend` as
+   "dash dash amend". One misheard letter in a word of five letters or more
+   still matches, at a lower confidence.
+5. **Dictation.** Final words pass through one of two modes. Prose mode only
+   fixes the casing of known terms: "gguf" becomes `GGUF` and ".net" becomes
+   `.NET`. Code mode also applies case commands, flags, spelled letters, symbols
+   and numbers. Every change keeps the words it came from. A change whose words
+   fall under the confidence floor of 0.6 is offered as an alternative instead
+   of applied.
 
 | You say, in code mode | You get |
 |---|---|
@@ -434,43 +422,104 @@ specified in `include/better_speech_recognizer.h`.
 
 In prose mode none of these change.
 
-Recognition reaches you in four places. The microphone button in the composer
-shows what is heard so far in secondary text and inserts the final text at the
-caret. `bt transcribe --file <path.wav> --language <code>` and the agent tool
-`transcribe_file` read a recording. Settings > Runtime > Dictation picks the
-microphone, the language, the mode and the vocabulary sources. Microphone audio
-is held in memory only while you dictate and is never written to disk.
+Results arrive as events: a partial with its stable and unstable text, a final
+with the text, the words heard and every substitution, and one finished event
+with the outcome. Unread partials of the same utterance collapse into the
+latest, and at most 4096 results wait to be read. Cancelling drops whatever has
+not been read.
 
-**Nothing provides a recognizer yet, so all four report why instead of
-recognizing.** The button is disabled with the reason as its tooltip, and
-`bt transcribe` exits 4 with it. Six things stand between this build and
-recognition:
+Recognition reaches you in four places:
 
-1. **An audio ABI in BetterRuntime.** Its 18 exports are text in, text out. The
-   fork needs exports that fill a `bs_recognizer_v1`. Upstream llama.cpp accepts
-   audio input through libmtmd as audio chunks. Whether the fork's llama.cpp
-   includes it is unknown, because its source is not in this repository.
-2. **A recognition model.** None is installed, approved or in the catalog, so no
-   word error rate on real speech has been measured.
-3. **Windows capture is uncompiled.** The WASAPI code builds only against the
-   Windows SDK, which this build environment does not have.
-4. **The C# side is uncompiled.** The bindings, `bt transcribe`, the agent tool,
-   the composer button and the settings were written without a .NET SDK to build
-   them, so their tests have not run.
-5. **The Host process carries no audio.** Its pipe protocol is text lines, so
-   recognition runs in the application process.
-6. **The CPU is shared, not budgeted.** Translation fixes its thread count when
+- **The composer.** A microphone button shows what is heard so far in secondary
+  text and inserts the final text at the caret. It never sends.
+- **The command line.** `bt transcribe --file <path.wav> --language <code>`, with
+  `--code-dictation` for code mode and `--json` for every segment and
+  substitution.
+- **Agents.** The `transcribe_file` tool reads a recording.
+- **Settings.** Settings > Runtime > Dictation picks the microphone, the
+  language, the mode and the vocabulary sources.
+
+Microphone audio is held in memory only while you dictate and is never written
+to disk. Until a recognizer exists, the button is disabled with the reason as
+its tooltip, and `bt transcribe` exits 4 with the same reason.
+
+### What is missing
+
+1. **Model entry points in BetterRuntime.** Its 18 exports are text in, text
+   out: no tokenizer, no embeddings, no audio. The fork needs exports that fill
+   a `bs_source_v1` and a `bs_recognizer_v1`. Upstream llama.cpp generates audio
+   through libmtmd, where `mtmd_gen_audio_process` produces codes a frame at a
+   time and PCM a window at a time with the decoder state carried between
+   windows, which is what streaming needs. libmtmd also accepts audio input as
+   audio chunks. Whether the fork's llama.cpp includes either is unknown,
+   because its source is not in this repository.
+2. **Models.** No speech model and no recognition model is installed, approved
+   or in the catalog. Upstream's speech pipelines are Qwen3-TTS and Kyutai Pocket
+   TTS, each a GGUF plus an mmproj. The languages upstream lists for Qwen3-TTS
+   are zh, en, de, it, pt, es, ja, ko, fr and ru. Czech is not one of them.
+3. **A laughter recording.** None ships, so `[Laugh]` needs a model that renders
+   laughter itself or a licensed local clip you configure.
+4. **Code that has not been built.** The C# side of speech to text (the
+   bindings, `bt transcribe`, `transcribe_file`, the composer button and the
+   settings) and the WASAPI capture were written without a .NET SDK or a
+   Windows SDK, so they have not been compiled and their tests have not run.
+5. **No audio through the Host process.** Its pipe protocol carries text lines,
+   so recognition runs in the application process.
+6. **A shared CPU without a budget.** Translation fixes its thread count when
    its model loads. Dictation asks for half the cores and cannot take threads
    back from a translation already running.
 
-Build and run the tests exactly as for synthesis. The tests drive the engine with
-a tone recognizer compiled into the test runner and nowhere else: each word is a
-tone at its own frequency, so a dropped or repeated word at a window join is
-visible in the text.
+### Build and test the speech engine
 
-The engine's own cost, measured on the same 4-thread 2.8 GHz Xeon, range over 4
-runs. The first two rows subtract the stand-in model's time, so they are the
-floor any model adds to:
+The library builds outside `BetterTranslator.sln`, so `dotnet build` works on
+a machine with no C++ toolchain. You need CMake 3.20 or newer and a C++20
+compiler. Visual Studio opens `native/BetterSpeech` as a CMake folder and
+produces `BetterSpeech.dll`. The app build copies it when you pass
+`-p:BetterSpeechDir=<folder>`, the way it picks up BetterRuntime.
+
+```bash
+cmake -S native/BetterSpeech -B out/speech -DCMAKE_BUILD_TYPE=Release
+cmake --build out/speech
+out/speech/better_speech_tests
+```
+
+```text
+106 passed, 0 failed
+```
+
+64 tests cover text to speech and 42 cover speech to text. All 106 also pass
+with `-DBS_SANITIZE=address,undefined` and with `-DBS_SANITIZE=thread`. The
+tests drive the engine with two stand-ins compiled into the test runner and
+nowhere else. The speech stand-in makes a tone per chunk, and the recognition
+stand-in hears each word as a tone of its own frequency, so a lost, reordered
+or repeated word shows in the output. Neither is a model, and no figure in this
+section comes from one.
+
+`out/speech/better_speech_bench` and `out/speech/better_speech_stt_bench`
+measure the engine's own cost.
+
+### Measured cost
+
+Measured on a 4-thread 2.8 GHz Xeon under Linux. Text to speech, per second of
+24 kHz audio, median of 9 runs, range over 4 repeats:
+
+| Path | ms per audio second |
+|---|---|
+| plain pipeline, export and playback ring | 0.9 to 1.1 |
+| rate 0.8 | 6.4 to 7.4 |
+| pitch +3 semitones | 7.6 to 11.3 |
+| rate 1.2 with pitch +2 semitones | 5.7 to 7.0 |
+| clip conversion, 48 kHz to 24 kHz | 2.0 to 2.8 |
+
+Any model costs far more than this. The pacing simulation in the benchmark, a
+sleeping tone source and not a model, shows where gaps come from: a source
+taking 0.7 s per second of audio, with 300 ms of prefill per chunk, left 500 ms of
+silence with no prebuffer and none with 0.25 s. A five-minute job through both
+the ring and the export raised the process peak memory 0 KiB over a five-second
+one.
+
+Speech to text, range over 4 runs. The first two rows subtract the stand-in
+model's time, so they are the floor any model adds to:
 
 | What | Measured |
 |---|---|
@@ -484,9 +533,11 @@ floor any model adds to:
 | one push of 100 ms of audio into a full ring | 16 to 31 us, 0 allocations |
 
 Live dictation adds the 450 ms the voice activity detector waits before it ends
-an utterance, and whatever the model takes to decode. First partial, end of
-speech to final text, real-time factor and word error rate with a real model
-have not been measured.
+an utterance, and whatever the model takes to decode.
+
+Not measured, because they need a real model: first audible speech, first
+partial result, end of speech to final text, real-time factor, thread counts,
+and word error rate on your own recordings.
 
 ## Translation engine
 
@@ -835,6 +886,7 @@ all of it.
 | `src/BetterTranslator.Host/` | `BetterTranslator.Host.exe`: the child process the model is loaded into, so a native abort cannot take the window with it. Copied beside the app by the build |
 | `src/BetterTranslator.Cli/` | `bt.exe`: the headless command line for scripts. References Core, Engine and Runtime, never the app |
 | `src/BetterTranslator.Map/` | Retrieval map world model, camera and Skia paint pass |
+| `native/BetterSpeech/` | The speech engine, both directions: a C++20 library with a C ABI, built with CMake outside the solution. `include/` holds the public headers and the two model contracts, `tests/` the test runner and its tone stand-ins, `bench/` the two benchmarks |
 | `native/BetterTranslator.Bootstrap/` | The C++20 bootstrap that becomes the shipped `BetterTranslator.exe`: PE payload lookup, container reader, per-user cache, `hostfxr` start. Built by `build\SingleFile.targets` through MSBuild.exe, not by `dotnet build` |
 | `tools/BetterTranslator.Packer/` | The packer: reads a publish tree, writes the container, appends the `.btpay` section, patches the PE headers. Also the only managed reader of the container, which is what the round-trip tests use |
 | `build/` | `SingleFile.targets` (publish, native build, pack, sign), `FormatConstants.targets` (generates the C# view of `btpay_format.h`), `run-singlefile-checks.ps1` (the evidence run, on a desktop of its own), and `BetterTranslator.SingleFile.csproj`, the only project the **SingleFile** solution configuration builds: it runs the chain, and its launch profile starts the packed exe, so Build and F5 in Visual Studio give you the artifact and then run it |
@@ -1169,6 +1221,12 @@ first and leaves them behind rather than copying them.
   than supported. Offering a language a model never saw produces something
   structurally perfect that no gate can fault, which is why this is the one
   place it can be prevented. Sources per language: `docs/language-coverage.md`.
+
+- **Speech** *(built, cannot speak or recognize yet)*. Text to speech and
+  speech to text run natively against test stand-ins. The composer carries a
+  dictation button, `bt` a `transcribe` command and the agent server a
+  `transcribe_file` tool, all disabled with the reason until a model can be
+  attached. See [Speech](#speech).
 
 The retrieval map is *(not yet built)*.
 
